@@ -2,74 +2,74 @@
 ```
 Volt
 	hub
-        assets
-            volt_hub
-        bin
-            volt.dll
-            volt_hub.dll
-            volt_hub.exe
-    installs
+		assets
+			volt_hub
+		bin
+			volt.dll
+			volt_hub.dll
+			volt_hub.exe
+	installs
 		1.0.0
 			assets
 				volt
-                    editor
+					editor
 			cmake
-                Volt.cmake
-                BuildEditor.cmake
-                BuildWindows.cmake
-                BuildXboxOne.cmake
+				Volt.cmake
+				BuildEditor.cmake
+				BuildWindows.cmake
+				BuildXboxOne.cmake
 				annotate_natives.py
 			modules
 				glfw
 					CMakeLists.txt
 			src
-                volt
-                    CMakeLists.txt
-                volt_editor
-                    CMakeLists.txt
-                volt_player
-                    CMakeLists.txt
+				volt
+					CMakeLists.txt
+				volt_editor
+					CMakeLists.txt
+				volt_player
+					CMakeLists.txt
 	packages
 		voltpy
 			assets
-                voltpy
-                    editor
+				voltpy
+					editor
 			cmake
 				VoltPy.cmake
 				package_scripts.py
 			modules
 				cpython
 					CMakeLists.txt
-            python
-                volt
-                    __main__.py
-            src
-                voltpy
-                    CMakeLists.txt
-            package.json
-    tools
-        CMake
-        Python 3.7
-        VulkanSDK
-        Microsoft DirectX SDK
+			python
+				volt
+					__main__.py
+			src
+				voltpy
+					CMakeLists.txt
+			package.json
+	tools
+		CMake
+		Python 3.7
+		VulkanSDK
+		Microsoft DirectX SDK
 ```
 
 ## Voltcraft Install
 ```
 Voltcraft
 	assets
-        volt
-        voltcraft
+		volt
+		voltcraft
 	bin
-        volt.dll
-        voltcraft.dll
-        voltcraft.exe
-        voltpy.dll
-    python
-        volt
-            __main__.py
-        voltcraft
-            __main__.py
+		volt.dll
+		voltcraft.dll
+		voltcraft.exe
+		voltpy.dll
+	python
+		volt
+			__main__.py
+		voltcraft
+			__main__.py
 ```
 
 ## Voltcraft Package
@@ -77,39 +77,39 @@ Voltcraft
 voltcraft
 	assets
 		voltcraft
-    build
-        android
-        ios
-        linux
-        macos
-        ps4
-        ps5
-        webgl
-        windows
-        xbox_360
-        xbox_one
-        xbox_series_x
+	build
+		android
+		ios
+		linux
+		macos
+		ps4
+		ps5
+		webgl
+		windows
+		xbox_360
+		xbox_one
+		xbox_series_x
 	cache
-        editor
-            bin
-                volt.dll
-                volt_editor.exe
-                voltcraft.dll
-                voltpy.dll
-        windows
-            bin
-                volt.dll
-                voltcraft.dll
-                voltcraft.exe
-                voltpy.dll
-        volt.gen.cpp
-        voltcraft.gen.cpp
-        voltpy.gen.cpp
-    python
-        voltcraft
-            __main__.py
-    src
-        voltcraft
-            CMakeLists.txt
-    package.json
+		editor
+			bin
+				volt.dll
+				volt_editor.exe
+				voltcraft.dll
+				voltpy.dll
+		windows
+			bin
+				volt.dll
+				voltcraft.dll
+				voltcraft.exe
+				voltpy.dll
+		volt.gen.cpp
+		voltcraft.gen.cpp
+		voltpy.gen.cpp
+	python
+		voltcraft
+			__main__.py
+	src
+		voltcraft
+			CMakeLists.txt
+	package.json
 ```
