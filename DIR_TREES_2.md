@@ -1,8 +1,9 @@
 ## Volt Install
 ```
-Volt
+.volt
 	cli
-		volt.exe
+		bin
+			volt.exe
 		Volt.cmake
 	hub
 		assets
@@ -12,6 +13,21 @@ Volt
 			volt_hub.dll
 			volt_hub.exe
 	packages
+		volt
+			1.2.0
+			1.2.1
+				assets
+					volt
+						editor
+				scripts
+					annotate_cpp.py
+				src
+					volt
+						CMakeLists.txt
+					volt_editor
+						CMakeLists.txt
+					volt_player
+						CMakeLists.txt
 		voltpy
 			1.0.7
 				1.2
@@ -22,21 +38,6 @@ Volt
 		VulkanSDK
 		Microsoft DirectX SDK
 		vcpkg
-	versions
-		1.2.0
-		1.2.1
-			assets
-				volt
-					editor
-			scripts
-				annotate_cpp.py
-			src
-				volt
-					CMakeLists.txt
-				volt_editor
-					CMakeLists.txt
-				volt_player
-					CMakeLists.txt
 ```
 
 ## Voltcraft Install
