@@ -1,5 +1,6 @@
 {
 	"description": "Volt Engine and editor.",
+	"git": "https://github.com/voltengine/volt.git",
 	"id": "volt",
 	"license": "MIT",
 	"publisher": "Volt Engine",
