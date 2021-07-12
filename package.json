@@ -1,8 +1,10 @@
 {
-	"dependencies": [],
 	"description": "Volt Engine and editor.",
 	"git": "https://github.com/voltengine/volt/",
 	"id": "volt",
+	"keywords": [
+		"engine"
+	],
 	"license": "MIT",
 	"publisher": "Volt Engine",
 	"title": "Volt",
