@@ -1,0 +1,5 @@
+{
+	"cmake.configureArgs": [
+		"-DVOLT_EDITOR=ON"
+	]
+}
