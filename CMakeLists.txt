@@ -7,13 +7,13 @@ include("$ENV{VOLT_PATH}/cmake/Volt.cmake")
 
 include("$ENV{VOLT_PATH}/cmake/CreateSharedLibrary.cmake")
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-	VOLT_IS_CURRENT_BUILD_TARGET
+target_compile_definitions(Volt PRIVATE VOLT_BUILD)
+
+target_precompile_headers(Volt PRIVATE
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/volt/pch.hpp"
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    OUTPUT_NAME "volt"
-)
+target_link_libraries(Volt JSON::JSON)
 
 # App (Special Target)
 
@@ -34,6 +34,8 @@ set_target_properties(APP PROPERTIES
     OUTPUT_NAME "${VOLT_ROOT_NAME}-app"
 )
 
-target_link_libraries(APP
-	${PROJECT_NAME}::${PROJECT_NAME}
+target_precompile_headers(APP PRIVATE
+	"${CMAKE_CURRENT_SOURCE_DIR}/app/pch.hpp"
 )
+
+target_link_libraries(APP Volt::Volt)
