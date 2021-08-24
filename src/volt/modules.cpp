@@ -48,7 +48,7 @@ void load(const std::string &name) {
 
 void unload(const std::string &name) {
 	if (!handles.contains(name))
-		throw std::runtime_error("No such module loaded.");
+		throw std::runtime_error("No such module loaded: " + name);
 
 #ifdef VOLT_PLATFORM_LINUX
 	dlclose(handles[name]);
@@ -102,8 +102,8 @@ void reload_all() {
 	}
 }
 
-void add_reload_callback(reload_callback &&callback) {
-	reload_callbacks.push_back(std::move(callback));
+void add_reload_callback(const reload_callback &callback) {
+	reload_callbacks.emplace_back(std::move(callback));
 }
 
 void hello() {

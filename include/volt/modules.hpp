@@ -25,7 +25,7 @@ VOLT_API void unload_all();
 
 VOLT_API void reload_all();
 
-VOLT_API void add_reload_callback(reload_callback &&callback);
+VOLT_API void add_reload_callback(const reload_callback &callback);
 
 inline std::string this_module();
 

@@ -1,20 +1,21 @@
-#include "type.hpp"
+namespace volt {
 
-namespace volt::reflection {
+// instance_owner
 
-// _instance_owner
+instance_owner::instance_owner(serializable *ptr,
+		std::list<instance_owner *> &parent_list)
+		: ptr(ptr), parent_list(parent_list) {
+	it = parent_list.emplace(parent_list.end(), this);
+}
 
-_instance_owner::_instance_owner(serializable *ptr, reflection::type &type) noexcept
-		: ptr(ptr), type(type) {}
-
-_instance_owner::~_instance_owner() noexcept {
-	type.instances.erase(it);
+instance_owner::~instance_owner() noexcept {
+	parent_list.erase(it);
 	delete ptr;
 }
 
 // _ref_manager
 
-_ref_manager::_ref_manager(_instance_owner *owner) noexcept
+_ref_manager::_ref_manager(instance_owner *owner) noexcept
 		: owner(owner) {}
 
 void _ref_manager::construct_shared() noexcept {
@@ -45,7 +46,7 @@ bool _ref_manager::owner_valid() const noexcept {
 // shared_instance
 
 template<typename T>
-shared_instance<T>::shared_instance(_instance_owner *owner)
+shared_instance<T>::shared_instance(instance_owner *owner)
 		: shared_instance(new _ref_manager(owner)) {}
 
 template<typename T>
@@ -69,11 +70,6 @@ shared_instance<T>::~shared_instance() noexcept {
 template<typename T>
 T *shared_instance<T>::operator->() const {
 	return static_cast<T *>(manager->owner->ptr);
-}
-
-template<typename T>
-type &shared_instance<T>::get_type() const noexcept {
-	return manager->owner->type;
 }
 
 template<typename T>
@@ -122,12 +118,6 @@ T *weak_instance<T>::operator->() const {
 template<typename T>
 bool weak_instance<T>::valid() const noexcept {
 	return manager->owner_valid();
-}
-
-template<typename T>
-type &weak_instance<T>::get_type() const noexcept {
-	assert(valid());
-	return manager->owner->type;
 }
 
 template<typename T>

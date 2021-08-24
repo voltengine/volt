@@ -1,44 +1,33 @@
 #pragma once
 
-#include "../macros.hpp"
+#include "macros.hpp"
 
 #include <list>
 #include <memory>
 
-namespace volt::reflection {
+#include "serializable.hpp"
 
-class serializable;
+namespace volt {
 
-class type;
-
-template<typename T>
-class weak_instance;
-
-class _instance_owner {
+class instance_owner {
 public:
 	serializable *ptr;
-	type &type;
-	std::list<weak_instance<serializable>>::iterator it;
 
-	inline _instance_owner(serializable *ptr, reflection::type &type) noexcept;
+	inline instance_owner(serializable *ptr, std::list<instance_owner *> &parent_list);
 
-	inline ~_instance_owner() noexcept;
+	inline ~instance_owner() noexcept;
 
-	template<typename T>
-	T &get(const std::string &field_name) const {
-		std::any &any_accessor = type.fields[field_name];
-		auto *accessor = std::any_cast<std::function<T &
-				(serializable *)>>(&any_accessor);
-		return (*accessor)(ptr);
-	}
+private:
+	std::list<instance_owner *> &parent_list;
+	std::list<instance_owner *>::iterator it;
 };
 
 class _ref_manager {
 public:
-	_instance_owner *owner;
+	instance_owner *owner;
 	size_t shared_count = 0, weak_count = 0;
 
-	inline _ref_manager(_instance_owner *owner) noexcept;
+	inline _ref_manager(instance_owner *owner) noexcept;
 
 	inline void construct_shared() noexcept;
 
@@ -60,7 +49,7 @@ public:
 	template<typename T>
 	friend class weak_instance;
 
-	shared_instance(_instance_owner *owner);
+	shared_instance(instance_owner *owner);
 
 	template<typename U>
 	shared_instance(const shared_instance<U> &other) noexcept;
@@ -71,19 +60,6 @@ public:
 	~shared_instance() noexcept;
 
 	T *operator->() const;
-
-	type &get_type() const noexcept;
-
-	template<typename T>
-	T &get(const std::string &field_name) const {
-		return manager->owner->get<T>(field_name);
-	}
-
-	// template<typename T>
-	// T &get(const std::string &field_name);
-
-	// template<typename Ret, typename... Args>
-	// Ret call(const std::string &method_name, Args &&...args);
 
 private:
 	_ref_manager *manager;
@@ -114,8 +90,6 @@ public:
 	T *operator->() const;
 
 	bool valid() const noexcept;
-
-	type &get_type() const noexcept;
 
 private:
 	_ref_manager *manager;

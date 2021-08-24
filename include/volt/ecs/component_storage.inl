@@ -1,6 +1,6 @@
 namespace volt::ecs {
 
-template<component_type T>
+template<typename T>
 template<typename... Args>
 T &component_storage<T>::add(size_t eid, Args &&...args) {
 	size_t new_cid = components.size();
@@ -16,17 +16,17 @@ T &component_storage<T>::add(size_t eid, Args &&...args) {
 	return components.emplace_back(std::forward<Args>(args)...);
 }
 
-template<component_type T>
+template<typename T>
 T &component_storage<T>::get(size_t cid) {
-	return components[id];
+	return components[cid];
 }
 
-template<component_type T>
+template<typename T>
 const std::vector<T> &component_storage<T>::get_components() const {
 	return components;
 }
 
-template<component_type T>
+template<typename T>
 void component_storage<T>::remove(size_t cid) {
 	size_t back_cid = components.size() - 1;
 	size_t back_eid = cid_to_eid[back_cid];
@@ -38,7 +38,7 @@ void component_storage<T>::remove(size_t cid) {
 	components.pop_back();
 }
 
-template<component_type T>
+template<typename T>
 const serializable *component_storage<T>
 		::get_ptr(size_t cid) const {
 	return &components[cid];

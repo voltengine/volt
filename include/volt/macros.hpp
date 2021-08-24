@@ -11,6 +11,9 @@
 #ifdef VOLT_PLATFORM_WINDOWS
 	#define VOLT_EXPORT __declspec(dllexport)
 	#define VOLT_IMPORT __declspec(dllimport)
+
+	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
 #elif defined(VOLT_PLATFORM_LINUX)
 	#define VOLT_EXPORT __attribute__((visibility("default")))
 	#define VOLT_IMPORT

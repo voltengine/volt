@@ -1,6 +1,10 @@
 #include <stdexcept>
 #include <string>
 
+#ifdef VOLT_PLATFORM_WINDOWS
+#include <Windows.h>
+#endif
+
 namespace volt::modules {
 
 inline std::string _path_to_name(const std::string &path) {

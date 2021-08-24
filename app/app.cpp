@@ -2,7 +2,7 @@
 
 #include <volt/modules.hpp>
 
-class type : public volt::reflection::serializable {
+class type : public volt::serializable {
 public:
 	int number = 7;
 
@@ -22,22 +22,15 @@ int main() {
 
 	volt::modules::load_all();
 	std::cout << "Loaded modules.\n";
+
 	try {
-	volt::modules::reload(VOLT_DEVELOPMENT_MODULE);}catch(...){}
-
-	volt::reflection::type::define<type>("type")
-			.constructor<int>()
-			.field("number", &::type::number);
-	auto type = volt::reflection::type::get("type");
-	std::cout << type.get_name() << std::endl;
-	{
-		volt::reflection::shared_instance<> instance = type.instantiate(69);
-		instance.get<int>("number") = 2;
-		std::cout << instance.get<int>("number") << std::endl;
-		std::cout << type.get_instances().size() << std::endl;
+		volt::modules::reload(VOLT_DEVELOPMENT_MODULE);
+		std::cout << "Reloaded modules.\n";
+	} catch (std::exception &e) {
+		std::cout << "Reload failed:\n" << e.what() << '\n';
 	}
-	std::cout << type.get_instances().size() << std::endl;
-	std::cout << "Done.\n";
-
+	
+	volt::modules::unload_all();
+	std::cout << "Unloaded modules.\n";
 	return 0;
 }

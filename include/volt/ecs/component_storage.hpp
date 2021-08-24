@@ -6,11 +6,13 @@
 #include <cstdint>
 #include <vector>
 
+#include <nlohmann/json.hpp>
+
 #include "../serializable.hpp"
 
 namespace volt::ecs {
 
-class base_component_storage {
+class base_component_storage : public serializable {
 public:
 	virtual ~base_component_storage() = default;
 
@@ -26,7 +28,7 @@ protected:
 	std::vector<size_t> eid_to_cid, cid_to_eid;
 };
 
-template<component_type T>
+template<typename T>
 class component_storage : public base_component_storage {
 public:
 	template<typename... Args>
@@ -38,7 +40,7 @@ public:
 
 	void remove(size_t cid) override;
 
-	const volt::Component *get_ptr(size_t cid) const override;
+	const serializable *get_ptr(size_t cid) const override;
 
 private:
 	// TODO: Implement custom
