@@ -1,10 +1,10 @@
 #pragma once
 
-#include "macros.hpp"
+#include "../macros.hpp"
 
 #include <nlohmann/json.hpp>
 
-namespace volt {
+namespace volt::modules {
 
 class serializable {
 public:

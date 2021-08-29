@@ -1,16 +1,9 @@
 #include <pch.hpp>
 
-#include <volt/modules.hpp>
+#include <volt/volt.hpp>
 
-class type : public volt::serializable {
-public:
-	int number = 7;
-
-	type(int number) : number(number) {}
-
-	int get_number() const {
-		return number;
-	}
+struct type : public volt::modules::serializable {
+	int number = 4;
 };
 
 int main() {
@@ -20,17 +13,35 @@ int main() {
 	std::cout << "Hello from Volt App! (Development Disabled)" << std::endl;
 #endif
 
-	volt::modules::load_all();
+	std::shared_ptr<int> x;
+
+	volt::modules::load();
 	std::cout << "Loaded modules.\n";
 
+	volt::ecs::entity_manager manager;
+	auto entity = manager.create();
+	auto json = nlohmann::json::object();
+	json["number"] = 7;
+	entity.add("voltpy::component", json);
+	std::cout << manager.storages[0]->serialize() << std::endl;
+	std::cout << entity.get("voltpy::component") << std::endl;
+
 	try {
-		volt::modules::reload(VOLT_DEVELOPMENT_MODULE);
-		std::cout << "Reloaded modules.\n";
+		std::cout << "Reloading development module...\n";
+		volt::modules::reload({ VOLT_DEVELOPMENT_MODULE }, [](){
+			std::cout << "Development module has been unloaded.\n";
+		});
+		std::cout << "Done reloading development module.\n";
 	} catch (std::exception &e) {
 		std::cout << "Reload failed:\n" << e.what() << '\n';
 	}
+
+	std::cout << manager.storages[0]->serialize() << std::endl;
+	std::cout << entity.get("voltpy::component") << std::endl;
+
+	entity.destroy();
 	
-	volt::modules::unload_all();
+	volt::modules::unload();
 	std::cout << "Unloaded modules.\n";
 	return 0;
 }

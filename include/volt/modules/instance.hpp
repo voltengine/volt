@@ -1,33 +1,33 @@
 #pragma once
 
-#include "macros.hpp"
+#include "../macros.hpp"
 
 #include <list>
 #include <memory>
 
 #include "serializable.hpp"
 
-namespace volt {
+namespace volt::modules {
 
-class instance_owner {
+class _instance_owner {
 public:
 	serializable *ptr;
 
-	inline instance_owner(serializable *ptr, std::list<instance_owner *> &parent_list);
+	inline _instance_owner(serializable *ptr, std::list<_instance_owner *> &tracking_list);
 
-	inline ~instance_owner() noexcept;
+	inline ~_instance_owner() noexcept;
 
 private:
-	std::list<instance_owner *> &parent_list;
-	std::list<instance_owner *>::iterator it;
+	std::list<_instance_owner *> &tracking_list;
+	std::list<_instance_owner *>::iterator it;
 };
 
 class _ref_manager {
 public:
-	instance_owner *owner;
+	_instance_owner *owner;
 	size_t shared_count = 0, weak_count = 0;
 
-	inline _ref_manager(instance_owner *owner) noexcept;
+	inline _ref_manager(_instance_owner *owner) noexcept;
 
 	inline void construct_shared() noexcept;
 
@@ -49,7 +49,9 @@ public:
 	template<typename T>
 	friend class weak_instance;
 
-	shared_instance(instance_owner *owner);
+	shared_instance();
+
+	shared_instance(_instance_owner *owner);
 
 	template<typename U>
 	shared_instance(const shared_instance<U> &other) noexcept;
@@ -59,12 +61,24 @@ public:
 
 	~shared_instance() noexcept;
 
+	template<typename U>
+	shared_instance<T> &operator=(const shared_instance<U> &other) noexcept;
+
+	template<typename U>
+	shared_instance<T> &operator=(shared_instance<U> &&other) noexcept;
+
+	operator bool() const noexcept;
+
+	T *operator*() const;
+
 	T *operator->() const;
+
+	T *get() const;
 
 private:
 	_ref_manager *manager;
 
-	shared_instance(_ref_manager *manager) noexcept;
+	shared_instance(_ref_manager *manager);
 };
 
 template<typename T = serializable>
@@ -85,16 +99,18 @@ public:
 	~weak_instance() noexcept;
 
 	template<typename U>
-	operator shared_instance<U>() const noexcept;
+	weak_instance<T> &operator=(const weak_instance<U> &other) noexcept;
 
-	T *operator->() const;
+	template<typename U>
+	weak_instance<T> &operator=(weak_instance<U> &&other) noexcept;
+
+	template<typename U>
+	operator shared_instance<U>() const noexcept;
 
 	bool valid() const noexcept;
 
 private:
 	_ref_manager *manager;
-
-	weak_instance(_ref_manager *manager) noexcept;
 };
 
 }

@@ -1,9 +1,11 @@
+#include <type_traits>
+
 namespace volt::ecs {
 
 template<typename T>
 template<typename... Args>
-T &component_storage<T>::add(size_t eid, Args &&...args) {
-	size_t new_cid = components.size();
+T &component_storage<T>::add(uint32_t eid, Args &&...args) {
+	uint32_t new_cid = components.size();
 
 	if (eid >= eid_to_cid.size())
 		eid_to_cid.resize(eid + 1);
@@ -17,7 +19,12 @@ T &component_storage<T>::add(size_t eid, Args &&...args) {
 }
 
 template<typename T>
-T &component_storage<T>::get(size_t cid) {
+T &component_storage<T>::get(uint32_t cid) {
+	return components[cid];
+}
+
+template<typename T>
+const T &component_storage<T>::get(uint32_t cid) const {
 	return components[cid];
 }
 
@@ -27,21 +34,60 @@ const std::vector<T> &component_storage<T>::get_components() const {
 }
 
 template<typename T>
-void component_storage<T>::remove(size_t cid) {
-	size_t back_cid = components.size() - 1;
-	size_t back_eid = cid_to_eid[back_cid];
+nlohmann::json component_storage<T>::serialize() const {
+	auto json = base_component_storage::serialize();
+
+	json["components"] = nlohmann::json::array();
+	auto &json_components = json["components"]
+			.get_ref<nlohmann::json::array_t &>();
+			
+	json_components.resize(components.size());
+	for (uint32_t cid = 0; cid < components.size(); cid++)
+		json_components[cid] = get_json(cid);
+	
+	return json;
+}
+
+template<typename T>
+void component_storage<T>::deserialize(const nlohmann::json &json) {
+	components.clear();
+	components.reserve(json["components"].size());
+	for (auto &json : json["components"]) {
+		if constexpr (std::is_convertible_v<nlohmann::json, T>)
+			components.emplace_back(json);
+		else
+			components.emplace_back();
+	}
+	
+	base_component_storage::deserialize(json);
+}
+
+template<typename T>
+void component_storage<T>::add_json(uint32_t eid, const nlohmann::json &json) {
+	if constexpr (std::is_convertible_v<nlohmann::json, T>)
+		add(eid, json);
+	else
+		add(eid);
+}
+
+template<typename T>
+nlohmann::json component_storage<T>::get_json(uint32_t cid) const {
+	if constexpr (std::is_convertible_v<nlohmann::json, T>)
+		return get(cid);
+	else
+		return nlohmann::json();
+}
+
+template<typename T>
+void component_storage<T>::remove(uint32_t cid) {
+	uint32_t back_cid = components.size() - 1;
+	uint32_t back_eid = cid_to_eid[back_cid];
 
 	cid_to_eid[cid] = back_eid;
 	eid_to_cid[back_eid] = cid;
 	
 	components[cid] = std::move(components.back());
 	components.pop_back();
-}
-
-template<typename T>
-const serializable *component_storage<T>
-		::get_ptr(size_t cid) const {
-	return &components[cid];
 }
 
 }

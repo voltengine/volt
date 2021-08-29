@@ -31,7 +31,6 @@ target_include_directories(APP PRIVATE
 
 set_target_properties(APP PROPERTIES
     CXX_STANDARD 20
-    OUTPUT_NAME "${VOLT_ROOT_NAME}-app"
 )
 
 target_precompile_headers(APP PRIVATE

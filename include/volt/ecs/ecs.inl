@@ -1,4 +1,8 @@
-#include "../assert.hpp"
+#include "../modules/modules.hpp"
+
+#include "component_storage.hpp"
+#include "entity.hpp"
+#include "entity_manager.hpp"
 
 namespace volt::ecs {
 
@@ -8,28 +12,38 @@ void register_component(const std::string &name) {
 	size_t index = already_registered
 			? _component_name_to_index[name]
 			: _component_index_counter++;
-	VOLT_ASSERT(index < VOLT_MAX_COMPONENTS,
-			"Too many components. Please bump VOLT_MAX_COMPONENTS before building.")
 
+	modules::register_serializable<component_storage<
+			T>>(_make_component_storage_name(name));
+	
 	if (already_registered) {
-		_storage_constructors[index] = []() {
-			return new component_storage<T>();
-		};
+		std::type_index i = _component_to_type_index[index];
+		_type_to_component_index.erase(i);
+		_component_to_type_index[index] = typeid(T);
+
+		// This must happen after erase or else an
+		// invalid type_index would be compared
+		_type_to_component_index[typeid(T)] = index;
+		return;
 	} else {
-		_storage_constructors.emplace_back([]() {
-			return new component_storage<T>();
-		});
+		_component_to_type_index.emplace_back(typeid(T));
+		_type_to_component_index[typeid(T)] = index;
+	}
+	
 
-		if (!_added_module_reload_callback) {
-			modules::add_reload_callback(_module_reload_callback);
-			_added_module_reload_callback = true;
-		}
 
-		_component_index_to_name.emplace_back(name);
-		_component_name_to_index[name] = index;
-		_module_name_to_component_index[modules::this_module()] = index;
-		_storage_owner_lists.emplace_back();
-	}	
+	if (index >= VOLT_MAX_COMPONENTS) {
+		throw std::runtime_error("Too many components. "
+				"Please bump VOLT_MAX_COMPONENTS before building.");
+	}
+
+	_component_index_to_name.emplace_back(name);
+	_component_name_to_index[name] = index;
+}
+
+template<typename T>
+const std::string &get_component_name() {
+	return _component_index_to_name[_type_to_component_index[typeid(T)]];
 }
 
 }

@@ -27,8 +27,8 @@ std::string this_module() {
 	dladdr1(&this_module, &info, &current_map, RTLD_DL_LINKMAP);
 	dlinfo(dlopen(nullptr), RTLD_DI_LINKMAP, &executable_map);
 
-	if (current_map == executable_map)
-		throw std::runtime_error("Cannot query module name from executable.");
+	// if (current_map == executable_map)
+	// 	throw std::runtime_error("Cannot query module name from executable.");
 
 	std::string path = info.dli_fname;
 	return _path_to_name(path);
@@ -48,8 +48,8 @@ std::string this_module() {
 				+ std::to_string(GetLastError()) + '.');
 	}
 
-	if (handle == GetModuleHandle(nullptr))
-		throw std::runtime_error("Cannot query module name from executable.");
+	// if (handle == GetModuleHandle(nullptr))
+	// 	throw std::runtime_error("Cannot query module name from executable.");
 
 	if (!GetModuleFileName(handle, path.data(), path.size())) {
 		throw std::runtime_error("GetModuleFileName returned "
@@ -59,6 +59,15 @@ std::string this_module() {
 	return _path_to_name(path);
 
 #endif
+}
+
+template<typename T>
+void register_serializable(const std::string &name) {
+	_module_name_to_serializable_names[this_module()].insert(name);
+
+	_serializable_name_to_constructor[name] = []() { return new T(); };
+	_serializable_name_to_instance_tracking_list.try_emplace(
+			name, std::list<_instance_owner *>());
 }
 
 }
