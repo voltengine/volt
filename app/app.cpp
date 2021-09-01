@@ -23,7 +23,6 @@ int main() {
 	auto json = nlohmann::json::object();
 	json["number"] = 7;
 	entity.add("voltpy::component", json);
-	std::cout << manager.storages[0]->serialize() << std::endl;
 	std::cout << entity.get("voltpy::component") << std::endl;
 
 	try {
@@ -36,7 +35,6 @@ int main() {
 		std::cout << "Reload failed:\n" << e.what() << '\n';
 	}
 
-	std::cout << manager.storages[0]->serialize() << std::endl;
 	std::cout << entity.get("voltpy::component") << std::endl;
 
 	entity.destroy();

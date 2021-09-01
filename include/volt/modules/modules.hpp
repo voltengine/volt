@@ -10,7 +10,7 @@
 #include "instance.hpp"
 
 namespace volt::modules {
-
+	
 VOLT_API extern std::map<std::string, std::set<std::string>
 		> _module_name_to_serializable_names;
 VOLT_API extern std::map<std::string, std::function<
@@ -36,6 +36,8 @@ inline std::string this_module();
 
 template<typename T>
 void register_serializable(const std::string &name);
+
+void unregister_serializable(const std::string &name);
 
 VOLT_API shared_instance<> instantiate_serializable(const std::string &name);
 

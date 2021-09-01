@@ -4,6 +4,8 @@
 
 #include <bitset>
 #include <cstdint>
+#include <list>
+#include <vector>
 
 #include <nlohmann/json.hpp>
 
@@ -16,18 +18,26 @@ class entity_manager {
 public:
 	friend class entity;
 
-	VOLT_API entity create();
-
-public:
-	struct entity_data {
+	struct _entity_data {
 		std::bitset<VOLT_MAX_COMPONENTS> mask;
 		uint32_t version = 0;
 	};
 
-	std::vector<entity_data> entities;
+	VOLT_API static std::list<entity_manager *> _instances;
+	
+	std::vector<_entity_data> _entities;
+	std::array<modules::shared_instance<_base_component_storage
+			>, VOLT_MAX_COMPONENTS> _storages;
+
+	VOLT_API entity_manager();
+
+	VOLT_API ~entity_manager();
+
+	VOLT_API entity create();
+
+private:
+	std::list<entity_manager *>::iterator instance_it;
 	std::vector<uint32_t> free_eids;
-	std::array<modules::shared_instance<base_component_storage
-			>, VOLT_MAX_COMPONENTS> storages;
 
 	VOLT_API bool expired(uint32_t eid, uint32_t version) const;
 
@@ -53,7 +63,7 @@ public:
 
 	VOLT_API void remove_component_index(uint32_t eid, size_t index);
 
-	VOLT_API base_component_storage *get_or_init_storage(size_t index);
+	VOLT_API _base_component_storage *get_or_init_storage(size_t index);
 };
 
 }

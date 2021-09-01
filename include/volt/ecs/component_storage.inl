@@ -4,7 +4,7 @@ namespace volt::ecs {
 
 template<typename T>
 template<typename... Args>
-T &component_storage<T>::add(uint32_t eid, Args &&...args) {
+T &_component_storage<T>::add(uint32_t eid, Args &&...args) {
 	uint32_t new_cid = components.size();
 
 	if (eid >= eid_to_cid.size())
@@ -19,23 +19,23 @@ T &component_storage<T>::add(uint32_t eid, Args &&...args) {
 }
 
 template<typename T>
-T &component_storage<T>::get(uint32_t cid) {
+T &_component_storage<T>::get(uint32_t cid) {
 	return components[cid];
 }
 
 template<typename T>
-const T &component_storage<T>::get(uint32_t cid) const {
+const T &_component_storage<T>::get(uint32_t cid) const {
 	return components[cid];
 }
 
 template<typename T>
-const std::vector<T> &component_storage<T>::get_components() const {
+const std::vector<T> &_component_storage<T>::get_components() const {
 	return components;
 }
 
 template<typename T>
-nlohmann::json component_storage<T>::serialize() const {
-	auto json = base_component_storage::serialize();
+nlohmann::json _component_storage<T>::serialize() const {
+	auto json = _base_component_storage::serialize();
 
 	json["components"] = nlohmann::json::array();
 	auto &json_components = json["components"]
@@ -49,7 +49,7 @@ nlohmann::json component_storage<T>::serialize() const {
 }
 
 template<typename T>
-void component_storage<T>::deserialize(const nlohmann::json &json) {
+void _component_storage<T>::deserialize(const nlohmann::json &json) {
 	components.clear();
 	components.reserve(json["components"].size());
 	for (auto &json : json["components"]) {
@@ -59,11 +59,11 @@ void component_storage<T>::deserialize(const nlohmann::json &json) {
 			components.emplace_back();
 	}
 	
-	base_component_storage::deserialize(json);
+	_base_component_storage::deserialize(json);
 }
 
 template<typename T>
-void component_storage<T>::add_json(uint32_t eid, const nlohmann::json &json) {
+void _component_storage<T>::add_json(uint32_t eid, const nlohmann::json &json) {
 	if constexpr (std::is_convertible_v<nlohmann::json, T>)
 		add(eid, json);
 	else
@@ -71,7 +71,7 @@ void component_storage<T>::add_json(uint32_t eid, const nlohmann::json &json) {
 }
 
 template<typename T>
-nlohmann::json component_storage<T>::get_json(uint32_t cid) const {
+nlohmann::json _component_storage<T>::get_json(uint32_t cid) const {
 	if constexpr (std::is_convertible_v<nlohmann::json, T>)
 		return get(cid);
 	else
@@ -79,7 +79,7 @@ nlohmann::json component_storage<T>::get_json(uint32_t cid) const {
 }
 
 template<typename T>
-void component_storage<T>::remove(uint32_t cid) {
+void _component_storage<T>::remove(uint32_t cid) {
 	uint32_t back_cid = components.size() - 1;
 	uint32_t back_eid = cid_to_eid[back_cid];
 

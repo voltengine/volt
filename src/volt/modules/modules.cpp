@@ -38,19 +38,19 @@ void load(const std::string &name) {
 #endif
 
 	if (!handle)
-		throw std::runtime_error("Failed to open module:\n" + path);
+		throw std::runtime_error("Failed to load module:\n" + path);
 
-	using volt_module_main = void (*)();
+	using volt_module_load = void (*)();
 #ifdef VOLT_PLATFORM_LINUX
-	auto module_main = reinterpret_cast<volt_module_main>(dlsym(handle, "volt_module_main"));
+	auto module_load = reinterpret_cast<volt_module_load>(dlsym(handle, "volt_module_load"));
 #elif defined(VOLT_PLATFORM_WINDOWS)
-	auto module_main = reinterpret_cast<volt_module_main>(GetProcAddress(handle, "volt_module_main"));
+	auto module_load = reinterpret_cast<volt_module_load>(GetProcAddress(handle, "volt_module_load"));
 #endif
 
-	if (!module_main)
-		throw std::runtime_error("Module does not export volt_module_main:\n" + path);
+	if (!module_load)
+		throw std::runtime_error("Module does not export volt_module_load:\n" + path);
+	module_load();
 
-	module_main();
 	module_name_to_handle[name] = std::move(handle);
 }
 
@@ -58,31 +58,33 @@ void unload(const std::string &name) {
 	if (!module_name_to_handle.contains(name))
 		throw std::runtime_error("No such module loaded: " + name);
 
-	// Delete old constructors
-	auto &serializable_names = _module_name_to_serializable_names[name];
-	for (auto &name : serializable_names) {
-		_serializable_name_to_constructor[name] = nullptr;
-		auto &tracking_list = _serializable_name_to_instance_tracking_list[name];
-		for (auto &owner : tracking_list) {
-			delete owner->ptr;
-			// Has to be reset to NULL or owner might
-			// attempt to delete invalid address
-			owner->ptr = nullptr;
-		}
-	}	
+	auto handle = module_name_to_handle[name];
+
+	using volt_module_unload = void (*)();
+	#ifdef VOLT_PLATFORM_LINUX
+		auto module_unload = reinterpret_cast<volt_module_unload>(dlsym(handle, "volt_module_unload"));
+	#elif defined(VOLT_PLATFORM_WINDOWS)
+		auto module_unload = reinterpret_cast<volt_module_unload>(GetProcAddress(handle, "volt_module_unload"));
+	#endif
+
+	if (!module_unload)
+		throw std::runtime_error("Module does not export volt_module_unload:\n"
+				+ name_to_path(name).string());
+	module_unload();
 
 #ifdef VOLT_PLATFORM_LINUX
-	dlclose(module_name_to_handle[name]);
+	dlclose(handle);
 #elif defined(VOLT_PLATFORM_WINDOWS)
-	FreeLibrary(module_name_to_handle[name]);
+	FreeLibrary(handle);
 #endif
 
 	module_name_to_handle.erase(name);
 }
 
 void reload(const std::vector<std::string> &names, const std::function<void()> &callback) {
-	// Serializable name -> list of JSON values
-	std::map<std::string, std::vector<nl::json>> serialized_data;
+	// Serializable name -> tracking list + list of JSON values
+	std::map<std::string, std::pair<std::list<
+			_instance_owner *>, std::vector<nl::json>>> data;
 
 	// Serialize and delete all serializable instances
 	for (auto &module_name : names) {
@@ -92,11 +94,12 @@ void reload(const std::vector<std::string> &names, const std::function<void()> &
 		auto &serializable_names = _module_name_to_serializable_names[module_name];
 
 		for (auto &serializable_name : serializable_names) {
-			auto &tracking_list = _serializable_name_to_instance_tracking_list[serializable_name];
-			auto &data_list = serialized_data[serializable_name];
+			auto &serializable_data = data[serializable_name];
+			serializable_data.first = std::move(
+					_serializable_name_to_instance_tracking_list[serializable_name]);
 
-			for (auto &owner : tracking_list)
-				data_list.emplace_back(owner->ptr->serialize());
+			for (auto owner : serializable_data.first)
+				serializable_data.second.emplace_back(owner->ptr->serialize());
 		}
 	}	
 
@@ -116,14 +119,20 @@ void reload(const std::vector<std::string> &names, const std::function<void()> &
 		auto &serializable_names = _module_name_to_serializable_names[module_name];
 
 		for (auto &serializable_name : serializable_names) {
-			auto &tracking_list = _serializable_name_to_instance_tracking_list[serializable_name];
-			auto &data_list = serialized_data[serializable_name];
+			if (!_serializable_name_to_constructor
+					.contains(serializable_name))
+				continue;
+
+			auto &serializable_data = data[serializable_name];
 
 			size_t i = 0;
-			for (auto &owner : tracking_list) {
+			for (auto owner : serializable_data.first) {
 				owner->ptr = _serializable_name_to_constructor[serializable_name]();
-				owner->ptr->deserialize(data_list[i++]);
+				owner->ptr->deserialize(serializable_data.second[i++]);
 			}
+
+			_serializable_name_to_instance_tracking_list
+					[serializable_name] = std::move(serializable_data.first);
 		}
 	}
 }
@@ -160,6 +169,17 @@ void reload(const std::function<void()> &callback) {
         return std::move(accumulator);
     });
 	reload(names, callback);
+}
+
+void unregister_serializable(const std::string &name) {
+	_module_name_to_serializable_names[this_module()].erase(name);
+	_serializable_name_to_constructor[name] = nullptr;
+
+	for (auto owner : _serializable_name_to_instance_tracking_list[name]) {
+		delete owner->ptr;
+		owner->ptr = nullptr;
+	}
+	_serializable_name_to_instance_tracking_list.erase(name);
 }
 
 shared_instance<> instantiate_serializable(const std::string &name) {

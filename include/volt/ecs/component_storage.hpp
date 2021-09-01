@@ -12,9 +12,9 @@
 
 namespace volt::ecs {
 
-class base_component_storage : public modules::serializable {
+class _base_component_storage : public modules::serializable {
 public:
-	virtual ~base_component_storage() = default;
+	virtual ~_base_component_storage();
 
 	VOLT_API uint32_t get_cid(uint32_t eid) const;
 
@@ -35,7 +35,7 @@ protected:
 };
 
 template<typename T>
-class component_storage : public base_component_storage {
+class _component_storage : public _base_component_storage {
 public:
 	template<typename... Args>
 	T &add(uint32_t eid, Args &&...args);

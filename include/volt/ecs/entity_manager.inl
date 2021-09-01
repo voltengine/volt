@@ -9,17 +9,17 @@ bool entity_manager::has_component(uint32_t eid) const {
 
 template<typename T>
 T &entity_manager::get_component(uint32_t eid) {
-	auto storage = static_cast<component_storage<T> *>(
-			storages[_type_to_component_index[typeid(T)]].get());
+	auto storage = static_cast<_component_storage<T> *>(
+			_storages[_type_to_component_index[typeid(T)]].get());
 	return storage->get(storage->get_cid(eid));
 }
 
 template<typename T, typename... Args>
 T &entity_manager::add_component(uint32_t eid, Args &&...args) {
 	uint32_t index = _type_to_component_index[typeid(T)];
-	entities[eid].mask.set(index);
+	_entities[eid].mask.set(index);
 
-	auto storage = static_cast<component_storage<T> *
+	auto storage = static_cast<_component_storage<T> *
 			>(get_or_init_storage(index));
 	return storage->add(eid, std::forward<Args>(args)...);
 }
