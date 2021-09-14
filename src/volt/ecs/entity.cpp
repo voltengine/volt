@@ -7,10 +7,10 @@ namespace volt::ecs {
 
 const entity entity::null;
 
-entity::entity() : manager(nullptr) {}
+entity::entity() : world(nullptr) {}
 
 std::ostream &operator<<(std::ostream &lhs, entity rhs) {
-	if (!rhs.manager)
+	if (!rhs.world)
 		return lhs << "Null Entity";
 
 	lhs << "Entity #" << rhs.id;
@@ -22,21 +22,21 @@ std::ostream &operator<<(std::ostream &lhs, entity rhs) {
 }
 
 entity::operator bool() const {
-	return manager && !manager->expired(id, version);
+	return world && !world->expired(id, version);
 }
 
 void entity::destroy() const {
 	if (!*this)
 		throw std::runtime_error("Cannot access " + util::to_string(*this));
 
-	manager->destroy(id);
+	world->destroy(id);
 }
 
 bool entity::has(const std::string &name) const {
 	if (!*this)
 		throw std::runtime_error("Cannot access " + util::to_string(*this));
 
-	return manager->has_component_index(id, _component_name_to_index[name]);
+	return world->has_component_by_name(id, name);
 }
 
 nlohmann::json entity::get(const std::string &name) const {
@@ -45,7 +45,7 @@ nlohmann::json entity::get(const std::string &name) const {
 	if (!has(name))
 		throw std::runtime_error(util::to_string(*this) + " does not contain " + name + '.');
 
-	return manager->has_component_index(id, _component_name_to_index[name]);
+	return world->get_component_by_name(id, name);
 }
 
 void entity::add(const std::string &name, const nlohmann::json &json) const {
@@ -54,7 +54,7 @@ void entity::add(const std::string &name, const nlohmann::json &json) const {
 	if (has(name))
 		throw std::runtime_error(util::to_string(*this) + " already contains " + name + '.');
 	
-	manager->add_component_index(id, _component_name_to_index[name], json);
+	world->add_component_by_name(id, name, json);
 }
 
 void entity::remove(const std::string &name) const {
@@ -63,11 +63,10 @@ void entity::remove(const std::string &name) const {
 	if (!has(name))
 		throw std::runtime_error(util::to_string(*this) + " does not contain " + name + '.');
 	
-	manager->remove_component_index(id, _component_name_to_index[name]);
+	world->remove_component_by_name(id, name);
 }
 
-entity::entity(entity_manager *manager, uint32_t id, uint32_t version)
-		: manager(manager), id(id), version(version) {}
-
+entity::entity(ecs::world *world, uint32_t id, uint32_t version)
+		: world(world), id(id), version(version) {}
 
 }

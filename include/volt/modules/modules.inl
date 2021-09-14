@@ -18,7 +18,7 @@ inline std::string _path_to_name(const std::string &path) {
 	return path.substr(filename_index, dot_index - filename_index);
 }
 
-std::string this_module() {
+std::string this_module_name() {
 #ifdef VOLT_PLATFORM_LINUX
 
 	Dl_info info;
@@ -43,7 +43,7 @@ std::string this_module() {
 	if (!GetModuleHandleEx(
 			GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
 			GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-			reinterpret_cast<LPCSTR>(&this_module), &handle)) {
+			reinterpret_cast<LPCSTR>(&this_module_name), &handle)) {
 		throw std::runtime_error("GetModuleHandleEx returned "
 				+ std::to_string(GetLastError()) + '.');
 	}
@@ -61,13 +61,8 @@ std::string this_module() {
 #endif
 }
 
-template<typename T>
-void register_serializable(const std::string &name) {
-	_module_name_to_serializable_names[this_module()].insert(name);
-
-	_serializable_name_to_constructor[name] = []() { return new T(); };
-	_serializable_name_to_instance_tracking_list.try_emplace(
-			name, std::list<_instance_owner *>());
+void register_unload_callback(const unload_callback &callback) {
+	_module_name_to_unload_callbacks[this_module_name()].push_back(callback);
 }
 
 }

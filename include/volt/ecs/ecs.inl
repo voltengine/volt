@@ -2,34 +2,52 @@
 
 #include "component_storage.hpp"
 #include "entity.hpp"
-#include "entity_manager.hpp"
+#include "system.hpp"
+#include "world.hpp"
 
 namespace volt::ecs {
 
 template<typename T>
 void register_component(const std::string &name) {
-	if (_type_to_component_index.contains(typeid(T)))
-		throw std::runtime_error("Component \"" + name + "\" is already registered.");
+	if (_component_name_to_index.contains(name))
+		throw std::runtime_error("Component name \"" + name + "\" is already registered.");
+	if (_component_type_index_to_name.contains(typeid(T)))
+		throw std::runtime_error("Component type for \"" + name + "\" is already registered.");
 
-	size_t index = _component_to_type_index.size();
+	size_t index = get_component_count();
 	if (index >= VOLT_MAX_COMPONENTS) {
 		throw std::runtime_error("Too many components. "
 				"Please bump VOLT_MAX_COMPONENTS before building.");
 	}
 
-	modules::register_serializable<_component_storage<
-			T>>(_make_component_storage_name(name));
-	
-	_component_to_type_index.emplace_back(typeid(T));
-	_type_to_component_index[typeid(T)] = index;
+	_component_type_index_to_name[typeid(T)] = name;
 
-	_component_index_to_name.emplace_back(name);
 	_component_name_to_index[name] = index;
+	_component_type_index_to_index[typeid(T)] = index;
+
+	_component_name_to_storage_constructor[name] = []() {
+		return new _component_storage<T>;
+	};
+
+	_module_name_to_component_names[modules::this_module_name()].emplace(name);
+
+	world::_register_component(name);
 }
 
 template<typename T>
 const std::string &get_component_name() {
-	return _component_index_to_name[_type_to_component_index[typeid(T)]];
+	return _component_type_index_to_name[typeid(T)];
+}
+
+template<system_type T>
+void register_system(const std::string &name) {
+	_system_name_to_constructor[name] = []() {
+		return new T;
+	};
+
+	_system_instances[name] = nullptr;
+
+	_module_name_to_system_names[modules::this_module_name()].emplace(name);
 }
 
 }

@@ -1,7 +1,4 @@
 {
-	"cmake.configureArgs": [
-		"-DVOLT_EDITOR=ON"
-	],
 	"files.associations": {
 		"*.fsh": "glsl",
 		"*.vsh": "glsl",

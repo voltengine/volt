@@ -7,39 +7,33 @@
 #include <set>
 #include <string>
 
-#include "instance.hpp"
-
 namespace volt::modules {
-	
-VOLT_API extern std::map<std::string, std::set<std::string>
-		> _module_name_to_serializable_names;
-VOLT_API extern std::map<std::string, std::function<
-		serializable *()>> _serializable_name_to_constructor;
-VOLT_API extern std::map<std::string, std::list<_instance_owner *
-		>> _serializable_name_to_instance_tracking_list;
+
+using unload_callback = std::function<void(const std::string &, bool)>;
+
+#ifdef VOLT_PLATFORM_LINUX
+constexpr const char *module_extension = ".so";
+#elif defined(VOLT_PLATFORM_WINDOWS)
+constexpr const char *module_extension = ".dll";
+#endif
+
+VOLT_API extern std::map<std::string, std::vector<
+		unload_callback>> _module_name_to_unload_callbacks;
 
 inline std::string _path_to_name(const std::string &path);
 
-VOLT_API void load(const std::string &name);
-
-VOLT_API void unload(const std::string &name);
-
-VOLT_API void reload(const std::vector<std::string> &names, const std::function<void()> &callback);
+inline std::string this_module_name();
 
 VOLT_API void load();
 
 VOLT_API void unload();
 
-VOLT_API void reload(const std::function<void()> &callback);
+VOLT_API void _reload_development_module(
+		const std::function<void()> &callback);
 
-inline std::string this_module();
+VOLT_API const std::set<std::string> &get_names();
 
-template<typename T>
-void register_serializable(const std::string &name);
-
-void unregister_serializable(const std::string &name);
-
-VOLT_API shared_instance<> instantiate_serializable(const std::string &name);
+inline void register_unload_callback(const unload_callback &callback);
 
 }
 

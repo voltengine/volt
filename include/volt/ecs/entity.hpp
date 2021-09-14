@@ -5,13 +5,13 @@
 #include <cstdint>
 #include <ostream>
 
-#include "entity_manager.hpp"
+#include "world.hpp"
 
 namespace volt::ecs {
 
 class entity {
 public:
-	friend entity_manager;
+	friend world;
 
 	VOLT_API static const entity null;
 
@@ -44,10 +44,10 @@ public:
 	VOLT_API void remove(const std::string &name) const;
 
 private:
-	entity_manager *manager;
+	world *world;
 	uint32_t id, version;
 
-	VOLT_API entity(entity_manager *manager, uint32_t id, uint32_t version);
+	VOLT_API entity(ecs::world *world, uint32_t id, uint32_t version);
 
 	template<typename T>
 	std::string get_type_name();

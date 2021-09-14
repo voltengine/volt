@@ -29,37 +29,8 @@ const T &_component_storage<T>::get(uint32_t cid) const {
 }
 
 template<typename T>
-const std::vector<T> &_component_storage<T>::get_components() const {
+std::vector<T> &_component_storage<T>::get_components() {
 	return components;
-}
-
-template<typename T>
-nlohmann::json _component_storage<T>::serialize() const {
-	auto json = _base_component_storage::serialize();
-
-	json["components"] = nlohmann::json::array();
-	auto &json_components = json["components"]
-			.get_ref<nlohmann::json::array_t &>();
-			
-	json_components.resize(components.size());
-	for (uint32_t cid = 0; cid < components.size(); cid++)
-		json_components[cid] = get_json(cid);
-	
-	return json;
-}
-
-template<typename T>
-void _component_storage<T>::deserialize(const nlohmann::json &json) {
-	components.clear();
-	components.reserve(json["components"].size());
-	for (auto &json : json["components"]) {
-		if constexpr (std::is_convertible_v<nlohmann::json, T>)
-			components.emplace_back(json);
-		else
-			components.emplace_back();
-	}
-	
-	_base_component_storage::deserialize(json);
 }
 
 template<typename T>

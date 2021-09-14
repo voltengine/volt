@@ -12,17 +12,13 @@
 
 namespace volt::ecs {
 
-class _base_component_storage : public modules::serializable {
+class _base_component_storage {
 public:
-	virtual ~_base_component_storage();
+	virtual ~_base_component_storage() = default;
 
 	VOLT_API uint32_t get_cid(uint32_t eid) const;
 
 	VOLT_API uint32_t get_eid(uint32_t cid) const;
-
-	VOLT_API virtual nlohmann::json serialize() const override;
-
-	VOLT_API virtual void deserialize(const nlohmann::json &json) override;
 
 	virtual void add_json(uint32_t eid, const nlohmann::json &json) = 0;
 
@@ -44,11 +40,7 @@ public:
 
 	const T &get(uint32_t cid) const;
 
-	const std::vector<T> &get_components() const;
-
-	nlohmann::json serialize() const override;
-
-	void deserialize(const nlohmann::json &json) override;
+	std::vector<T> &get_components();
 
 	virtual void add_json(uint32_t eid, const nlohmann::json &json) override;
 

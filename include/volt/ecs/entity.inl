@@ -7,7 +7,7 @@ bool entity::has() const {
 	if (!*this)
 		throw std::runtime_error("Cannot access " + util::to_string(*this));
 	
-	return manager->has_component<T>(id);
+	return world->has_component<T>(id);
 }
 
 template<typename T>
@@ -19,7 +19,7 @@ T &entity::get() const {
 				+ get_component_name<T>() + '.');
 	}
 	
-	return manager->get_component<T>(id);
+	return world->get_component<T>(id);
 }
 
 template<typename T, typename... Args>
@@ -31,7 +31,7 @@ T &entity::add(Args &&...args) const {
 				+ get_component_name<T>() + '.');
 	}
 	
-	return manager->add_component<T>(id, std::forward<Args>(args)...);
+	return world->add_component<T>(id, std::forward<Args>(args)...);
 }
 
 template<typename T>
@@ -43,7 +43,7 @@ void entity::remove() const {
 				+ get_component_name<T>() + '.');
 	}
 	
-	manager->remove_component<T>(id);
+	world->remove_component<T>(id);
 }
 
 }
