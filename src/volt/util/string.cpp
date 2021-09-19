@@ -1,7 +1,7 @@
 #include <volt/pch.hpp>
 #include <volt/util/string.hpp>
 
-namespace util {
+namespace volt::util {
 
 void ltrim(std::string &str) {
 	auto end = std::find_if(str.begin(), str.end(),

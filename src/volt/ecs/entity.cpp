@@ -3,6 +3,8 @@
 
 #include <volt/util/string.hpp>
 
+#include <volt/error.hpp>
+
 namespace volt::ecs {
 
 const entity entity::null;
@@ -26,43 +28,30 @@ entity::operator bool() const {
 }
 
 void entity::destroy() const {
-	if (!*this)
-		throw std::runtime_error("Cannot access " + util::to_string(*this));
-
+	VOLT_DEVELOPMENT_ASSERT(*this, "Cannot access " + util::to_string(*this))
 	world->destroy(id);
 }
 
 bool entity::has(const std::string &name) const {
-	if (!*this)
-		throw std::runtime_error("Cannot access " + util::to_string(*this));
-
+	VOLT_DEVELOPMENT_ASSERT(*this, "Cannot access " + util::to_string(*this))
 	return world->has_component_by_name(id, name);
 }
 
 nlohmann::json entity::get(const std::string &name) const {
-	if (!*this)
-		throw std::runtime_error("Cannot access " + util::to_string(*this));
-	if (!has(name))
-		throw std::runtime_error(util::to_string(*this) + " does not contain " + name + '.');
-
+	VOLT_DEVELOPMENT_ASSERT(has(name), util::to_string(*this) +
+			" does not contain " + name + '.')
 	return world->get_component_by_name(id, name);
 }
 
 void entity::add(const std::string &name, const nlohmann::json &json) const {
-	if (!*this)
-		throw std::runtime_error("Cannot access " + util::to_string(*this));
-	if (has(name))
-		throw std::runtime_error(util::to_string(*this) + " already contains " + name + '.');
-	
+	VOLT_DEVELOPMENT_ASSERT(!has(name), util::to_string(*this) +
+			" already contains " + name + '.')
 	world->add_component_by_name(id, name, json);
 }
 
 void entity::remove(const std::string &name) const {
-	if (!*this)
-		throw std::runtime_error("Cannot access " + util::to_string(*this));
-	if (!has(name))
-		throw std::runtime_error(util::to_string(*this) + " does not contain " + name + '.');
-	
+	VOLT_DEVELOPMENT_ASSERT(has(name), util::to_string(*this) +
+			" does not contain " + name + '.')
 	world->remove_component_by_name(id, name);
 }
 

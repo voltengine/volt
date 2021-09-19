@@ -1,7 +1,7 @@
 #include <volt/macros.hpp>
 
 #include <volt/ecs/ecs.hpp>
-#include <volt/modules/modules.hpp>
+#include <volt/modules.hpp>
 
 extern "C" {
 

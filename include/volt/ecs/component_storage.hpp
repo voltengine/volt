@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../modules/modules.hpp"
+#include "../modules.hpp"
 
 #include <concepts>
 #include <cstdint>

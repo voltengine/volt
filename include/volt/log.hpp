@@ -1,34 +1,42 @@
 #pragma once
 
-#include "../macros.hpp"
+#include "macros.hpp"
 
-#include <stdexcept>
+#include <filesystem>
+#include <iostream>
 
-namespace volt {
+namespace volt::log {
 
-// void _log(const std::string &message,
-// 		const std::filesystem::path &file,
-// 		size_t line, decltype(termcolor::reset)) {
-// 	message += " (" + file.filename().string() + ':' + line + ")";
-// 	std::cout << termcolor::bright_green << message << termcolor::reset;
-// }
+VOLT_API void _log(const std::string &prefix, std::string message,
+		const std::filesystem::path &file, size_t line);
+
+VOLT_API void info(const std::string &message,
+		const std::filesystem::path &file, size_t line);
+
+VOLT_API void warning(const std::string &message,
+		const std::filesystem::path &file, size_t line);
+
+VOLT_API void error(const std::string &message,
+		const std::filesystem::path &file, size_t line);
 
 }
 
-#define VOLT_LOG_INFO(message) \
-		::volt::_log_info( \
+#define VOLT_LOG_INFO(message)\
+		::volt::log::info(\
 				message, __FILE__, __LINE__));
-#define VOLT_LOG_WARNING(message) \
-		::volt::_log_warning( \
+#define VOLT_LOG_WARNING(message)\
+		::volt::log::warning(\
 				message, __FILE__, __LINE__));
-#define VOLT_LOG_ERROR(message) \
-		::volt::_log_error( \
+#define VOLT_LOG_ERROR(message)\
+		::volt::log::error(\
 				message, __FILE__, __LINE__));
 
 #ifdef VOLT_DEVELOPMENT
-	#define VOLT_DEVELOPMENT_LOG_INFO VOLT_LOG_INFO
-	#define VOLT_DEVELOPMENT_LOG_WARNING VOLT_LOG_WARNING
-	#define VOLT_DEVELOPMENT_LOG_ERROR VOLT_LOG_ERROR
+	#define VOLT_DEVELOPMENT_LOG_INFO(message) VOLT_LOG_INFO(message)
+	#define VOLT_DEVELOPMENT_LOG_WARNING(message) VOLT_LOG_WARNING(message)
+	#define VOLT_DEVELOPMENT_LOG_ERROR(message) VOLT_LOG_ERROR(message)
 #else
-	#define VOLT_DEVELOPMENT_ASSERT
+	#define VOLT_DEVELOPMENT_LOG_INFO(message)
+	#define VOLT_DEVELOPMENT_LOG_WARNING(message)
+	#define VOLT_DEVELOPMENT_LOG_ERROR(message)
 #endif

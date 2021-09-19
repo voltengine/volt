@@ -1,5 +1,6 @@
 {
 	"dependencies": {
+		"voltengine/date": "3.0.1",
 		"voltengine/json": "3.9.1",
 		"voltengine/termcolor": "2.0.0"
 	},

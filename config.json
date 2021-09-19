@@ -1,8 +1,6 @@
 {
 	"volt": {
-		"app": {
-			"publisher": "Publisher",
-			"title": "Title"
-		}
+		"title": "Example",
+		"publisher": "Volt Engine"
 	}
 }

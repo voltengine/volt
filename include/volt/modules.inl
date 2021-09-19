@@ -1,8 +1,10 @@
 #include <stdexcept>
 #include <string>
 
+#include "error.hpp"
+
 #ifdef VOLT_PLATFORM_WINDOWS
-#include <Windows.h>
+	#include <Windows.h>
 #endif
 
 namespace volt::modules {
@@ -22,13 +24,7 @@ std::string this_module_name() {
 #ifdef VOLT_PLATFORM_LINUX
 
 	Dl_info info;
-	link_map *current_map, *executable_map;
-
-	dladdr1(&this_module, &info, &current_map, RTLD_DL_LINKMAP);
-	dlinfo(dlopen(nullptr), RTLD_DI_LINKMAP, &executable_map);
-
-	// if (current_map == executable_map)
-	// 	throw std::runtime_error("Cannot query module name from executable.");
+	dladdr(&this_module, &info);
 
 	std::string path = info.dli_fname;
 	return _path_to_name(path);
@@ -40,21 +36,14 @@ std::string this_module_name() {
 	std::string path;
 	path.resize(MAX_PATH);
 
-	if (!GetModuleHandleEx(
+	VOLT_ASSERT(GetModuleHandleEx(
 			GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
 			GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-			reinterpret_cast<LPCSTR>(&this_module_name), &handle)) {
-		throw std::runtime_error("GetModuleHandleEx returned "
-				+ std::to_string(GetLastError()) + '.');
-	}
+			reinterpret_cast<LPCSTR>(&this_module_name), &handle),
+			"GetModuleHandleEx returned " + std::to_string(GetLastError()) + '.');
 
-	// if (handle == GetModuleHandle(nullptr))
-	// 	throw std::runtime_error("Cannot query module name from executable.");
-
-	if (!GetModuleFileName(handle, path.data(), path.size())) {
-		throw std::runtime_error("GetModuleFileName returned "
-				+ std::to_string(GetLastError()) + '.');
-	}
+	VOLT_ASSERT(GetModuleFileName(handle, path.data(), path.size()),
+			"GetModuleFileName returned " + std::to_string(GetLastError()) + '.');
 
 	return _path_to_name(path);
 

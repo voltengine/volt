@@ -1,11 +1,13 @@
 #include "ecs.hpp"
 
+#include "../error.hpp"
+
 namespace volt::ecs {
 
 template<typename T>
 std::bitset<VOLT_MAX_COMPONENTS> _make_component_filter() {
-	if (!_component_type_index_to_index.contains(typeid(T)))
-		throw std::runtime_error("No such component registered.");
+	VOLT_DEVELOPMENT_ASSERT(_component_type_index_to_index.contains(typeid(T)),
+			std::string("No such component registered: ") + typeid(T).name())
 
 	std::bitset<VOLT_MAX_COMPONENTS> mask;
 	mask.set(_component_type_index_to_index[typeid(T)]);
@@ -19,9 +21,8 @@ std::bitset<VOLT_MAX_COMPONENTS> _make_component_filter() {
 
 template<typename T>
 void world::each(const std::function<void(T &)> &func) const {
-	// TODO Check only during development
-	if (!_component_type_index_to_name.contains(typeid(T)))
-		throw std::runtime_error("No such component registered.");
+	VOLT_DEVELOPMENT_ASSERT(_component_type_index_to_index.contains(typeid(T)),
+			std::string("No such component registered: ") + typeid(T).name())
 
 	auto storage = static_cast<_component_storage<T> *>(
 			storages.at(_component_type_index_to_name[typeid(T)]).get());
@@ -32,8 +33,8 @@ void world::each(const std::function<void(T &)> &func) const {
 
 template<typename T, typename... Filters>
 void world::each(const std::function<void(T &, Filters &...)> &func) const {
-	if (!_component_type_index_to_name.contains(typeid(T)))
-		throw std::runtime_error("No such component registered.");
+	VOLT_DEVELOPMENT_ASSERT(_component_type_index_to_index.contains(typeid(T)),
+			std::string("No such component registered: ") + typeid(T).name())
 
 	auto storage = static_cast<_component_storage<T> *>(
 			storages.at(_component_type_index_to_name[typeid(T)]).get());

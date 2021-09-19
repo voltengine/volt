@@ -16,13 +16,17 @@ int main() {
 #endif
  
 	volt::modules::load();
+
 	std::cout << "\nLoaded modules.\n";
 	for (auto &name : volt::modules::get_names())
 		std::cout << name << '\n';
 
 	while (true) {
-		std::cout << "\n[P] - Print State; [U] - Update Systems; "
-				"[R] - Reload \"" VOLT_DEVELOPMENT_MODULE "\"; [Q] - Quit\n";
+		std::cout << "\n[P] - Print State; [U] - Update Systems; ";
+#ifdef VOLT_DEVELOPMENT
+		std::cout << "[R] - Reload \"" VOLT_DEVELOPMENT_MODULE "\"; ";
+#endif
+		std::cout << "[Q] - Quit\n";
 		char c;
 		do {
 			c = getch();
@@ -61,14 +65,15 @@ int main() {
 		case 'u':
 			try {
 				volt::ecs::update_systems(0);
-			} catch (std::exception &e) {
-				std::cout << "Update failed:\n" << e.what() << '\n';
+			} catch (volt::error &e) {
+				volt::log::error(e.what(), e.where(), e.at());
 			}
 			continue;
+#ifdef VOLT_DEVELOPMENT
 		case 'r':
 			try {
 				std::cout << "\nReloading " VOLT_DEVELOPMENT_MODULE "...\n";
-				volt::modules::_reload_development_module([]() {
+				volt::modules::reload_development_module([]() {
 					auto src = fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "cmake" / "bin"
 							/ (std::string(VOLT_DEVELOPMENT_MODULE) + volt::modules::module_extension);
 					auto dst = fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "bin"
@@ -77,10 +82,11 @@ int main() {
 					fs::copy(src, dst);
 				});
 				std::cout << "Done reloading " VOLT_DEVELOPMENT_MODULE ".\n";
-			} catch (std::exception &e) {
-				std::cout << "Reload failed:\n" << e.what() << '\n';
+			} catch (volt::error &e) {
+				volt::log::error(e.what(), e.where(), e.at());
 			}
 			continue;
+#endif
 		default:
 			break;
 		}

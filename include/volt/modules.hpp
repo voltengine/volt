@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../macros.hpp"
+#include "macros.hpp"
 
 #include <functional>
 #include <map>
@@ -28,8 +28,10 @@ VOLT_API void load();
 
 VOLT_API void unload();
 
-VOLT_API void _reload_development_module(
+#ifdef VOLT_DEVELOPMENT
+VOLT_API void reload_development_module(
 		const std::function<void()> &callback);
+#endif
 
 VOLT_API const std::set<std::string> &get_names();
 

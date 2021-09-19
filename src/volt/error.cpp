@@ -1,5 +1,5 @@
 #include <volt/pch.hpp>
-#include <volt/assert.hpp>
+#include <volt/error.hpp>
 
 namespace volt {
 

@@ -1,5 +1,6 @@
-#include "../modules/modules.hpp"
+#include "../modules.hpp"
 
+#include "../error.hpp"
 #include "component_storage.hpp"
 #include "entity.hpp"
 #include "system.hpp"
@@ -9,16 +10,16 @@ namespace volt::ecs {
 
 template<typename T>
 void register_component(const std::string &name) {
-	if (_component_name_to_index.contains(name))
-		throw std::runtime_error("Component name \"" + name + "\" is already registered.");
-	if (_component_type_index_to_name.contains(typeid(T)))
-		throw std::runtime_error("Component type for \"" + name + "\" is already registered.");
+	VOLT_ASSERT(!_component_name_to_index.contains(name),
+			"Component name \"" + name + "\" is already registered.")
+	VOLT_ASSERT(!_component_type_index_to_name.contains(typeid(T)),
+			"Cannot register type as component \"" + name +
+			"\". It's already registered as \"" +
+			_component_type_index_to_name[typeid(T)] + "\".")
 
 	size_t index = get_component_count();
-	if (index >= VOLT_MAX_COMPONENTS) {
-		throw std::runtime_error("Too many components. "
-				"Please bump VOLT_MAX_COMPONENTS before building.");
-	}
+	VOLT_ASSERT(index < VOLT_MAX_COMPONENTS, "Too many components. "
+			"Please bump VOLT_MAX_COMPONENTS before building.")
 
 	_component_type_index_to_name[typeid(T)] = name;
 
@@ -41,6 +42,9 @@ const std::string &get_component_name() {
 
 template<system_type T>
 void register_system(const std::string &name) {
+	VOLT_ASSERT(!_system_name_to_constructor.contains(name),
+			"System name \"" + name + "\" is already registered.")
+
 	_system_name_to_constructor[name] = []() {
 		return new T;
 	};
