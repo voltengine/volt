@@ -2,6 +2,7 @@
 #include <volt/config.hpp>
 
 #include <volt/util/util.hpp>
+#include <volt/log.hpp>
 #include <volt/paths.hpp>
 
 namespace fs = std::filesystem;
@@ -44,8 +45,13 @@ static nl::json cleave(nl::json from, const nl::json &what) {
 namespace volt::config {
 
 static void load_from_data() {
-	::config.update(nl::json::parse(util::read_text_file(
-			paths::data() / "config.json")));
+	try {
+		::config.update(nl::json::parse(util::read_text_file(
+				paths::data() / "config.json")));
+		VOLT_LOG_INFO("User configuration has been loaded.")
+	} catch (...) {
+		VOLT_LOG_INFO("No user configuration available.")
+	}
 }
 
 static void try_init() {
@@ -81,7 +87,7 @@ static void try_init() {
 #endif
 }
 
-nl::json json() {
+nl::json &json() {
 	try_init();
 	return ::config;
 }

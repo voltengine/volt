@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="D:\Library\Source\voltengine\volt\cache\cmake-build-temp\CMakeFiles\fa31e7521945a15d3dc00e8749b0fbac\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{BBA668B9-3D3A-3CD3-B92D-3FA6976E89D9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

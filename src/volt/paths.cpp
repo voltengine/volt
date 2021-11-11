@@ -20,7 +20,9 @@ static fs::path get_app_prefix() {
 }
 
 fs::path data() {
-#ifdef VOLT_PLATFORM_LINUX
+#ifdef VOLT_DEVELOPMENT
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "data";
+#elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_DATA_HOME");
 	if (!xdg) {
 		return fs::path(std::getenv("HOME")) / ".local" /
@@ -36,7 +38,9 @@ fs::path data() {
 }
 
 fs::path documents() {
-#ifdef VOLT_PLATFORM_LINUX
+#ifdef VOLT_DEVELOPMENT
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "documents";
+#elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_DOCUMENTS_DIR");
 	if (!xdg) {
 		return fs::path(std::getenv("HOME")) / "Documents" / get_app_prefix();
@@ -50,7 +54,9 @@ fs::path documents() {
 }
 
 fs::path pictures() {
-#ifdef VOLT_PLATFORM_LINUX
+#ifdef VOLT_DEVELOPMENT
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "pictures";
+#elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_PICTURES_DIR");
 	if (!xdg) {
 		return fs::path(std::getenv("HOME")) / "Pictures" / get_app_prefix();
@@ -64,7 +70,9 @@ fs::path pictures() {
 }
 
 fs::path videos() {
-#ifdef VOLT_PLATFORM_LINUX
+#ifdef VOLT_DEVELOPMENT
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "videos";
+#elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_VIDEOS_DIR");
 	if (!xdg) {
 		return fs::path(std::getenv("HOME")) / "Videos" / get_app_prefix();
@@ -78,7 +86,9 @@ fs::path videos() {
 }
 
 fs::path music() {
-#ifdef VOLT_PLATFORM_LINUX
+#ifdef VOLT_DEVELOPMENT
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "music";
+#elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_MUSIC_DIR");
 	if (!xdg) {
 		return fs::path(std::getenv("HOME")) / "Music" / get_app_prefix();
@@ -92,7 +102,9 @@ fs::path music() {
 }
 
 fs::path saves() {
-#ifdef VOLT_PLATFORM_LINUX
+#ifdef VOLT_DEVELOPMENT
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "saves";
+#elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_DATA_HOME");
 	if (!xdg) {
 		return fs::path(std::getenv("HOME")) / ".local" /

@@ -2,6 +2,7 @@
 #include <volt/log.hpp>
 
 #include <volt/util/util.hpp>
+#include <volt/config.hpp>
 #include <volt/paths.hpp>
 
 namespace fs = std::filesystem;
@@ -12,6 +13,10 @@ namespace volt::log {
 void _log(const std::string &prefix, std::string message, const fs::path &file, size_t line) {
 	message += " (" + file.filename().string() + ':' + util::to_string(line) + ")";
 	std::cout << message << tc::reset << std::endl;
+
+	// We must init config before initializing static variable below, because
+	// it might call _log(...), i.e. this function during fist call to its API 
+	config::json();
 
 	static auto log = []() {
 		auto now = std::chrono::system_clock::now();

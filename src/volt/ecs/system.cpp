@@ -3,11 +3,15 @@
 
 namespace volt::ecs {
 
-void system::unique_lock_all() {
+async_system::async_system() {
+	_async = true;
+}
+
+void async_system::unique_lock_all() {
 	_unique_mask.set();
 }
 
-void system::shared_lock_all() {
+void async_system::shared_lock_all() {
 	_shared_mask.set();
 }
 

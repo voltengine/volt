@@ -22,14 +22,11 @@ VOLT_API void error(const std::string &message,
 }
 
 #define VOLT_LOG_INFO(message)\
-		::volt::log::info(\
-				message, __FILE__, __LINE__));
+		::volt::log::info(message, __FILE__, __LINE__);
 #define VOLT_LOG_WARNING(message)\
-		::volt::log::warning(\
-				message, __FILE__, __LINE__));
+		::volt::log::warning(message, __FILE__, __LINE__);
 #define VOLT_LOG_ERROR(message)\
-		::volt::log::error(\
-				message, __FILE__, __LINE__));
+		::volt::log::error(message, __FILE__, __LINE__);
 
 #ifdef VOLT_DEVELOPMENT
 	#define VOLT_DEVELOPMENT_LOG_INFO(message) VOLT_LOG_INFO(message)

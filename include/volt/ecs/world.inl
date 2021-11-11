@@ -2,30 +2,28 @@
 
 #include "../error.hpp"
 
-namespace volt::ecs {
+namespace volt::ecs::_internal {
 
 template<typename T>
-std::bitset<VOLT_MAX_COMPONENTS> _make_component_filter() {
-	VOLT_DEVELOPMENT_ASSERT(_component_type_index_to_index.contains(typeid(T)),
-			std::string("No such component registered: ") + typeid(T).name())
-
+std::bitset<VOLT_MAX_COMPONENTS> make_component_filter() {
 	std::bitset<VOLT_MAX_COMPONENTS> mask;
-	mask.set(_component_type_index_to_index[typeid(T)]);
+	mask.set(get_component_index<T>());
 	return mask;
 }
 
 template<typename T, typename T2, typename... Tn>
-std::bitset<VOLT_MAX_COMPONENTS> _make_component_filter() {
-	return _make_component_filter<T>() | _make_component_filter<T2, Tn...>();
+std::bitset<VOLT_MAX_COMPONENTS> make_component_filter() {
+	return make_component_filter<T>() | make_component_filter<T2, Tn...>();
 }
+
+}
+
+namespace volt::ecs {
 
 template<typename T>
 void world::each(const std::function<void(T &)> &func) const {
-	VOLT_DEVELOPMENT_ASSERT(_component_type_index_to_index.contains(typeid(T)),
-			std::string("No such component registered: ") + typeid(T).name())
-
-	auto storage = static_cast<_component_storage<T> *>(
-			storages.at(_component_type_index_to_name[typeid(T)]).get());
+	auto storage = static_cast<_internal::component_storage<T> *>(
+			storages.at(get_component_name<T>()).get());
 
 	for (T &component : storage->get_components())
 		func(component);
@@ -33,13 +31,11 @@ void world::each(const std::function<void(T &)> &func) const {
 
 template<typename T, typename... Filters>
 void world::each(const std::function<void(T &, Filters &...)> &func) const {
-	VOLT_DEVELOPMENT_ASSERT(_component_type_index_to_index.contains(typeid(T)),
-			std::string("No such component registered: ") + typeid(T).name())
+	auto storage = static_cast<_internal::component_storage<T> *>(
+			storages.at(get_component_name<T>()).get());
 
-	auto storage = static_cast<_component_storage<T> *>(
-			storages.at(_component_type_index_to_name[typeid(T)]).get());
-
-	std::bitset<VOLT_MAX_COMPONENTS> filter = _make_component_filter<Filters>();
+	std::bitset<VOLT_MAX_COMPONENTS> filter =
+			_internal::make_component_filter<Filters>();
 
 	for (uint32_t cid = 0; cid < storage->get_components().size(); cid++) {
 		uint32_t eid = storage->get_eid(cid);
@@ -51,29 +47,29 @@ void world::each(const std::function<void(T &, Filters &...)> &func) const {
 template<typename T>
 bool world::has_component(uint32_t eid) const {
 	return entities[eid].mask.test(
-			_component_type_index_to_index[typeid(T)]);
+			_internal::get_component_index<T>());
 }
 
 template<typename T>
 T &world::get_component(uint32_t eid) {
-	auto storage = static_cast<_component_storage<T> *>(
-			storages[_component_type_index_to_name[typeid(T)]].get());
+	auto storage = static_cast<_internal::component_storage<T> *>(
+			storages[get_component_name<T>()].get());
 	return storage->get(storage->get_cid(eid));
 }
 
 template<typename T, typename... Args>
 T &world::add_component(uint32_t eid, Args &&...args) {
-	uint32_t index = _component_type_index_to_index[typeid(T)];
+	uint32_t index = _internal::get_component_index<T>();
 	entities[eid].mask.set(index);
 
-	auto storage = static_cast<_component_storage<T> *>(
-			storages[_component_type_index_to_name[typeid(T)]].get());
+	auto storage = static_cast<_internal::component_storage<T> *>(
+			storages[get_component_name<T>()].get());
 	return storage->add(eid, std::forward<Args>(args)...);
 }
 
 template<typename T>
 void world::remove_component(uint32_t eid) {
-	remove_component_by_name(eid, _component_type_index_to_name[typeid(T)]);
+	remove_component_by_name(eid, get_component_name<T>());
 }
 
 }

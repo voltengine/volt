@@ -8,13 +8,11 @@
 
 #include <nlohmann/json.hpp>
 
-// #include "../modules/serializable.hpp"
+namespace volt::ecs::_internal {
 
-namespace volt::ecs {
-
-class _base_component_storage {
+class base_component_storage {
 public:
-	virtual ~_base_component_storage() = default;
+	virtual ~base_component_storage() = default;
 
 	VOLT_API uint32_t get_cid(uint32_t eid) const;
 
@@ -31,7 +29,7 @@ protected:
 };
 
 template<typename T>
-class _component_storage : public _base_component_storage {
+class component_storage : public base_component_storage {
 public:
 	template<typename... Args>
 	T &add(uint32_t eid, Args &&...args);

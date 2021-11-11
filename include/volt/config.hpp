@@ -6,7 +6,7 @@
 
 namespace volt::config {
 
-VOLT_API nlohmann::json json();
+VOLT_API nlohmann::json &json();
 
 VOLT_API void save();
 

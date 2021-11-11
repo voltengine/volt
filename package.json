@@ -1,8 +1,10 @@
 {
 	"dependencies": {
 		"voltengine/date": "3.0.1",
+		"voltengine/glfw": "3.3.5",
 		"voltengine/json": "3.9.1",
-		"voltengine/termcolor": "2.0.0"
+		"voltengine/termcolor": "2.0.0",
+		"voltengine/volk": "1.2.190"
 	},
 	"description": "Volt Engine and editor.",
 	"git": "https://github.com/voltengine/volt.git",
