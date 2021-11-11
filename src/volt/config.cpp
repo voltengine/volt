@@ -5,6 +5,9 @@
 #include <volt/log.hpp>
 #include <volt/paths.hpp>
 
+#include <glad/vulkan.h>
+#include <glad/gl.h>
+
 namespace fs = std::filesystem;
 namespace nl = nlohmann;
 

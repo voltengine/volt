@@ -25,5 +25,9 @@
 #include <date/date.h>
 #include <nlohmann/json.hpp>
 #include <termcolor/termcolor.hpp>
-#include <volk/volk.h>
+
+#include <glad/gl.h>
+#include <glad/vulkan.h>
+
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>

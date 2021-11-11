@@ -106,10 +106,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME}
 	Date::Date
+	Glad::Glad
 	GLFW::GLFW
 	JSON::JSON
 	Termcolor::Termcolor
-	Volk::Volk
 )
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE
