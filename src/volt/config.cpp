@@ -5,9 +5,6 @@
 #include <volt/log.hpp>
 #include <volt/paths.hpp>
 
-#include <glad/vulkan.h>
-#include <glad/gl.h>
-
 namespace fs = std::filesystem;
 namespace nl = nlohmann;
 
@@ -57,12 +54,42 @@ static void load_from_data() {
 	}
 }
 
-static void try_init() {
-	static bool initialized = false;
-	if (initialized)
-		return;
-	initialized = true;
+nl::json &json() {
+	return ::config;
+}
 
+void save() {
+	nl::json cleaved = cleave(::config, default_config);
+	util::write_file(paths::data() / "config.json", cleaved.dump(1, '\t'));
+}
+
+void reset_to_default() {
+	::config = default_config;
+}
+
+#ifdef VOLT_DEVELOPMENT
+
+void save_default() {
+	nl::json cleaved = cleave(default_config, base_config);
+	util::write_file(fs::path(VOLT_DEVELOPMENT_PATH) /
+			"config.json", cleaved.dump(1, '\t'));
+}
+
+void reset_to_base() {
+	::config = default_config = base_config;
+}
+
+void load() {
+	load_from_data();
+}
+
+#endif
+
+}
+
+namespace volt::config::_internal {
+
+void init() {
 #ifdef VOLT_DEVELOPMENT
 	std::vector<std::string> paths = util::split(util::read_text_file(
 			fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "paths.txt"), "\n");
@@ -89,41 +116,5 @@ static void try_init() {
 	load_from_data();
 #endif
 }
-
-nl::json &json() {
-	try_init();
-	return ::config;
-}
-
-void save() {
-	try_init();
-	nl::json cleaved = cleave(::config, default_config);
-	util::write_file(paths::data() / "config.json", cleaved.dump(1, '\t'));
-}
-
-void reset_to_default() {
-	try_init();
-	::config = default_config;
-}
-
-#ifdef VOLT_DEVELOPMENT
-
-void save_default() {
-	try_init();
-	nl::json cleaved = cleave(default_config, base_config);
-	util::write_file(fs::path(VOLT_DEVELOPMENT_PATH) /
-			"config.json", cleaved.dump(1, '\t'));
-}
-
-void reset_to_base() {
-	try_init();
-	::config = default_config = base_config;
-}
-
-void load() {
-	load_from_data();
-}
-
-#endif
 
 }

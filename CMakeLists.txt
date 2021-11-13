@@ -13,6 +13,7 @@ endfunction()
 set(VOLT_DEVELOPMENT true CACHE BOOL "Build app with development features (i.e. the editor).")
 set(VOLT_MAX_COMPONENTS "128" CACHE STRING "Maximum number of registered components.")
 
+# Read root package name into $CACHE{VOLT_DEVELOPMENT_MODULE}
 if(VOLT_DEVELOPMENT)
 	file(READ "${CMAKE_SOURCE_DIR}/package.json" VOLT_PACKAGE_JSON)
 	string(JSON VOLT_PACKAGE_ID GET ${VOLT_PACKAGE_JSON} "id")
@@ -26,6 +27,13 @@ if(VOLT_DEVELOPMENT)
 else()
 	message("[Volt] Development is disabled.")
 endif()
+
+# Read version into $CACHE{VOLT_VERSION}
+file(READ "${CMAKE_SOURCE_DIR}/package.json" VOLT_PACKAGE_JSON)
+string(JSON VOLT_PACKAGE_VERSION GET ${VOLT_PACKAGE_JSON} "version")
+set(VOLT_VERSION ${VOLT_PACKAGE_VERSION} CACHE INTERNAL "")
+unset(VOLT_PACKAGE_JSON)
+unset(VOLT_PACKAGE_VERSION)
 
 # Creates shared library target named ${PROJECT_NAME}
 # (aliased as ${PROJECT_NAME}::${PROJECT_NAME}),
@@ -82,6 +90,7 @@ function(volt_add_module target)
 
 	# Add precompiler definitions and set build type
 	target_compile_definitions(${target} PUBLIC VOLT_MAX_COMPONENTS=${VOLT_MAX_COMPONENTS})
+	target_compile_definitions(${target} PUBLIC VOLT_VERSION="$CACHE{VOLT_VERSION}")
 	if(VOLT_DEVELOPMENT)
 		target_compile_definitions(${target} PUBLIC VOLT_DEVELOPMENT)
 		target_compile_definitions(${target} PUBLIC VOLT_DEVELOPMENT_PATH="${CMAKE_SOURCE_DIR}")
@@ -112,6 +121,12 @@ target_link_libraries(${PROJECT_NAME}
 	Termcolor::Termcolor
 )
 
+if(WIN32)
+	target_link_libraries(${PROJECT_NAME}
+		"d3d12.lib" "dxgi.lib" "d3dcompiler.lib"
+	)
+endif()
+
 target_precompile_headers(${PROJECT_NAME} PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/volt/pch.hpp"
 )
@@ -138,4 +153,8 @@ target_precompile_headers(APP PRIVATE
 	"${CMAKE_CURRENT_SOURCE_DIR}/app/pch.hpp"
 )
 
-target_link_libraries(APP Volt::Volt)
+target_link_libraries(APP
+	Glad::Glad
+	GLFW::GLFW
+	Volt::Volt
+)

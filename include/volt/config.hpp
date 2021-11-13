@@ -23,3 +23,9 @@ VOLT_API void load();
 #endif
 
 }
+
+namespace volt::config::_internal {
+
+VOLT_API void init();
+
+}

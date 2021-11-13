@@ -1,7 +1,7 @@
 {
 	"dependencies": {
 		"voltengine/date": "3.0.1",
-		"voltengine/glad": "2.0.0-beta+vk12.gl46.all-2021-11-11",
+		"voltengine/glad": "2.0.0-beta+vk12.core.loader.all-2021-11-12",
 		"voltengine/glfw": "3.3.5",
 		"voltengine/json": "3.9.1",
 		"voltengine/termcolor": "2.0.0"

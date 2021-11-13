@@ -9,9 +9,5 @@
 
 #include <volt/volt.hpp>
 
-#ifdef VOLT_PLATFORM_WINDOWS
-	#define WIN32_LEAN_AND_MEAN
-	#define NOMINMAX
-
-	#include <Windows.h>
-#endif
+#include <glad/vulkan.h>
+#include <GLFW/glfw3.h>

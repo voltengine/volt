@@ -11,6 +11,8 @@ namespace tc = termcolor;
 namespace volt::log {
 
 void _log(const std::string &prefix, std::string message, const fs::path &file, size_t line) {
+	using namespace std::chrono;
+
 	message += " (" + file.filename().string() + ':' + util::to_string(line) + ")";
 	std::cout << message << tc::reset << std::endl;
 
@@ -19,7 +21,7 @@ void _log(const std::string &prefix, std::string message, const fs::path &file, 
 	config::json();
 
 	static auto log = []() {
-		auto now = std::chrono::system_clock::now();
+		auto now = system_clock::now();
     	std::string iso_day = date::format("%F", now);
 
 		fs::path logs_path = paths::data() / "logs";
@@ -34,7 +36,10 @@ void _log(const std::string &prefix, std::string message, const fs::path &file, 
 		return std::ofstream(log_path, std::ios_base::out);
 	}();
 
-    log << prefix << message << std::endl;
+	auto now = floor<seconds>(system_clock::now());
+	std::string timestamp = date::format("%T", now);
+
+    log << '[' << timestamp << "] " << prefix << message << std::endl;
 }
 
 void info(const std::string &message, const fs::path &file, size_t line) {
