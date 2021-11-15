@@ -1,0 +1,23 @@
+#pragma once
+
+#include <volt/macros.hpp>
+
+#include <volt/pch.hpp>
+
+#include <volt/video/swapchain.hpp>
+#include <volt/video/vk12/device.hpp>
+#include <volt/video/vk12/window.hpp>
+
+namespace volt::video::vk12 {
+
+class swapchain : public video::swapchain {
+public:
+	vk12::device &device;
+	VkSwapchainKHR vk_swapchain;
+
+	VOLT_API swapchain(vk12::device &device, vk12::window &window);
+
+	VOLT_API ~swapchain();
+};
+
+}

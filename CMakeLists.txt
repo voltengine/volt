@@ -97,7 +97,7 @@ function(volt_add_module target)
 		target_compile_definitions(${target} PUBLIC VOLT_DEVELOPMENT_MODULE="$CACHE{VOLT_DEVELOPMENT_MODULE}")
 	endif()
 
-	# Add entry point source file generation step
+	# Add module_main source file generation step
 	add_custom_command(
 		OUTPUT ${GENERATED_SOURCE}
 		COMMAND "python" "$CACHE{VOLT_LIST_DIR}/generate_module_main.py" ${VOLT_DEVELOPMENT} "${CMAKE_CURRENT_SOURCE_DIR}" "${GENERATED_SOURCE}" ${SPACE_SEPARATED_HEADERS}
@@ -119,6 +119,7 @@ target_link_libraries(${PROJECT_NAME}
 	GLFW::GLFW
 	JSON::JSON
 	Termcolor::Termcolor
+	VulkanMemoryAllocator::VulkanMemoryAllocator
 )
 
 if(WIN32)

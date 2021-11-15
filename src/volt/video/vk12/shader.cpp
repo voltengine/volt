@@ -3,7 +3,7 @@
 
 #include <volt/error.hpp>
 
-namespace volt::video::vk12::_internal {
+namespace volt::video::vk12 {
 
 shader::shader(VkDevice vk_device, const std::vector<
 		uint8_t> &bytecode) : vk_device(vk_device) {

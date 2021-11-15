@@ -14,19 +14,7 @@ int main() {
 		VOLT_ASSERT(glfwInit(), "Failed to initialize GLFW.")
 		volt::config::_internal::init();
 
-		std::shared_ptr<video::instance> instance =
-				std::make_shared<video::vk12::instance>();
-		auto window = instance->create_window("Test Window", { 1280, 720 });
-		window->set_visible(true);
-		auto adapters = instance->list_adapters();
-		for (auto &adapter : adapters)
-			std::cout << adapter->name() << adapter->dedicated_video_memory() << std::endl;
-		auto adapter = adapters[0];
-		auto device = adapter->create_device();
-		auto swapchain = device->create_swapchain(window);
-		auto swapchain2 = device->create_swapchain(window);
-
-#if VOLT_DEVELOPMENT
+		#if VOLT_DEVELOPMENT
 		#ifdef NDEBUG
 			std::cout << "Hello from Volt App! (Development Enabled At: " VOLT_DEVELOPMENT_PATH ")" << '\n';
 		#else
@@ -36,12 +24,44 @@ int main() {
 		std::cout << "Hello from Volt App! (Development Disabled)" << '\n';
 #endif
 		volt::modules::load();
-
-		std::cout << "\nLoaded modules.\n";
+		
+		std::cout << "\nLoaded modules:\n";
 		for (auto &name : volt::modules::get_names())
 			std::cout << name << '\n';
 
+
+		using namespace video;
+
+		auto window = std::make_shared<os::window>("Test Window", math::uvec2(1280, 720));
+		window->set_visible(true);
+
+		auto instance = video::create_instance(video::api::vk12);
+		auto adapter = instance->list_adapters()[0];
+		auto device = adapter->create_device();
+		auto surface = device->create_surface(window);
+		// create_surface(window) emits an error if another surface is already created for that window.
+		// Dropping all references to surface will destroy it and in turn allow another call to create_surface(window).
+
+		auto buffer = device->create_buffer(
+			resource::type::internal,
+			queue::type::graphics | queue::type::copy,
+			buffer::feature::vertex | buffer::feature::destination,
+			1024
+		);
+		
+		auto texture = device->create_texture(
+			resource::type::internal,
+			0,
+			texture::feature::sampler | texture::feature::destination,
+			{ 2048, 2048 }, 1, 1, texture::format::bc1_srgb
+		);
+		// auto queue = device->get_graphics_queue();
+		// auto buffers = window->get_buffers();
+		
 		while (!window->is_closing()) { glfwPollEvents(); }
+
+
+		
 
 // 		while (true) {
 // 			std::cout << "\n[P] - Print State; [U] - Update Systems; ";
@@ -121,14 +141,6 @@ int main() {
 
 		volt::modules::unload();
 		std::cout << "\nUnloaded modules.\n";
-
-		swapchain2.reset();
-		swapchain.reset();
-		device.reset();
-		window.reset();
-		instance.reset();
-
-		glfwTerminate();
 	} catch (std::exception &e) {
 		VOLT_LOG_ERROR(e.what())
 		// TODO: display OS alert
@@ -136,6 +148,9 @@ int main() {
 		volt::log::error(e.what(), e.where(), e.at());
 		// TODO: display OS alert
 	}
+
+	// C libraries do not throw errors
+	glfwTerminate();
 
 	return 0;
 }

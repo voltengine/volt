@@ -4,7 +4,8 @@
 		"voltengine/glad": "2.0.0-beta+vk12.core.loader.all-2021-11-12",
 		"voltengine/glfw": "3.3.5",
 		"voltengine/json": "3.9.1",
-		"voltengine/termcolor": "2.0.0"
+		"voltengine/termcolor": "2.0.0",
+		"voltengine/vulkan-memory-allocator": "2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709"
 	},
 	"description": "Volt Engine and editor.",
 	"git": "https://github.com/voltengine/volt.git",

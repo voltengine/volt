@@ -1,11 +1,28 @@
 #pragma once
 
-#include "d3d12/d3d12.hpp"
-#include "vk12/vk12.hpp"
+#include <memory>
+
+namespace volt::video {
+
+enum class api {
+	vk12
+};
+
+
+
+
+
+
+
+
+
+class instance;
+
+VOLT_API std::shared_ptr<video::instance> create_instance(video::api api);
+
+}
+
 #include "adapter.hpp"
 #include "device.hpp"
 #include "instance.hpp"
-#include "monitor.hpp"
-#include "pipeline.hpp"
 #include "shader.hpp"
-#include "window.hpp"

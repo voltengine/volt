@@ -3,7 +3,6 @@
 
 #include <volt/util/util.hpp>
 #include <volt/video/vk12/adapter.hpp>
-#include <volt/video/vk12/device.hpp>
 #include <volt/video/vk12/vk12.hpp>
 #include <volt/error.hpp>
 #include <volt/log.hpp>
@@ -63,7 +62,7 @@ instance::instance() {
 	// Attach debug functionality to instance info
 #ifndef NDEBUG
 		// Attach validation layers
-	auto &layers = _internal::validation_layers();
+	auto &layers = vk12::validation_layers();
 	instance_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
 	instance_info.ppEnabledLayerNames = layers.data();
 
@@ -136,7 +135,7 @@ std::vector<std::shared_ptr<video::adapter>> instance::list_adapters() {
 	adapters.reserve(num_physical_devices);
 	for (uint32_t i = 0; i < num_physical_devices; i++) {
 		VkPhysicalDevice physical_device = physical_devices[i];
-		auto adapter = std::make_shared<_internal::adapter>(vk_instance, physical_device, vk_dummy_surface);
+		auto adapter = std::make_shared<vk12::adapter>(shared_from_this(), physical_device, vk_dummy_surface);
 
 		// Check queue families availability
 		if (adapter->present_family == -1 || adapter->graphics_family == -1 ||
@@ -145,6 +144,7 @@ std::vector<std::shared_ptr<video::adapter>> instance::list_adapters() {
 		}
 
 		// Test if there's sufficient amount of queues available
+		// TODO: Drob this part and make queues shareable
 		auto families = adapter->families;
 		if (--families[adapter->present_family].queueCount < 0)
 			continue;
@@ -157,8 +157,8 @@ std::vector<std::shared_ptr<video::adapter>> instance::list_adapters() {
 
 		// Check device extension support
 		if (!std::all_of(
-			_internal::device_extensions.begin(),
-			_internal::device_extensions.end(),
+			vk12::device_extensions.begin(),
+			vk12::device_extensions.end(),
 			[&](const char *extension_name) {
 				return std::find_if(
 					adapter->supported_extensions.begin(),
@@ -183,10 +183,6 @@ std::vector<std::shared_ptr<video::adapter>> instance::list_adapters() {
 	glfwDestroyWindow(glfw_dummy_window);
 
 	return adapters;
-}
-
-std::shared_ptr<video::window> instance::create_window(std::string title, math::uvec2 size) {
-	return std::make_shared<_internal::window>(std::move(title), size, vk_instance);
 }
 
 }

@@ -2,32 +2,35 @@
 #include <volt/video/vk12/adapter.hpp>
 
 #include <volt/video/vk12/device.hpp>
+#include <volt/video/vk12/instance.hpp>
 #include <volt/error.hpp>
 
-namespace volt::video::vk12::_internal {
+namespace volt::video::vk12 {
 
-adapter::adapter(VkInstance vk_instance, VkPhysicalDevice
-		vk_physical_device, VkSurfaceKHR vk_dummy_surface)
-		: vk_instance(vk_instance), vk_physical_device(vk_physical_device) {
-	VOLT_ASSERT(gladLoaderLoadVulkan(vk_instance, vk_physical_device, nullptr),
+adapter::adapter(std::shared_ptr<video::instance> &&instance,
+		VkPhysicalDevice physical_device, VkSurfaceKHR vk_dummy_surface)
+		: video::adapter(std::move(instance)), physical_device(physical_device) {
+	auto &_instance = *static_cast<vk12::instance *>(this->instance.get());
+
+	VOLT_ASSERT(gladLoaderLoadVulkan(_instance.vk_instance, physical_device, nullptr),
 			"Failed to load Vulkan physical device symbols.")
 
 	// Query adapter properties
-	vkGetPhysicalDeviceProperties(vk_physical_device, &vk_physical_device_properties);
-	vkGetPhysicalDeviceMemoryProperties(vk_physical_device, &vk_physical_device_memory_properties);
+	vkGetPhysicalDeviceProperties(physical_device, &physical_device_properties);
+	vkGetPhysicalDeviceMemoryProperties(physical_device, &physical_device_memory_properties);
 
 	// Queue family details
 	uint32_t num_families;
-	vkGetPhysicalDeviceQueueFamilyProperties(vk_physical_device, &num_families, nullptr);
+	vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &num_families, nullptr);
 	families.resize(num_families);
-	vkGetPhysicalDeviceQueueFamilyProperties(vk_physical_device, &num_families, families.data());
+	vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &num_families, families.data());
 
 	std::vector<uint32_t> present_score(num_families, 1), graphics_score(num_families, 1),
 			compute_score(num_families, 1), transfer_score(num_families, 1);
 
 	for (uint32_t i = 0; i < families.size(); i++) {
 		VkBool32 present_support;
-		vkGetPhysicalDeviceSurfaceSupportKHR(vk_physical_device, i, vk_dummy_surface, &present_support);
+		vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, vk_dummy_surface, &present_support);
 		auto family = families[i];
 		bool transfer_support = family.queueFlags & VK_QUEUE_TRANSFER_BIT
 				|| family.queueFlags & VK_QUEUE_COMPUTE_BIT
@@ -73,49 +76,64 @@ adapter::adapter(VkInstance vk_instance, VkPhysicalDevice
 
 	// Extension support
 	uint32_t num_supported_extensions;
-	vkEnumerateDeviceExtensionProperties(vk_physical_device, nullptr, &num_supported_extensions, nullptr);
+	vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &num_supported_extensions, nullptr);
 	supported_extensions.resize(num_supported_extensions);
-	vkEnumerateDeviceExtensionProperties(vk_physical_device, nullptr, &num_supported_extensions, supported_extensions.data());
+	vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &num_supported_extensions, supported_extensions.data());
 
 	// Surface support
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vk_physical_device, vk_dummy_surface, &surface_capabilities);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, vk_dummy_surface, &surface_capabilities);
 
 	uint32_t num_formats;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(vk_physical_device, vk_dummy_surface, &num_formats, nullptr);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, vk_dummy_surface, &num_formats, nullptr);
 	if (num_formats != 0) {
 		surface_formats.resize(num_formats);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(vk_physical_device, vk_dummy_surface, &num_formats, surface_formats.data());
+		vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, vk_dummy_surface, &num_formats, surface_formats.data());
 	}
 
 	uint32_t num_modes;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(vk_physical_device, vk_dummy_surface, &num_modes, nullptr);
+	vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, vk_dummy_surface, &num_modes, nullptr);
 	if (num_modes != 0) {
 		surface_present_modes.resize(num_modes);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(vk_physical_device, vk_dummy_surface, &num_modes, surface_present_modes.data());
+		vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, vk_dummy_surface, &num_modes, surface_present_modes.data());
 	}
+
+	vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
 }
 
-std::shared_ptr<video::device> adapter::create_device() {
-	return std::make_shared<_internal::device>(*this);
+std::vector<uint32_t> adapter::unique_families(video::queue::types sync_queues) {
+	std::vector<uint32_t> families;
+
+	if (sync_queues & video::queue::type::graphics)
+		families.push_back(graphics_family);
+
+	if (sync_queues & video::queue::type::compute && std::find(
+			families.begin(), families.end(), compute_family) == families.end())
+		families.push_back(compute_family);
+
+	if (sync_queues & video::queue::type::copy && std::find(
+			families.begin(), families.end(), transfer_family) == families.end())
+		families.push_back(transfer_family);
+
+	return families;
 }
 
 uint32_t adapter::vendor_id() {
-	return vk_physical_device_properties.vendorID;
+	return physical_device_properties.vendorID;
 }
 
 uint32_t adapter::device_id() {
-	return vk_physical_device_properties.deviceID;
+	return physical_device_properties.deviceID;
 }
 
 std::string adapter::name() {
-	return vk_physical_device_properties.deviceName;
+	return physical_device_properties.deviceName;
 }
 
 uint64_t adapter::dedicated_video_memory() {
 	static VkDeviceSize memory = [&]() {
 		VkDeviceSize memory = 0;
-		for (uint32_t i = 0; i < vk_physical_device_memory_properties.memoryHeapCount; i++) {
-			VkMemoryHeap heap = vk_physical_device_memory_properties.memoryHeaps[i];
+		for (uint32_t i = 0; i < physical_device_memory_properties.memoryHeapCount; i++) {
+			VkMemoryHeap heap = physical_device_memory_properties.memoryHeaps[i];
 			if (heap.flags & VkMemoryHeapFlagBits::VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
 				memory += heap.size;
 		}
@@ -123,6 +141,10 @@ uint64_t adapter::dedicated_video_memory() {
 	}();
 	
 	return memory;
+}
+
+std::shared_ptr<video::device> adapter::create_device() {
+	return std::make_shared<vk12::device>(shared_from_this());
 }
 
 }

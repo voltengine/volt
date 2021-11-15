@@ -40,6 +40,12 @@
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\modules.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\os\monitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\os\window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\paths.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -55,28 +61,13 @@
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\util\version.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\adapter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\device.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\instance.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\pipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\monitor.cpp">
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\video.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\adapter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\device.cpp">
@@ -85,19 +76,22 @@
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\instance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\swapchain.cpp">
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\texture_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\vk12.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="D:\Library\Source\voltengine\volt\src\volt\video\window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="D:\Library\Source\voltengine\volt\build\generated\volt.cpp">
@@ -210,6 +204,15 @@
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\modules.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\os\monitor.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\os\os.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\os\window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\paths.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -228,82 +231,103 @@
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\adapter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\command_buffer.hpp">
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\buffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\command_queue.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\d3d12\adapter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\d3d12\d3d12.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\d3d12\device.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\d3d12\instance.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\d3d12\pipeline.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\d3d12\shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\d3d12\window.hpp">
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\buffer_view.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\device.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\fence.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\instance.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\monitor.hpp">
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\pool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\pipeline.hpp">
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\queue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\resource.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\routine.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\shader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\swapchain.hpp">
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\surface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\texture_view.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\video.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\vk12\adapter.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\vk12\device.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\vk12\instance.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\vk12\shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\vk12\swapchain.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\vk12\vk12.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\vk12\window.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\video\window.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\include\volt\volt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\pch.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\adapter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\d3d12.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\device.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\instance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\pipeline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\shader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\d3d12\window.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\adapter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\buffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\device.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\instance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\queue.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\shader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\surface.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\texture_view.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="D:\Library\Source\voltengine\volt\src\volt\video\vk12\vk12.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="D:\Library\Source\voltengine\volt\build\CMakeFiles\Volt.dir\Debug\cmake_pch.hxx">
