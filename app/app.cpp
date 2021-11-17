@@ -32,31 +32,35 @@ int main() {
 
 		using namespace video;
 
-		auto window = std::make_shared<os::window>("Test Window", math::uvec2(1280, 720));
+		std::shared_ptr<os::window> window = std::make_shared<os::window>("Test Window", math::uvec2(1280, 720));
 		window->set_visible(true);
 
-		auto instance = video::create_instance(video::api::vk12);
-		auto adapter = instance->list_adapters()[0];
-		auto device = adapter->create_device();
-		auto surface = device->create_surface(window);
+		std::shared_ptr<video::instance> instance = video::create_instance(video::api::vk12);
+		std::vector<std::shared_ptr<video::adapter>> adapters = instance->enumerate_adapters();
+		std::shared_ptr<video::adapter> &adapter = adapters[0];
+		std::shared_ptr<video::device> device = adapter->create_device();
+		std::shared_ptr<video::surface> surface = device->create_surface(window);
+		std::shared_ptr<video::graphics_queue> queue = device->access_graphics_queue();
+		std::shared_ptr<video::graphics_pool> pool = queue->create_pool();
+		std::shared_ptr<video::graphics_routine> routine = pool->create_routine();
+		std::shared_ptr<video::graphics_subroutine> subroutine = pool->create_subroutine();
+
 		// create_surface(window) emits an error if another surface is already created for that window.
 		// Dropping all references to surface will destroy it and in turn allow another call to create_surface(window).
 
 		auto buffer = device->create_buffer(
-			resource::type::internal,
-			queue::type::graphics | queue::type::copy,
-			buffer::feature::vertex | buffer::feature::destination,
+			resource_type::internal,
+			sync_queue::graphics | sync_queue::copy,
+			buffer_feature::vertex | buffer_feature::destination,
 			1024
 		);
 		
 		auto texture = device->create_texture(
-			resource::type::internal,
-			0,
-			texture::feature::sampler | texture::feature::destination,
-			{ 2048, 2048 }, 1, 1, texture::format::bc1_srgb
+			resource_type::internal,
+			sync_queue::none,
+			texture_feature::sampler | texture_feature::destination,
+			{ 2048, 2048 }, 1, 1, texture_format::bc1_srgb
 		);
-		// auto queue = device->get_graphics_queue();
-		// auto buffers = window->get_buffers();
 		
 		while (!window->is_closing()) { glfwPollEvents(); }
 

@@ -1,7 +1,8 @@
 #include "../util/util.hpp"
 
-namespace volt::math {
+#include "../error.hpp"
 
+namespace volt::math {
 
 template<scalar T>
 const quat<T> quat<T>::identity(1);
@@ -32,7 +33,7 @@ quat<T> quat<T>::axis_angle(T angle, const vec3<U> &axis) {
 template<scalar T>
 template<scalar U>
 quat<T> quat<T>::from_basis(const mat3<U> &basis) {
-	assert(is_orthonormal(basis) && "Basis must be orthonormal.");
+	VOLT_DEVELOPMENT_ASSERT(is_orthonormal(basis), "Basis must be orthonormal.")
 
 	vec3<T> x = basis.x, y = basis.y, z = basis.z;
 

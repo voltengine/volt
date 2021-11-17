@@ -1,10 +1,10 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/device.hpp>
 
 #include <volt/math/math.hpp>
 #include <volt/video/vk12/adapter.hpp>
 #include <volt/video/vk12/buffer.hpp>
-#include <volt/video/vk12/shader.hpp>
+#include <volt/video/vk12/fence.hpp>
+#include <volt/video/vk12/queue.hpp>
 #include <volt/video/vk12/surface.hpp>
 #include <volt/video/vk12/texture.hpp>
 #include <volt/video/vk12/vk12.hpp>
@@ -52,7 +52,7 @@ device::device(std::shared_ptr<video::adapter> &&adapter) : video::device(std::m
 	VkPhysicalDeviceFeatures device_features{};
 	device_info.pEnabledFeatures = &device_features;
 
-#ifndef NDEBUG
+#ifdef VOLT_VIDEO_DEBUG
 	auto &layers = vk12::validation_layers();
 	device_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
 	device_info.ppEnabledLayerNames = layers.data();
@@ -61,8 +61,8 @@ device::device(std::shared_ptr<video::adapter> &&adapter) : video::device(std::m
 	device_info.ppEnabledExtensionNames = vk12::device_extensions.data();
 	device_info.enabledExtensionCount = vk12::device_extensions.size();
 
-	VOLT_ASSERT(vkCreateDevice(_adapter.physical_device, &device_info, nullptr, &vk_device)
-			== VK_SUCCESS, "Failed to create device.")
+	VOLT_VK12_CHECK(vkCreateDevice(_adapter.physical_device, &device_info,
+			nullptr, &vk_device), "Failed to create device.")
 	VOLT_ASSERT(gladLoaderLoadVulkan(instance.vk_instance, _adapter.physical_device, vk_device),
 			"Failed to load Vulkan device symbols.")
 
@@ -73,12 +73,13 @@ device::device(std::shared_ptr<video::adapter> &&adapter) : video::device(std::m
 	allocator_info.instance = instance.vk_instance;
 	vmaCreateAllocator(&allocator_info, &allocator);
 
-	vkGetDeviceQueue(vk_device, _adapter.graphics_family, 0, &graphics_queue.vk_queue);
-	vkGetDeviceQueue(vk_device, _adapter.compute_family, 0, &compute_queue.vk_queue);
-	vkGetDeviceQueue(vk_device, _adapter.transfer_family, 0, &transfer_queue.vk_queue);
+	vkGetDeviceQueue(vk_device, _adapter.graphics_family, 0, &vk_graphics_queue);
+	vkGetDeviceQueue(vk_device, _adapter.compute_family, 0, &vk_compute_queue);
+	vkGetDeviceQueue(vk_device, _adapter.transfer_family, 0, &vk_copy_queue);
 }
 
 device::~device() {
+	wait();
 	vmaDestroyAllocator(allocator);
 	vkDestroyDevice(vk_device, nullptr);
 }
@@ -87,25 +88,18 @@ void device::wait() {
 	vkDeviceWaitIdle(vk_device);
 }
 
-video::queue &device::get_graphics_queue() {
-	return graphics_queue;
-}
-
-video::queue &device::get_compute_queue() {
-	return compute_queue;
-}
-
-video::queue &device::get_copy_queue() {
-	return transfer_queue;
-}
-
 std::shared_ptr<video::buffer> device::create_buffer(
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::buffer::features features,
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::buffer_features features,
 		size_t size) {
 	return std::shared_ptr<video::buffer>(new vk12::buffer(
 			shared_from_this(), resource_type, sync_queues, features, size));
+}
+
+std::shared_ptr<video::fence> device::create_fence(uint64_t initial_value) {
+	return std::shared_ptr<video::fence>(new vk12::fence(
+			shared_from_this(), initial_value));
 }
 
 std::shared_ptr<video::surface> device::create_surface(std::shared_ptr<os::window> window) {
@@ -113,42 +107,54 @@ std::shared_ptr<video::surface> device::create_surface(std::shared_ptr<os::windo
 }
 
 std::shared_ptr<video::texture> device::create_texture(
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::texture::features features,
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::texture_features features,
 		size_t size, uint32_t levels, uint32_t layers,
-		video::texture::format format) {
+		video::texture_format format) {
 	return std::shared_ptr<video::texture>(new vk12::texture(
 			shared_from_this(), resource_type, sync_queues, features, size, levels, layers, format));
 }
 
 std::shared_ptr<video::texture> device::create_texture(
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::texture::features features,
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::texture_features features,
 		math::uvec2 size, uint32_t levels, uint32_t layers,
-		video::texture::format format) {
+		video::texture_format format) {
 	return std::shared_ptr<video::texture>(new vk12::texture(
 			shared_from_this(), resource_type, sync_queues, features, size, levels, layers, format));
 }
 
 std::shared_ptr<video::texture> device::create_texture(
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::texture::features features,
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::texture_features features,
 		math::uvec3 size, uint32_t levels, uint32_t layers,
-		video::texture::format format) {
-	return std::shared_ptr<video::texture>(new vk12::texture(
-			shared_from_this(), resource_type, sync_queues, features, size, levels, layers, format));
-}
-
-std::shared_ptr<video::shader> device::create_shader(
-		const std::vector<uint8_t> &bytecode) {
-	return std::shared_ptr<video::shader>(new vk12::shader(vk_device, bytecode));
+		video::texture_format format) {
+	return std::shared_ptr<video::texture>(
+			new vk12::texture(shared_from_this(),
+			resource_type, sync_queues, features,
+			size, levels, layers, format));
 }
 
 // std::shared_ptr<video::pipeline> device::create_pipeline() {
 // 	return nullptr; // TODO: Implement
 // }
+
+std::shared_ptr<video::graphics_queue> device::new_graphics_queue() {
+	return std::shared_ptr<video::graphics_queue>(
+			new vk12::graphics_queue(shared_from_this(), vk_graphics_queue));
+}
+
+std::shared_ptr<video::compute_queue> device::new_compute_queue() {
+	return std::shared_ptr<video::compute_queue>(
+			new vk12::compute_queue(shared_from_this(), vk_compute_queue));
+}
+
+std::shared_ptr<video::copy_queue> device::new_copy_queue() {
+	return std::shared_ptr<video::copy_queue>(
+			new vk12::copy_queue(shared_from_this(), vk_copy_queue));
+}
 
 }

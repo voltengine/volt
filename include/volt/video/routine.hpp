@@ -2,16 +2,63 @@
 
 #include "../macros.hpp"
 
+#include <memory>
+
+#include "enums.hpp"
+
 namespace volt::video {
 
+template<command_type T>
+class pool;
+
+template<command_type T, bool Sub = false>
 class routine {
 public:
+	virtual void begin(bool disposable) = 0;
+
+	// virtual void begin(bool disposable, render_pass, uint32_t subpass, framebuffer, bool occlusion_query, bool precise_query) = 0;
+
+	virtual void end() = 0;
+
+	virtual void execute_subroutine(const std::shared_ptr<video::routine<T, true>> &subroutine) = 0;
+
+	const std::shared_ptr<video::pool<T>> &get_pool() {
+		return pool;
+	}
+
+protected:
+	std::shared_ptr<video::pool<T>> pool;
+
+	routine(std::shared_ptr<video::pool<T>> &&pool)
+			: pool(std::move(pool)) {}
+};
+
+template<command_type T>
+using subroutine = routine<T, true>;
+
+using graphics_routine = routine<command_type::graphics>;
+using compute_routine = routine<command_type::compute>;
+using copy_routine = routine<command_type::copy>;
+
+using graphics_subroutine = subroutine<command_type::graphics>;
+using compute_subroutine = subroutine<command_type::compute>;
+using copy_subroutine = subroutine<command_type::copy>;
+
+// TODO: Specialize graphics, compute, copy routines
+
+}
+
+// #pragma once
+
+// #include "../macros.hpp"
+
+// namespace volt::video {
+
 // #ifndef NDEBUG
-// 	video::queue::type get_queue_type();
+// 	video::queue_type get_queue_type();
 // #endif
 
 	// Common
-	// void reset();
 	// void begin();
 	// void end();
 
@@ -36,12 +83,4 @@ public:
 	//void copy_buffer_to_image() // vkCmdCopyBufferToImage
 	// void copy_buffer // vkCmdCopyBuffer
 
-protected:
-// #ifndef NDEBUG
-// 	video::queue::type queue_type;
-// #endif
 
-	VOLT_API routine() = default;
-};
-
-}

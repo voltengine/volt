@@ -1,7 +1,5 @@
 #pragma once
 
-#include <volt/macros.hpp>
-
 #include <volt/pch.hpp>
 
 #include <volt/video/adapter.hpp>
@@ -23,19 +21,19 @@ public:
 	std::vector<VkPresentModeKHR> surface_present_modes;
 	VkPhysicalDeviceMemoryProperties memory_properties;
 
-	VOLT_API adapter(std::shared_ptr<video::instance> &&instance, VkPhysicalDevice physical_device, VkSurfaceKHR vk_dummy_surface);
+	adapter(std::shared_ptr<video::instance> &&instance, VkPhysicalDevice physical_device, VkSurfaceKHR vk_dummy_surface);
 
-	VOLT_API std::vector<uint32_t> unique_families(video::queue::types sync_queues);
+	std::vector<uint32_t> unique_families(video::sync_queues sync_queues);
 
-	VOLT_API uint32_t vendor_id() override;
+	uint32_t vendor_id() override;
 
-	VOLT_API uint32_t device_id() override;
+	uint32_t device_id() override;
 
-	VOLT_API std::string name() override;
+	std::string name() override;
 
-	VOLT_API uint64_t dedicated_video_memory() override;
+	uint64_t dedicated_video_memory() override;
 
-	VOLT_API std::shared_ptr<video::device> create_device() override;
+	std::shared_ptr<video::device> create_device() override;
 };
 
 }

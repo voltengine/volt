@@ -1,4 +1,3 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/instance.hpp>
 
 #include <volt/util/util.hpp>
@@ -60,7 +59,7 @@ instance::instance() {
 	instance_info.pApplicationInfo = &app_info;
 
 	// Attach debug functionality to instance info
-#ifndef NDEBUG
+#ifdef VOLT_VIDEO_DEBUG
 		// Attach validation layers
 	auto &layers = vk12::validation_layers();
 	instance_info.enabledLayerCount = static_cast<uint32_t>(layers.size());
@@ -81,7 +80,7 @@ instance::instance() {
 				glfw_extensions + num_glfw_extensions);
 
 		// More instance extensions can be added here
-	#ifndef NDEBUG
+	#ifdef VOLT_VIDEO_DEBUG
 		extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 	#endif
 
@@ -91,26 +90,26 @@ instance::instance() {
 	instance_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 
 	// Initialize instance
-	VOLT_ASSERT(vkCreateInstance(&instance_info, nullptr, &vk_instance)
-			== VK_SUCCESS, "Failed to create instance.")
+	VOLT_VK12_CHECK(vkCreateInstance(&instance_info, nullptr, &vk_instance),
+			"Failed to create instance.")
 	VOLT_ASSERT(gladLoaderLoadVulkan(vk_instance, nullptr, nullptr),
 			"Failed to load Vulkan instance symbols.")
 
 	// Initialize debug messenger
-#ifndef NDEBUG
-	VOLT_ASSERT(vkCreateDebugUtilsMessengerEXT(vk_instance, &messenger_info, nullptr, &vk_messenger)
-			== VK_SUCCESS, "Failed to create debug utils messenger.")
+#ifdef VOLT_VIDEO_DEBUG
+	VOLT_VK12_CHECK(vkCreateDebugUtilsMessengerEXT(vk_instance, &messenger_info, nullptr, &vk_messenger),
+			"Failed to create debug utils messenger.")
 #endif
 }
 
 instance::~instance() {
-#ifndef NDEBUG
+#ifdef VOLT_VIDEO_DEBUG
 	vkDestroyDebugUtilsMessengerEXT(vk_instance, vk_messenger, nullptr);
 #endif
 	vkDestroyInstance(vk_instance, nullptr);
 }
 
-std::vector<std::shared_ptr<video::adapter>> instance::list_adapters() {
+std::vector<std::shared_ptr<video::adapter>> instance::enumerate_adapters() {
 	uint32_t num_physical_devices = 0;
 	vkEnumeratePhysicalDevices(vk_instance, &num_physical_devices, nullptr);
 
@@ -128,8 +127,8 @@ std::vector<std::shared_ptr<video::adapter>> instance::list_adapters() {
 	VOLT_ASSERT(glfw_dummy_window, "Failed to create window.")
 
 	VkSurfaceKHR vk_dummy_surface;
-	VOLT_ASSERT(glfwCreateWindowSurface(vk_instance, glfw_dummy_window, nullptr, &vk_dummy_surface)
-			== VK_SUCCESS, "Failed to create window surface.")
+	VOLT_VK12_CHECK(glfwCreateWindowSurface(vk_instance, glfw_dummy_window, nullptr, &vk_dummy_surface),
+			"Failed to create window surface.")
 
 	std::vector<std::shared_ptr<video::adapter>> adapters;
 	adapters.reserve(num_physical_devices);
@@ -144,7 +143,7 @@ std::vector<std::shared_ptr<video::adapter>> instance::list_adapters() {
 		}
 
 		// Test if there's sufficient amount of queues available
-		// TODO: Drob this part and make queues shareable
+		// TODO: Drop this part and make queues shareable
 		auto families = adapter->families;
 		if (--families[adapter->present_family].queueCount < 0)
 			continue;

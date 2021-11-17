@@ -1,4 +1,3 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/swapchain.hpp>
 
 #include <volt/error.hpp>

@@ -1,10 +1,10 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/surface.hpp>
 
 #include <volt/video/vk12/adapter.hpp>
 #include <volt/video/vk12/device.hpp>
 #include <volt/video/vk12/instance.hpp>
 #include <volt/video/vk12/texture.hpp>
+#include <volt/video/vk12/vk12.hpp>
 #include <volt/error.hpp>
 
 static void frame_resize_callback() {
@@ -24,7 +24,7 @@ surface::surface(std::shared_ptr<video::device> &&device, std::shared_ptr<os::wi
 	this->window->_construct_surface();
 	
 	// Surface
-	VOLT_ASSERT(glfwCreateWindowSurface(instance.vk_instance, this->window->_glfw_window, nullptr, &vk_surface) == VK_SUCCESS,
+	VOLT_VK12_CHECK(glfwCreateWindowSurface(instance.vk_instance, this->window->_glfw_window, nullptr, &vk_surface),
 			"Failed to create window surface.")
 
 	// Swapchain
@@ -92,8 +92,8 @@ surface::surface(std::shared_ptr<video::device> &&device, std::shared_ptr<os::wi
 
 	swapchain_info.oldSwapchain = VK_NULL_HANDLE;
 
-	VOLT_ASSERT(vkCreateSwapchainKHR(_device.vk_device, &swapchain_info, nullptr, &vk_swapchain)
-			== VK_SUCCESS, "Failed to create swapchain.")
+	VOLT_VK12_CHECK(vkCreateSwapchainKHR(_device.vk_device, &swapchain_info, nullptr, &vk_swapchain),
+			"Failed to create swapchain.")
 
 	// Get swapchain textures
 	uint32_t num_images;
@@ -102,10 +102,10 @@ surface::surface(std::shared_ptr<video::device> &&device, std::shared_ptr<os::wi
 	vkGetSwapchainImagesKHR(_device.vk_device, vk_swapchain, &num_images, images.data());
 
 	// Create textures and views
-	for (VkImage image : images) {
-		auto texture = std::make_shared<vk12::texture>(std::shared_ptr(this->device), image, surface_format.format);
-		auto view = texture->create_view(video::texture_view::type::tex2d, video::texture_view::aspect::color);
-	}
+	// for (VkImage image : images) {
+	// 	auto texture = std::make_shared<vk12::texture>(std::shared_ptr(this->device), image, surface_format.format);
+	// 	auto view = texture->create_view(video::texture_view::type::tex2d, video::texture_view::aspect::color);
+	// }
 
 	// // Create Framebuffers
 

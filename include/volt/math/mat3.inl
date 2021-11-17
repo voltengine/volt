@@ -1,3 +1,5 @@
+#include "../error.hpp"
+
 namespace volt::math {
 
 template<scalar T>
@@ -244,7 +246,7 @@ mat3<T> inverse(const mat3<T> &mat) {
 	T det3 = +(mat.x.y * mat.y.z - mat.y.y * mat.x.z);
 
 	T det = mat.x.x * det1 + mat.y.x * det2 + mat.z.x * det3;
-	assert(det != 0 && "Matrix is singular.");
+	VOLT_DEVELOPMENT_ASSERT(det != 0, "Matrix is singular.")
 
 	return mat3<T>(
 		det1, det2, det3,

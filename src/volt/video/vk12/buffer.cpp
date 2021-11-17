@@ -1,4 +1,3 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/buffer.hpp>
 
 #include <volt/video/vk12/adapter.hpp>
@@ -8,9 +7,9 @@
 namespace volt::video::vk12 {
 
 buffer::buffer(std::shared_ptr<video::device> &&device,
-			video::resource::type resource_type,
-			video::queue::types sync_queues,
-			video::buffer::features features,
+			video::resource_type resource_type,
+			video::sync_queues sync_queues,
+			video::buffer_features features,
 			size_t size)
 			: video::buffer(std::move(device)),
 			_device(*static_cast<vk12::device *>(this->device.get())) {
@@ -40,8 +39,7 @@ buffer::~buffer() {
 }
 
 void buffer::map(void **ptr) {
-	VOLT_DEVELOPMENT_ASSERT(vmaMapMemory(_device.allocator, allocation, ptr)
-			== VK_SUCCESS, "Failed to unmap memory.");
+	VOLT_VK12_DEBUG_CHECK(vmaMapMemory(_device.allocator, allocation, ptr), "Failed to map buffer memory.")
 }
 
 void buffer::unmap() {
@@ -49,13 +47,11 @@ void buffer::unmap() {
 }
 
 void buffer::read(size_t offset, size_t size) {
-	VOLT_DEVELOPMENT_ASSERT(vmaInvalidateAllocation(_device.allocator, allocation, offset, size)
-			== VK_SUCCESS, "Failed to invalidate allocation.");
+	VOLT_VK12_DEBUG_CHECK(vmaInvalidateAllocation(_device.allocator, allocation, offset, size),  "Failed to invalidate allocation.")
 }
 
 void buffer::write(size_t offset, size_t size) {
-	VOLT_DEVELOPMENT_ASSERT(vmaFlushAllocation(_device.allocator, allocation, offset, size)
-			== VK_SUCCESS, "Failed to flush allocation.");
+	VOLT_VK12_DEBUG_CHECK(vmaFlushAllocation(_device.allocator, allocation, offset, size), "Failed to flush allocation.")
 }
 
 }

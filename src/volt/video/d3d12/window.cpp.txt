@@ -1,4 +1,3 @@
-#include <volt/pch.hpp>
 #include <volt/video/d3d12/window.hpp>
 
 namespace volt::video::d3d12::_internal {

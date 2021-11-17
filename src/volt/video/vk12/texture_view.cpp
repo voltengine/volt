@@ -1,29 +1,29 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/texture_view.hpp>
 
 #include <volt/video/vk12/device.hpp>
 #include <volt/video/vk12/texture.hpp>
+#include <volt/video/vk12/vk12.hpp>
 #include <volt/error.hpp>
 
 namespace volt::video::vk12 {
 
-static std::map<video::texture_view::type, VkImageViewType> view_types{
-	{ video::texture_view::type::tex1d,       VK_IMAGE_VIEW_TYPE_1D },
-	{ video::texture_view::type::tex1d_array, VK_IMAGE_VIEW_TYPE_1D_ARRAY },
+static std::map<video::texture_view_type, VkImageViewType> view_types{
+	{ video::texture_view_type::tex1d,       VK_IMAGE_VIEW_TYPE_1D },
+	{ video::texture_view_type::tex1d_array, VK_IMAGE_VIEW_TYPE_1D_ARRAY },
 
-	{ video::texture_view::type::tex2d,       VK_IMAGE_VIEW_TYPE_2D },
-	{ video::texture_view::type::tex2d_array, VK_IMAGE_VIEW_TYPE_2D_ARRAY },
+	{ video::texture_view_type::tex2d,       VK_IMAGE_VIEW_TYPE_2D },
+	{ video::texture_view_type::tex2d_array, VK_IMAGE_VIEW_TYPE_2D_ARRAY },
 
-	{ video::texture_view::type::tex3d, VK_IMAGE_VIEW_TYPE_3D },
+	{ video::texture_view_type::tex3d,       VK_IMAGE_VIEW_TYPE_3D },
 
-	{ video::texture_view::type::cube,       VK_IMAGE_VIEW_TYPE_CUBE },
-	{ video::texture_view::type::cube_array, VK_IMAGE_VIEW_TYPE_CUBE_ARRAY }
+	{ video::texture_view_type::cube,        VK_IMAGE_VIEW_TYPE_CUBE },
+	{ video::texture_view_type::cube_array,  VK_IMAGE_VIEW_TYPE_CUBE_ARRAY }
 };
 
 texture_view::texture_view(
 		std::shared_ptr<video::texture> &&texture,
-		video::texture_view::type type,
-		video::texture_view::aspects aspects)
+		video::texture_view_type type,
+		video::texture_view_aspects aspects)
 		: video::texture_view(std::move(texture)) {
 	auto &_texture = *static_cast<vk12::texture *>(texture.get());
 	auto &device = *static_cast<vk12::device *>(_texture.get_device().get());
@@ -43,8 +43,8 @@ texture_view::texture_view(
 	view_create_info.subresourceRange.baseArrayLayer = 0;
 	view_create_info.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
 
-	VOLT_ASSERT(vkCreateImageView(device.vk_device, &view_create_info, nullptr, &image_view)
-			== VK_SUCCESS, "Failed to create image view.")
+	VOLT_VK12_CHECK(vkCreateImageView(device.vk_device, &view_create_info, nullptr, &image_view),
+			"Failed to create image view.")
 }
 
 texture_view::~texture_view() {

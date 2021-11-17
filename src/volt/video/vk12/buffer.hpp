@@ -1,7 +1,5 @@
 #pragma once
 
-#include <volt/macros.hpp>
-
 #include <volt/pch.hpp>
 
 #include <volt/video/vk12/device.hpp>
@@ -15,21 +13,21 @@ public:
 	VkBuffer vk_buffer;
 	VmaAllocation allocation;
 
-	VOLT_API buffer(std::shared_ptr<video::device> &&device,
-			video::resource::type resource_type,
-			video::queue::types sync_queues,
-			video::buffer::features features,
+	buffer(std::shared_ptr<video::device> &&device,
+			video::resource_type resource_type,
+			video::sync_queues sync_queues,
+			video::buffer_features features,
 			size_t size);
 
-	VOLT_API ~buffer();
+	~buffer();
 
-	VOLT_API void map(void **ptr) override;
+	void map(void **ptr) override;
 
-	VOLT_API void unmap() override;
+	void unmap() override;
 
-	VOLT_API void read(size_t offset, size_t size) override;
+	void read(size_t offset, size_t size) override;
 
-	VOLT_API void write(size_t offset, size_t size) override;
+	void write(size_t offset, size_t size) override;
 
 private:
 	vk12::device &_device;

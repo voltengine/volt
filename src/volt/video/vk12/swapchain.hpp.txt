@@ -1,7 +1,5 @@
 #pragma once
 
-#include <volt/macros.hpp>
-
 #include <volt/pch.hpp>
 
 #include <volt/video/swapchain.hpp>
@@ -15,9 +13,9 @@ public:
 	vk12::device &device;
 	VkSwapchainKHR vk_swapchain;
 
-	VOLT_API swapchain(vk12::device &device, vk12::window &window);
+	swapchain(vk12::device &device, vk12::window &window);
 
-	VOLT_API ~swapchain();
+	~swapchain();
 };
 
 }

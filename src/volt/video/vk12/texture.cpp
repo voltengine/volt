@@ -1,4 +1,3 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/texture.hpp>
 
 #include <volt/video/vk12/adapter.hpp>
@@ -11,11 +10,11 @@ namespace volt::video::vk12 {
 using namespace math;
 
 texture::texture(std::shared_ptr<video::device> &&device,
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::texture::features features,
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::texture_features features,
 		uint32_t size, uint32_t levels, uint32_t layers,
-		video::texture::format format)
+		video::texture_format format)
 		: video::texture(std::move(device)),
 		_device(*static_cast<vk12::device *>(this->device.get())) {
 	VkImageCreateInfo image_info{};
@@ -28,11 +27,11 @@ texture::texture(std::shared_ptr<video::device> &&device,
 }
 
 texture::texture(std::shared_ptr<video::device> &&device,
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::texture::features features,
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::texture_features features,
 		math::uvec2 size, uint32_t levels, uint32_t layers,
-		video::texture::format format)
+		video::texture_format format)
 		: video::texture(std::move(device)),
 		_device(*static_cast<vk12::device *>(this->device.get())) {
 	VkImageCreateInfo image_info{};
@@ -45,11 +44,11 @@ texture::texture(std::shared_ptr<video::device> &&device,
 }
 
 texture::texture(std::shared_ptr<video::device> &&device,
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::texture::features features,
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::texture_features features,
 		math::uvec3 size, uint32_t levels, uint32_t layers,
-		video::texture::format format)
+		video::texture_format format)
 		: video::texture(std::move(device)),
 		_device(*static_cast<vk12::device *>(this->device.get())) {
 	VkImageCreateInfo image_info{};
@@ -72,15 +71,15 @@ texture::~texture() {
 }
 
 std::shared_ptr<video::texture_view> texture::create_view(
-		video::texture_view::type type,
-		video::texture_view::aspects aspects) {
+		video::texture_view_type type,
+		video::texture_view_aspects aspects) {
 	return std::shared_ptr<video::texture_view>(static_cast<video::texture_view *>(
 			new vk12::texture_view(shared_from_this(), type, aspects)));
 }
 
 void texture::map(void **ptr) {
-	VOLT_DEVELOPMENT_ASSERT(vmaMapMemory(_device.allocator, allocation, ptr)
-			== VK_SUCCESS, "Failed to unmap memory.");
+	VOLT_VK12_DEBUG_CHECK(vmaMapMemory(_device.allocator, allocation, ptr),
+			"Failed to unmap memory.");
 }
 
 void texture::unmap() {
@@ -88,30 +87,30 @@ void texture::unmap() {
 }
 
 void texture::read(size_t offset, size_t size) {
-	VOLT_DEVELOPMENT_ASSERT(vmaInvalidateAllocation(_device.allocator, allocation, offset, size)
-			== VK_SUCCESS, "Failed to invalidate allocation.");
+	VOLT_VK12_DEBUG_CHECK(vmaInvalidateAllocation(_device.allocator, allocation, offset, size),
+			"Failed to invalidate allocation.");
 }
 
 void texture::write(size_t offset, size_t size) {
-	VOLT_DEVELOPMENT_ASSERT(vmaFlushAllocation(_device.allocator, allocation, offset, size)
-			== VK_SUCCESS, "Failed to flush allocation.");
+	VOLT_VK12_DEBUG_CHECK(vmaFlushAllocation(_device.allocator, allocation, offset, size),
+			"Failed to flush allocation.");
 }
 
 void texture::create(VkImageCreateInfo &&image_info,
-		video::resource::type resource_type,
-		video::queue::types sync_queues,
-		video::texture::features features,
-		uint32_t levels, video::texture::format format) {
+		video::resource_type resource_type,
+		video::sync_queues sync_queues,
+		video::texture_features features,
+		uint32_t levels, video::texture_format format) {
 	auto &adapter = *static_cast<vk12::adapter *>(_device.get_adapter().get());
 
 	VkBufferUsageFlags buffer_usage = (features & 0b11) | ((features & 0b111100) << 2);
 	// Buffer will never be used in presentation queue
 	std::set<uint32_t> unique_families;
-	if (sync_queues & video::queue::type::graphics)
+	if (sync_queues & video::sync_queue::graphics)
 		unique_families.emplace(adapter.graphics_family);
-	if (sync_queues & video::queue::type::compute)
+	if (sync_queues & video::sync_queue::compute)
 		unique_families.emplace(adapter.compute_family);
-	if (sync_queues & video::queue::type::copy)
+	if (sync_queues & video::sync_queue::copy)
 		unique_families.emplace(adapter.transfer_family);
 	std::vector<uint32_t> families(unique_families.begin(), unique_families.end());
 

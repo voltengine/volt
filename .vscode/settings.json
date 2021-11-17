@@ -69,6 +69,17 @@
 		"numeric": "cpp",
 		"valarray": "cpp",
 		"deque": "cpp",
-		"stack": "cpp"
+		"stack": "cpp",
+		"bitset": "cpp",
+		"codecvt": "cpp",
+		"condition_variable": "cpp",
+		"fstream": "cpp",
+		"mutex": "cpp",
+		"optional": "cpp",
+		"regex": "cpp",
+		"set": "cpp",
+		"shared_mutex": "cpp",
+		"sstream": "cpp",
+		"numbers": "cpp"
 	}
 }

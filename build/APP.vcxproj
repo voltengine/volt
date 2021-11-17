@@ -59,25 +59,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Library\Source\voltengine\volt\build\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Library\Source\voltengine\volt\build\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">APP.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">APP</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Library\Source\voltengine\volt\build\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Library\Source\voltengine\volt\build\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">APP.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">APP</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Library\Source\voltengine\volt\build\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Library\Source\voltengine\volt\build\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">APP.dir\MinSizeRel\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">APP</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Library\Source\voltengine\volt\build\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Library\Source\voltengine\volt\build\bin\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">APP.dir\RelWithDebInfo\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">APP</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -99,15 +99,15 @@
       <PrecompiledHeaderOutputFile>D:/Library/Source/voltengine/volt/build/APP.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;VOLT_MAX_COMPONENTS=128;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;VOLT_MAX_COMPONENTS=128;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -115,13 +115,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>Glad::Glad.lib;GLFW::GLFW.lib;Debug\volt.lib;Date::Date.lib;Glad::Glad.lib;GLFW::GLFW.lib;JSON::JSON.lib;Termcolor::Termcolor.lib;VulkanMemoryAllocator::VulkanMemoryAllocator.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Debug\volt.lib;dependencies\glfw\src\Debug\glfw3dll.lib;dependencies\vulkan-memory-allocator\Debug\vma.lib;dependencies\glad\Debug\glad.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>D:/Library/Source/voltengine/volt/build/Debug/APP.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/Debug/APP.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/bin/APP.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -130,7 +130,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -141,17 +141,17 @@
       <PrecompiledHeaderOutputFile>D:/Library/Source/voltengine/volt/build/APP.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;VOLT_MAX_COMPONENTS=128;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;VOLT_MAX_COMPONENTS=128;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -159,13 +159,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>Glad::Glad.lib;GLFW::GLFW.lib;Release\volt.lib;Date::Date.lib;Glad::Glad.lib;GLFW::GLFW.lib;JSON::JSON.lib;Termcolor::Termcolor.lib;VulkanMemoryAllocator::VulkanMemoryAllocator.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>Release\volt.lib;dependencies\glfw\src\Release\glfw3dll.lib;dependencies\vulkan-memory-allocator\Release\vma.lib;dependencies\glad\Release\glad.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>D:/Library/Source/voltengine/volt/build/Release/APP.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/Release/APP.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/bin/APP.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -174,7 +174,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
@@ -185,17 +185,17 @@
       <PrecompiledHeaderOutputFile>D:/Library/Source/voltengine/volt/build/APP.dir/MinSizeRel/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;VOLT_MAX_COMPONENTS=128;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;VOLT_MAX_COMPONENTS=128;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -203,13 +203,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>Glad::Glad.lib;GLFW::GLFW.lib;MinSizeRel\volt.lib;Date::Date.lib;Glad::Glad.lib;GLFW::GLFW.lib;JSON::JSON.lib;Termcolor::Termcolor.lib;VulkanMemoryAllocator::VulkanMemoryAllocator.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>MinSizeRel\volt.lib;dependencies\glfw\src\MinSizeRel\glfw3dll.lib;dependencies\vulkan-memory-allocator\MinSizeRel\vma.lib;dependencies\glad\MinSizeRel\glad.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>D:/Library/Source/voltengine/volt/build/MinSizeRel/APP.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/MinSizeRel/APP.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/bin/APP.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -218,7 +218,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -230,15 +230,15 @@
       <PrecompiledHeaderOutputFile>D:/Library/Source/voltengine/volt/build/APP.dir/RelWithDebInfo/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;VOLT_MAX_COMPONENTS=128;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION="0.1.0";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH="D:/Library/Source/voltengine/volt";VOLT_DEVELOPMENT_MODULE="volt";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;VOLT_MAX_COMPONENTS=128;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;GLAD_API_CALL_EXPORT;GLFW_DLL;VOLT_MAX_COMPONENTS=128;VOLT_VIDEO_DEBUG=false;VOLT_VERSION=\"0.1.0\";VOLT_DEVELOPMENT;VOLT_DEVELOPMENT_PATH=\"D:/Library/Source/voltengine/volt\";VOLT_DEVELOPMENT_MODULE=\"volt\";VMA_DYNAMIC_VULKAN_FUNCTIONS=1;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\volt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Library\Source\voltengine\volt\app;D:\Library\Source\voltengine\.volt\packages\voltengine\glad\2.0.0-beta+vk12.core.loader.all-2021-11-12\include;D:\Library\Source\voltengine\.volt\packages\voltengine\glfw\3.3.5\include;D:\Library\Source\voltengine\volt\include;D:\Library\Source\voltengine\.volt\packages\voltengine\date\3.0.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\json\3.9.1\include;D:\Library\Source\voltengine\.volt\packages\voltengine\termcolor\2.0.0\include;D:\Library\Source\voltengine\.volt\packages\voltengine\vulkan-memory-allocator\2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -246,13 +246,13 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <Link>
-      <AdditionalDependencies>Glad::Glad.lib;GLFW::GLFW.lib;RelWithDebInfo\volt.lib;Date::Date.lib;Glad::Glad.lib;GLFW::GLFW.lib;JSON::JSON.lib;Termcolor::Termcolor.lib;VulkanMemoryAllocator::VulkanMemoryAllocator.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>RelWithDebInfo\volt.lib;dependencies\glfw\src\RelWithDebInfo\glfw3dll.lib;dependencies\vulkan-memory-allocator\RelWithDebInfo\vma.lib;dependencies\glad\RelWithDebInfo\glad.lib;d3d12.lib;dxgi.lib;d3dcompiler.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>D:/Library/Source/voltengine/volt/build/RelWithDebInfo/APP.lib</ImportLibrary>
-      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/RelWithDebInfo/APP.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>D:/Library/Source/voltengine/volt/build/bin/APP.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
     </Link>
     <ProjectReference>
@@ -272,7 +272,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\.volt\cmake\Volt.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Library\Source\voltengine\volt\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Library/Source/voltengine/volt/CMakeLists.txt</Message>
@@ -285,7 +285,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\.volt\cmake\Volt.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Library\Source\voltengine\volt\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule D:/Library/Source/voltengine/volt/CMakeLists.txt</Message>
@@ -298,7 +298,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\.volt\cmake\Volt.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">D:\Library\Source\voltengine\volt\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
       <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule D:/Library/Source/voltengine/volt/CMakeLists.txt</Message>
@@ -311,7 +311,7 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-3.20\Modules\Platform\WindowsPaths.cmake;D:\Library\Source\voltengine\.volt\cmake\Volt.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeCXXCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeRCCompiler.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\3.20.0-rc2\CMakeSystem.cmake;D:\Library\Source\voltengine\volt\build\CMakeFiles\cmake.verify_globs;%(AdditionalInputs)</AdditionalInputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">D:\Library\Source\voltengine\volt\build\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
@@ -360,9 +360,21 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
+    <ProjectReference Include="D:\Library\Source\voltengine\volt\build\dependencies\glfw\src\GLFW.vcxproj">
+      <Project>{B997A7B5-53DA-3908-8004-08D8685AF084}</Project>
+      <Name>GLFW</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Library\Source\voltengine\volt\build\dependencies\glad\Glad.vcxproj">
+      <Project>{6ABDD7E0-F04B-3FC0-926C-0744D1FEDCF3}</Project>
+      <Name>Glad</Name>
+    </ProjectReference>
     <ProjectReference Include="D:\Library\Source\voltengine\volt\build\Volt.vcxproj">
       <Project>{61A44177-2594-3206-BAA0-8B426C58CF4D}</Project>
       <Name>Volt</Name>
+    </ProjectReference>
+    <ProjectReference Include="D:\Library\Source\voltengine\volt\build\dependencies\vulkan-memory-allocator\VulkanMemoryAllocator.vcxproj">
+      <Project>{3F3DB73C-B7DE-3763-9B48-52DACC3A962C}</Project>
+      <Name>VulkanMemoryAllocator</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

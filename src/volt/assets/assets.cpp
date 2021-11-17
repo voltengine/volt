@@ -142,7 +142,7 @@ asset_ref<asset> load(const asset_path &path) {
 	return owner;
 }
 
-VOLT_API void reload(const asset_path &path) {
+void reload(const asset_path &path) {
 	path_to_cached_owner[path]->ptr.reset();
 	// path_to_cached_owner[path]->ptr = load(path);
 }

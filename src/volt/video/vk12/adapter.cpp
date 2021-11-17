@@ -1,4 +1,3 @@
-#include <volt/pch.hpp>
 #include <volt/video/vk12/adapter.hpp>
 
 #include <volt/video/vk12/device.hpp>
@@ -100,17 +99,17 @@ adapter::adapter(std::shared_ptr<video::instance> &&instance,
 	vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
 }
 
-std::vector<uint32_t> adapter::unique_families(video::queue::types sync_queues) {
+std::vector<uint32_t> adapter::unique_families(video::sync_queues sync_queues) {
 	std::vector<uint32_t> families;
 
-	if (sync_queues & video::queue::type::graphics)
+	if (sync_queues & video::sync_queue::graphics)
 		families.push_back(graphics_family);
 
-	if (sync_queues & video::queue::type::compute && std::find(
+	if (sync_queues & video::sync_queue::compute && std::find(
 			families.begin(), families.end(), compute_family) == families.end())
 		families.push_back(compute_family);
 
-	if (sync_queues & video::queue::type::copy && std::find(
+	if (sync_queues & video::sync_queue::copy && std::find(
 			families.begin(), families.end(), transfer_family) == families.end())
 		families.push_back(transfer_family);
 

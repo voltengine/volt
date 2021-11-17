@@ -1,30 +1,62 @@
 #pragma once
 
-#include "../../macros.hpp"
+#include <volt/pch.hpp>
 
-#include <d3d12.h>
-#include <dxgi.h>
+#include <volt/video/device.hpp>
 
-#include "../device.hpp"
-
-namespace volt::video::d3d12::_internal {
+namespace volt::video::d3d12 {
 
 class device : public video::device {
 public:
-	VOLT_API device(IDXGIAdapter1 *d3d_adapter);
+	ID3D12Device *d3d_device;
 
-	VOLT_API ~device();
+#ifdef VOLT_VIDEO_DEBUG
+	ID3D12DebugDevice* debug_device;
+#endif
 
-	VOLT_API void wait() override;
+	device(std::shared_ptr<video::adapter> &&adapter);
 
-	VOLT_API std::shared_ptr<video::swapchain> create_swapchain(const std::shared_ptr<os::window> &window) override;
+	~device();
 
-	VOLT_API std::shared_ptr<video::shader> create_shader(const std::vector<uint8_t> &bytecode) override;
+	void wait() override;
 
-	VOLT_API std::shared_ptr<video::pipeline> create_pipeline() override;
+	std::shared_ptr<video::buffer> create_buffer(
+			video::resource_type resource_type,
+			video::sync_queues sync_queues,
+			video::buffer_features features,
+			size_t size) override;
+
+	std::shared_ptr<video::fence> create_fence(uint64_t initial_value = 0) override;
+
+	std::shared_ptr<video::surface> create_surface(std::shared_ptr<os::window> window) override;
+
+	std::shared_ptr<video::texture> create_texture(
+			video::resource_type resource_type,
+			video::sync_queues sync_queues,
+			video::texture_features features,
+			size_t size, uint32_t levels, uint32_t layers,
+			video::texture_format format) override;
+
+	std::shared_ptr<video::texture> create_texture(
+			video::resource_type resource_type,
+			video::sync_queues sync_queues,
+			video::texture_features features,
+			math::uvec2 size, uint32_t levels, uint32_t layers,
+			video::texture_format format) override;
+
+	std::shared_ptr<video::texture> create_texture(
+			video::resource_type resource_type,
+			video::sync_queues sync_queues,
+			video::texture_features features,
+			math::uvec3 size, uint32_t levels, uint32_t layers,
+			video::texture_format format) override;
 
 private:
-	ID3D12Device *d3d_device;
+	std::shared_ptr<video::graphics_queue> new_graphics_queue() override;
+
+	std::shared_ptr<video::compute_queue> new_compute_queue() override;
+
+	std::shared_ptr<video::copy_queue> new_copy_queue() override;
 };
 
 

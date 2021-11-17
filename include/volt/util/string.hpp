@@ -13,8 +13,9 @@ namespace volt::util {
 template<typename T>
 std::string to_string(const T &value);
 
-template<std::floating_point T>
-std::string to_string(T value, bool trim_zeros = true, int32_t precision = 6);
+// Commented out due to poor concept support in Visual Studio 2019
+// template<std::floating_point T>
+// std::string to_string(T value, bool trim_zeros = true, int32_t precision = 6);
 
 VOLT_API void ltrim(std::string &str);
 

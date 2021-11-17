@@ -8,7 +8,7 @@ namespace volt::video::d3d12::_internal {
 
 class window : public os::window {
 public:
-	VOLT_API window(std::string &&title, math::uvec2 size);
+	window(std::string &&title, math::uvec2 size);
 };
 
 }
