@@ -119,4 +119,5 @@ lines.append('}')
 lines.append('')
 lines.append('}')
 
+os.makedirs(os.path.dirname(sys.argv[3]), exist_ok=True)
 open(sys.argv[3], 'w').writelines([line + '\n' for line in lines])

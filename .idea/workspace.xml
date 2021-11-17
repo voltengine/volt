@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="Volt" targetName="APP" />
+      <config projectName="Volt" targetName="GLFW" />
+      <config projectName="Volt" targetName="Glad" />
+      <config projectName="Volt" targetName="Volt" />
+      <config projectName="Volt" targetName="VulkanMemoryAllocator" />
+      <config projectName="Volt" targetName="update_mappings" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Volt Debug (Visual Studio 2022 AMD64 + Ninja)" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_BUILD_TYPE=Debug -DVOLT_DEVELOPMENT=ON -DVOLT_GPU_DEBUG=ON -G Ninja" GENERATION_DIR="cache/cmake" ENABLED="true" />
+      <configuration PROFILE_NAME="Volt Edit (Visual Studio 2022 AMD64 + Ninja)" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_BUILD_TYPE=Release -DVOLT_DEVELOPMENT=ON -DVOLT_GPU_DEBUG=ON -G Ninja" GENERATION_DIR="cache/cmake" ENABLED="false" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="c4366a9c-18e5-4696-85c4-f0e9434d7809" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/app.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/CMakeCache.txt" beforeDir="false" afterPath="$PROJECT_DIR$/build/CMakeCache.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/CMakeFiles/CMakeOutput.log" beforeDir="false" afterPath="$PROJECT_DIR$/build/CMakeFiles/CMakeOutput.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/generate_module_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/generate_module_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/error.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/volt/error.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/os/window.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/volt/os/window.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/adapter.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/binding.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/buffer.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/buffer_view.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/device.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/enums.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/fence.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/instance.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/pipeline.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/pipeline_builder.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/pool.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/queue.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/resource.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/routine.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/semaphore.hpp.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/surface.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/swapchain.hpp.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/texture.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/texture_view.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/video/video.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/volt/volt.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/volt/volt.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/ecs/ecs.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/volt/ecs/ecs.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/error.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/volt/error.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/os/window.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/volt/os/window.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/adapter.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/adapter.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/d3d12.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/d3d12.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/device.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/device.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/fence.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/fence.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/instance.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/instance.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/pipeline.cpp.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/pipeline.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/queue.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/queue.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/window.cpp.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/d3d12/window.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/device.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/video.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/adapter.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/adapter.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/buffer.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/buffer.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/device.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/device.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/fence.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/fence.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/instance.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/instance.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/pipeline.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/pool.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/pool.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/queue.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/queue.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/routine.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/routine.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/surface.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/surface.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/swapchain.cpp.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/swapchain.hpp.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/texture.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/texture.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/texture_view.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/texture_view.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/vk12.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/volt/video/vk12/vk12.hpp" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Volt Debug (Visual Studio 2022 AMD64 + Ninja)" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="213KmsYr4mbWvuyXtmxZR8eZJ6G" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
+    <property name="cmake.loaded.for.project" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+  </component>
+  <component name="RunManager" selected="CMake Application.APP">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="APP" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Volt" TARGET_NAME="APP" CONFIG_NAME="Volt Debug (Visual Studio 2022 AMD64 + Ninja)" RUN_TARGET_PROJECT_NAME="Volt" RUN_TARGET_NAME="APP">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GLFW" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Volt" TARGET_NAME="GLFW" CONFIG_NAME="Volt Debug (Visual Studio 2022 AMD64 + Ninja)">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Glad" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Volt" TARGET_NAME="Glad" CONFIG_NAME="Volt Debug (Visual Studio 2022 AMD64 + Ninja)">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Volt" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Volt" TARGET_NAME="Volt" CONFIG_NAME="Volt Debug (Visual Studio 2022 AMD64 + Ninja)">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="VulkanMemoryAllocator" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Volt" TARGET_NAME="VulkanMemoryAllocator" CONFIG_NAME="Volt Debug (Visual Studio 2022 AMD64 + Ninja)">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="update_mappings" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Volt" TARGET_NAME="update_mappings" CONFIG_NAME="Volt Debug (Visual Studio 2022 AMD64 + Ninja)">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.APP" />
+      <item itemvalue="CMake Application.Volt" />
+      <item itemvalue="CMake Application.Glad" />
+      <item itemvalue="CMake Application.GLFW" />
+      <item itemvalue="CMake Application.update_mappings" />
+      <item itemvalue="CMake Application.VulkanMemoryAllocator" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="c4366a9c-18e5-4696-85c4-f0e9434d7809" name="Default Changelist" comment="" />
+      <created>1637164493345</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1637164493345</updated>
+      <workItem from="1637164495074" duration="730000" />
+      <workItem from="1637165247526" duration="239000" />
+      <workItem from="1637165505080" duration="176000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/app/app.cpp</url>
+          <line>34</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/app/app.cpp</url>
+          <line>70</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

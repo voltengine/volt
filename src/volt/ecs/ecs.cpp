@@ -236,7 +236,7 @@ void module_unload_callback(const std::string &module_name) {
 	}
 
 	// Delete all systems
-	// They will be reinstantiated on first update
+	// They will be re-instantiated on first update
 	// and query new component indices for lock masks
 	for (auto &instance : system_instances)
 		instance.second = nullptr;

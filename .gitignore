@@ -1,2 +1,9 @@
+# Volt
 /build/
 /cache/
+
+# JetBrains CLion
+/.idea/*
+!/.idea/workspace.xml
+!/.idea/codeStyles/
+!/.idea/inspectionProfiles/

@@ -8,12 +8,13 @@
 
 namespace volt {
 
-class error {
+class error : public std::exception {
 public:
-	VOLT_API error(const std::string &message,
-			const std::filesystem::path &file, size_t line);
+    VOLT_API error(std::string message, const std::filesystem::path &file, size_t line);
 
-	VOLT_API const std::string &what() const;
+	virtual ~error() = default;
+
+	VOLT_API const char *what() const override;
 
 	VOLT_API const std::filesystem::path &where() const;
 

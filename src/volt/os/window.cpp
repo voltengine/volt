@@ -87,7 +87,7 @@ uvec2 window::get_pos() {
 	return windowed_pos;
 }
 
-void window::set_pos(uvec2 pos) {
+void window::set_pos(uvec2 pos) const {
 	if (!fullscreen)
 		glfwSetWindowPos(_glfw_window, pos.x, pos.y);
 }
@@ -96,12 +96,12 @@ uvec2 window::get_size() {
 	return windowed_size;
 }
 
-void window::set_size(uvec2 size) {
+void window::set_size(uvec2 size) const {
 	if (!fullscreen)
 		glfwSetWindowSize(_glfw_window, size.x, size.y);
 }
 
-bool window::is_maximized() {
+bool window::is_maximized() const {
 	return maximized;
 }
 
@@ -111,7 +111,7 @@ void window::set_maximized(bool maximized) {
 	apply_mode();
 }
 
-bool window::is_minimized() {
+bool window::is_minimized() const {
 	return minimized;
 }
 
@@ -121,7 +121,7 @@ void window::set_minimized(bool minimized) {
 	apply_mode();
 }
 
-bool window::is_fullscreen() {
+bool window::is_fullscreen() const {
 	return fullscreen;
 }
 
@@ -158,7 +158,7 @@ void window::set_monitor(std::shared_ptr<os::monitor> monitor) {
 	}
 }
 
-bool window::is_visible() {
+bool window::is_visible() const {
 	return glfwGetWindowAttrib(_glfw_window, GLFW_VISIBLE) == GLFW_TRUE;
 }
 
@@ -169,7 +169,7 @@ void window::set_visible(bool visible) {
 		glfwHideWindow(_glfw_window);
 }
 
-bool window::focused() {
+bool window::focused() const {
 	return glfwGetWindowAttrib(_glfw_window, GLFW_FOCUSED) == GLFW_TRUE;
 }
 
@@ -181,7 +181,7 @@ uvec2 window::get_frame_size() {
 	return frame_size;
 }
 
-bool window::has_surface() {
+bool window::has_surface() const {
 	return surface_constructed;
 }
 
@@ -245,8 +245,7 @@ void window::maximize_callback(GLFWwindow *glfw_window, int32_t maximized) {
 }
 
 void window::framebuffer_size_callback(GLFWwindow *glfw_window, int32_t width, int32_t height) {
-	window *window = static_cast<os::window *>(
-			glfwGetWindowUserPointer(glfw_window));
+	auto window = static_cast<os::window *>(glfwGetWindowUserPointer(glfw_window));
 
 	window->frame_size.x = math::max(width, 1);
 	window->frame_size.y = math::max(height, 1);

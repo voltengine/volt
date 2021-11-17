@@ -31,21 +31,21 @@ public:
 
 	VOLT_API math::uvec2 get_pos();
 
-	VOLT_API void set_pos(math::uvec2 pos);
+	VOLT_API void set_pos(math::uvec2 pos) const;
 
 	VOLT_API math::uvec2 get_size();
 
-	VOLT_API void set_size(math::uvec2 size);
+	VOLT_API void set_size(math::uvec2 size) const;
 
-	VOLT_API bool is_maximized();
+	VOLT_API bool is_maximized() const;
 
 	VOLT_API void set_maximized(bool maximized);
 
-	VOLT_API bool is_minimized();
+	VOLT_API bool is_minimized() const;
 
 	VOLT_API void set_minimized(bool minimized);
 
-	VOLT_API bool is_fullscreen();
+	VOLT_API bool is_fullscreen() const;
 
 	VOLT_API void set_fullscreen(bool fullscreen);
 
@@ -53,17 +53,17 @@ public:
 
 	VOLT_API void set_monitor(std::shared_ptr<monitor> monitor);
 
-	VOLT_API bool is_visible();
+	VOLT_API bool is_visible() const;
 
 	VOLT_API void set_visible(bool visible);
 
-	VOLT_API bool focused();
+	VOLT_API bool focused() const;
 
 	VOLT_API void focus();
 
 	VOLT_API math::uvec2 get_frame_size();
 
-	VOLT_API bool has_surface();
+	VOLT_API bool has_surface() const;
 
 	VOLT_API void _construct_surface();
 

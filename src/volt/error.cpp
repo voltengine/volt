@@ -3,12 +3,12 @@
 
 namespace volt {
 
-error::error(const std::string &message,
+error::error(std::string message,
 		const std::filesystem::path &file, size_t line)
-		: message(message), file(file.filename()), line(line) {}
+		: message(std::move(message)), file(file.filename()), line(line) {}
 
-const std::string &error::what() const {
-	return message;
+const char *error::what() const {
+	return message.c_str();
 }
 
 const std::filesystem::path &error::where() const {

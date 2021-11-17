@@ -14,58 +14,66 @@ int main() {
 		VOLT_ASSERT(glfwInit(), "Failed to initialize GLFW.")
 		volt::config::_internal::init();
 
-		#if VOLT_DEVELOPMENT
-		#ifdef NDEBUG
-			std::cout << "Hello from Volt App! (Development Enabled At: " VOLT_DEVELOPMENT_PATH ")" << '\n';
-		#else
-			std::cout << "Hello from Volt App! (Development with Debugging Support Enabled At: " VOLT_DEVELOPMENT_PATH ")" << '\n';
-		#endif
+#if VOLT_DEVELOPMENT
+#ifdef NDEBUG
+		std::cout << "Hello from Volt App! (Development Enabled At: " VOLT_DEVELOPMENT_PATH ")" << '\n';
+#else
+		std::cout << "Hello from Volt App! (Development with Debugging Support Enabled At: " VOLT_DEVELOPMENT_PATH ")" << '\n';
+#endif
 #else
 		std::cout << "Hello from Volt App! (Development Disabled)" << '\n';
 #endif
 		volt::modules::load();
-		
+
 		std::cout << "\nLoaded modules:\n";
 		for (auto &name : volt::modules::get_names())
 			std::cout << name << '\n';
 
 
-		using namespace video;
+		using namespace gpu;
 
 		std::shared_ptr<os::window> window = std::make_shared<os::window>("Test Window", math::uvec2(1280, 720));
 		window->set_visible(true);
 
-		std::shared_ptr<video::instance> instance = video::create_instance(video::api::vk12);
-		std::vector<std::shared_ptr<video::adapter>> adapters = instance->enumerate_adapters();
-		std::shared_ptr<video::adapter> &adapter = adapters[0];
-		std::shared_ptr<video::device> device = adapter->create_device();
-		std::shared_ptr<video::surface> surface = device->create_surface(window);
-		std::shared_ptr<video::graphics_queue> queue = device->access_graphics_queue();
-		std::shared_ptr<video::graphics_pool> pool = queue->create_pool();
-		std::shared_ptr<video::graphics_routine> routine = pool->create_routine();
-		std::shared_ptr<video::graphics_subroutine> subroutine = pool->create_subroutine();
+		std::shared_ptr<gpu::instance> instance = gpu::create_instance(gpu::api::vk12);
+		std::vector<std::shared_ptr<gpu::adapter>> adapters = instance->enumerate_adapters();
+		std::shared_ptr<gpu::adapter> &adapter = adapters[0];
+		std::shared_ptr<gpu::device> device = adapter->create_device();
+		std::shared_ptr<gpu::surface> surface = device->create_surface(window);
+		std::shared_ptr<gpu::graphics_queue> queue = device->access_graphics_queue();
+		std::shared_ptr<gpu::graphics_pool> pool = queue->create_pool();
+		std::shared_ptr<gpu::graphics_routine> routine = pool->create_routine();
+		std::shared_ptr<gpu::graphics_subroutine> subroutine = pool->create_subroutine();
 
 		// create_surface(window) emits an error if another surface is already created for that window.
 		// Dropping all references to surface will destroy it and in turn allow another call to create_surface(window).
 
 		auto buffer = device->create_buffer(
-			resource_type::internal,
-			sync_queue::graphics | sync_queue::copy,
-			buffer_feature::vertex | buffer_feature::destination,
-			1024
+				resource_type::internal,
+				sync_queue::graphics | sync_queue::copy,
+				buffer_feature::vertex | buffer_feature::destination,
+				1024
 		);
-		
+
 		auto texture = device->create_texture(
-			resource_type::internal,
-			sync_queue::none,
-			texture_feature::sampler | texture_feature::destination,
-			{ 2048, 2048 }, 1, 1, texture_format::bc1_srgb
+				resource_type::internal,
+				sync_queue::none,
+				texture_feature::sampler | texture_feature::destination,
+				{2048, 2048}, 1, 1, texture_format::bc1_srgb
 		);
-		
-		while (!window->is_closing()) { glfwPollEvents(); }
+
+		auto fence = device->create_fence(0);
+		uint64_t fence_counter = 0;
+
+		while (!window->is_closing()) {
+			glfwPollEvents();
+			queue->signal(fence, ++fence_counter);
+			queue->flush();
+			fence->wait(fence_counter);
+		}
 
 
-		
+
 
 // 		while (true) {
 // 			std::cout << "\n[P] - Print State; [U] - Update Systems; ";
@@ -98,7 +106,7 @@ int main() {
 // 					}
 // 					if (system_names.contains(module_name)) {
 // 						std::cout << "\n(systems) ";
-						
+
 // 						for (auto &system_name : system_names.at(module_name)) {
 // 							std::cout << system_name;
 // 							if (system_name != *std::prev(system_names.at(module_name).end()))
@@ -107,7 +115,7 @@ int main() {
 // 					}
 // 					if (asset_types.contains(module_name)) {
 // 						std::cout << "\n(assets) ";
-						
+
 // 						for (auto &asset_type : asset_types.at(module_name)) {
 // 							std::cout << asset_type;
 // 							if (asset_type != *std::prev(asset_types.at(module_name).end()))
@@ -139,17 +147,17 @@ int main() {
 // 			default:
 // 				break;
 // 			}
-			
+
 // 			break;
 // 		}
 
 		volt::modules::unload();
 		std::cout << "\nUnloaded modules.\n";
-	} catch (std::exception &e) {
-		VOLT_LOG_ERROR(e.what())
-		// TODO: display OS alert
 	} catch (volt::error &e) {
 		volt::log::error(e.what(), e.where(), e.at());
+		// TODO: display OS alert
+	} catch (std::exception &e) {
+		VOLT_LOG_ERROR(e.what())
 		// TODO: display OS alert
 	}
 

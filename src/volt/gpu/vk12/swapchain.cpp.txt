@@ -1,0 +1,17 @@
+#include <volt/gpu/vk12/swapchain.hpp>
+
+#include <volt/error.hpp>
+
+namespace volt::gpu::vk12 {
+
+using namespace math;
+
+swapchain::swapchain(vk12::device &device, vk12::window &window) : device(device) {
+	
+}
+
+swapchain::~swapchain() {
+	vkDestroySwapchainKHR(device.vk_device, vk_swapchain, nullptr);
+}
+
+}
