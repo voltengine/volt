@@ -21,7 +21,7 @@ static fs::path get_app_prefix() {
 
 fs::path data() {
 #ifdef VOLT_DEVELOPMENT
-	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "data";
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "user-paths" / "data";
 #elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_DATA_HOME");
 	if (!xdg) {
@@ -39,7 +39,7 @@ fs::path data() {
 
 fs::path documents() {
 #ifdef VOLT_DEVELOPMENT
-	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "documents";
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "user-paths" / "documents";
 #elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_DOCUMENTS_DIR");
 	if (!xdg) {
@@ -55,7 +55,7 @@ fs::path documents() {
 
 fs::path pictures() {
 #ifdef VOLT_DEVELOPMENT
-	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "pictures";
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "user-paths" / "pictures";
 #elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_PICTURES_DIR");
 	if (!xdg) {
@@ -71,7 +71,7 @@ fs::path pictures() {
 
 fs::path videos() {
 #ifdef VOLT_DEVELOPMENT
-	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "videos";
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "user-paths" / "videos";
 #elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_VIDEOS_DIR");
 	if (!xdg) {
@@ -87,7 +87,7 @@ fs::path videos() {
 
 fs::path music() {
 #ifdef VOLT_DEVELOPMENT
-	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "music";
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "user-paths" / "music";
 #elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_MUSIC_DIR");
 	if (!xdg) {
@@ -103,7 +103,7 @@ fs::path music() {
 
 fs::path saves() {
 #ifdef VOLT_DEVELOPMENT
-	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "run" / "saves";
+	return fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "user-paths" / "saves";
 #elif defined(VOLT_PLATFORM_LINUX)
 	char *xdg = std::getenv("XDG_DATA_HOME");
 	if (!xdg) {

@@ -2,21 +2,16 @@
 
 #include "../macros.hpp"
 
+#include <cstdint>
 #include <memory>
-
-#include "enums.hpp"
 
 namespace volt::gpu {
 
 class device;
 
-class pipeline {
+class shader {
 public:
-	void add_shader(shader);
-
-	void add_binding();
-
-	void build();
+	virtual ~shader() = default;
 
 	const std::shared_ptr<gpu::device> &get_device() {
 		return device;
@@ -25,7 +20,7 @@ public:
 protected:
 	std::shared_ptr<gpu::device> device;
 
-	pipeline(std::shared_ptr<gpu::device> &&device)
+	shader(std::shared_ptr<gpu::device> &&device)
 			: device(std::move(device)) {}
 };
 

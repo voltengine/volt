@@ -4,18 +4,19 @@
 
 #include <volt/gpu/swapchain.hpp>
 #include <volt/gpu/vk12/device.hpp>
-#include <volt/gpu/vk12/window.hpp>
 
 namespace volt::gpu::vk12 {
 
 class swapchain : public gpu::swapchain {
 public:
-	vk12::device &device;
+	VkSurfaceKHR vk_surface;
 	VkSwapchainKHR vk_swapchain;
 
-	swapchain(vk12::device &device, vk12::window &window);
+	swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window);
 
 	~swapchain();
+
+	// virtual std::vector<const std::shared_ptr<gpu::texture>> &get_frames() = 0;
 };
 
 }

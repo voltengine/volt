@@ -4,13 +4,12 @@
 
 #include <volt/gpu/pool.hpp>
 
-namespace volt::gpu::vk12 {
+namespace volt::gpu::d3d12 {
 
 template<command_types T>
 class pool : public gpu::pool<T> {
 public:
-	VkCommandPool command_pool;
-	VkDevice device;
+	ID3D12CommandAllocator *allocator;
 
 	pool(std::shared_ptr<gpu::queue<T>> &&queue);
 

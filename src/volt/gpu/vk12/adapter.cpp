@@ -99,17 +99,17 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
 }
 
-std::vector<uint32_t> adapter::unique_families(gpu::sync_queues sync_queues) {
+std::vector<uint32_t> adapter::unique_families(gpu::command_types sync_queues) {
 	std::vector<uint32_t> families;
 
-	if (sync_queues & gpu::sync_queue::graphics)
+	if (sync_queues & gpu::command_type::rasterization)
 		families.push_back(graphics_family);
 
-	if (sync_queues & gpu::sync_queue::compute && std::find(
+	if (sync_queues & gpu::command_type::compute && std::find(
 			families.begin(), families.end(), compute_family) == families.end())
 		families.push_back(compute_family);
 
-	if (sync_queues & gpu::sync_queue::copy && std::find(
+	if (sync_queues & gpu::command_type::copy && std::find(
 			families.begin(), families.end(), transfer_family) == families.end())
 		families.push_back(transfer_family);
 

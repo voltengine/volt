@@ -15,7 +15,7 @@ instance::instance() {
 			"Failed to get debug interface.");
 
 	VOLT_D3D12_CHECK(debug->QueryInterface(IID_PPV_ARGS(&this->debug)),
-			"Failed to query factory debug.");
+			"Failed to query factory debug interface.");
 	debug->Release();
 
 	this->debug->EnableDebugLayer();
@@ -43,6 +43,15 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 			&adapter) != DXGI_ERROR_NOT_FOUND; index++) {
 		adapters.emplace_back(new d3d12::adapter(shared_from_this(), adapter));
 	}
+
+	// Sort adapters, so one with the largest amount of memory will end up at index 0
+	std::sort(
+		adapters.begin(),
+		adapters.end(),
+		[](auto &a1, auto &a2) {
+			return a1->dedicated_video_memory() > a2->dedicated_video_memory();
+		}
+	);
 	
 	return adapters;
 }

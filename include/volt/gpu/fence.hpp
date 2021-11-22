@@ -11,6 +11,8 @@ class device;
 
 class fence {
 public:
+	virtual ~fence() = default;
+
 	virtual uint64_t value() = 0;
 
 	virtual void signal(uint64_t value) = 0;

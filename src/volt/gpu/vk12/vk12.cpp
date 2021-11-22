@@ -35,11 +35,11 @@ std::vector<const char *> device_extensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-std::map<gpu::resource_type, VmaMemoryUsage> vma_memory_usages{
-	{ gpu::resource_type::internal, VMA_MEMORY_USAGE_GPU_ONLY },
-	{ gpu::resource_type::staging,  VMA_MEMORY_USAGE_CPU_ONLY },
-	{ gpu::resource_type::write,    VMA_MEMORY_USAGE_CPU_TO_GPU },
-	{ gpu::resource_type::read,     VMA_MEMORY_USAGE_GPU_TO_CPU }
+std::map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages{
+	{ gpu::memory_type::internal, VMA_MEMORY_USAGE_GPU_ONLY },
+	{ gpu::memory_type::staging,  VMA_MEMORY_USAGE_CPU_ONLY },
+	{ gpu::memory_type::write,    VMA_MEMORY_USAGE_CPU_TO_GPU },
+	{ gpu::memory_type::read,     VMA_MEMORY_USAGE_GPU_TO_CPU }
 };
 
 std::map<gpu::texture_format, VkFormat> texture_formats{

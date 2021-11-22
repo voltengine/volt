@@ -1,4 +1,4 @@
-#include <volt/gpu/vk12/surface.hpp>
+#include <volt/gpu/vk12/swapchain.hpp>
 
 #include <volt/gpu/vk12/adapter.hpp>
 #include <volt/gpu/vk12/device.hpp>
@@ -15,13 +15,13 @@ namespace volt::gpu::vk12 {
 
 using namespace math;
 
-surface::surface(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window)
-	: gpu::surface(std::move(device), std::move(window)) {
+swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window)
+	: gpu::swapchain(std::move(device), std::move(window)) {
 	auto &_device = *static_cast<vk12::device *>(this->device.get());
 	auto &adapter = *static_cast<vk12::adapter *>(_device.get_adapter().get());
 	auto &instance = *static_cast<vk12::instance *>(adapter.get_instance().get());
 
-	this->window->_construct_surface();
+	this->window->_construct_swapchain();
 	
 	// Surface
 	VOLT_VK12_CHECK(glfwCreateWindowSurface(instance.vk_instance, this->window->_glfw_window, nullptr, &vk_surface),
@@ -127,17 +127,17 @@ surface::surface(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::wind
 	this->window->_on_frame_resize(frame_resize_callback);
 }
 
-surface::~surface() {
+swapchain::~swapchain() {
 	auto &_device = *static_cast<vk12::device *>(device.get());
 	auto &_instance = *static_cast<vk12::instance *>(device->get_adapter()->get_instance().get());
 
 	vkDestroySwapchainKHR(_device.vk_device, vk_swapchain, nullptr);
 	vkDestroySurfaceKHR(_instance.vk_instance, vk_surface, nullptr);
 
-	window->_destruct_surface();
+	window->_destruct_swapchain();
 }
 
-// std::vector<const std::shared_ptr<gpu::texture>> &surface::get_frames() {
+// std::vector<const std::shared_ptr<gpu::texture>> &swapchain::get_frames() {
 	
 // }
 

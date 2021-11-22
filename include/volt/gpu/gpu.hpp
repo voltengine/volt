@@ -6,7 +6,7 @@
 namespace volt::gpu {
 
 enum class api {
-	vk12
+	d3d12, vk12
 };
 
 class instance;

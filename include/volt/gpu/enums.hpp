@@ -4,20 +4,17 @@
 
 namespace volt::gpu {
 
-enum class command_type {
-	graphics, compute, copy // Types of queues, pools and routines
-};
-
-using sync_queues = uint32_t;
-namespace sync_queue {
-	constexpr sync_queues
-			none     = 0,      // Dummy value that means "empty mask"
-			graphics = 1 << 0,
-			compute  = 1 << 1,
-			copy     = 1 << 2;
+using command_types = uint32_t;
+namespace command_type {
+	constexpr command_types
+			none          = 0,
+			rasterization = 1 << 0,
+			compute       = 1 << 1,
+			copy          = 1 << 2;
+			// raytracing = 1 << 3
 }
 
-enum class resource_type {
+enum class memory_type {
 	internal, // Stored in local device memory, very fast access from GPU
 	staging,  // For uploading data to staging buffer
 	write,    // For streaming data into GPU, i.e. using a constant buffer; Requires resource::write(...) after access and before unmapping
@@ -59,7 +56,7 @@ namespace texture_feature {
 			source                   = 1 << 0, // Source for copy operations 
 			destination              = 1 << 1, // Destination for copy operations
 			sampler                  = 1 << 2, // Can be used as sampler
-			storage                  = 1 << 3, // Can be used as storage texture
+			// storage                  = 1 << 3, // Can be used as storage texture
 			color_attachment         = 1 << 4, // Can be used as color attachment
 			depth_stencil_attachment = 1 << 5; // Can be used as depth-stencil attachment
 }
@@ -78,40 +75,35 @@ enum class texture_layout {
 	sampler                  // Use as sampler
 };
 
-enum class texture_view_type {
-	tex1d, tex1d_array, // 1D array view can access 2D texture
-	tex2d, tex2d_array, // 2D array view can access 3D texture
+enum class texture_type {
+	tex1d, tex1d_array, // 1D array view can access layered 1D texture
+	tex2d, tex2d_array, // 2D array view can access layered 2D texture
 	tex3d,
-	cube, cube_array    // Cube view can access layered 2D texture; Cube array view can access layered 3D texture
+	cube, cube_array    // Cube view and cube array view can access layered 2D texture;
 };
 
-using texture_view_aspects = uint32_t;
-namespace texture_view_aspect {
-	constexpr texture_view_aspects
-			color   = 1 << 0,
-			depth   = 1 << 1,
-			stencil = 1 << 2;
-}
+// using texture_view_aspects = uint32_t;
+// namespace texture_view_aspect {
+// 	constexpr texture_view_aspects
+// 			color   = 1 << 0,
+// 			depth   = 1 << 1,
+// 			stencil = 1 << 2;
+// }
 
-enum class shader_stage {
-	vertex,
-	tesselation_control,
-	tesselation_evaluation, // Must appear with tesselation_control
-	geometry,
-	pixel,
-	compute
+enum class attachment_initializer {
+	none, clear, preserve
 };
 
-enum class binding_type {
-	constant_buffer,
-	storage_buffer,
-	sampler,
-	static_sampler
-};
+// using storage_usages = uint32_t;
+	// namespace storage_usage {
+	// 	constexpr storage_usages
+	// 			input  = 1 << 0,
+	// 			output = 1 << 1;
+	// }
 
-using binding_stages = uint32_t;
-namespace binding_stage {
-	constexpr binding_stages
+using shader_stages = uint32_t;
+namespace shader_stage {
+	constexpr shader_stages
 			vertex                 = 1 << 0,
 			tesselation_control    = 1 << 1,
 			tesselation_evaluation = 1 << 2,
@@ -120,10 +112,6 @@ namespace binding_stage {
 			compute                = 1 << 5,
 			all                    = 0b111111;
 }
-
-enum class pipeline_type {
-	graphics, compute
-};
 
 enum class pipeline_stage { // Used for barriers
 	begin,//...

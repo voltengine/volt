@@ -65,9 +65,9 @@ public:
 
 	VOLT_API bool has_surface() const;
 
-	VOLT_API void _construct_surface();
+	VOLT_API void _construct_swapchain();
 
-	VOLT_API void _destruct_surface();
+	VOLT_API void _destruct_swapchain();
 
 	VOLT_API void _on_frame_resize(std::function<void()> &&callback);
 

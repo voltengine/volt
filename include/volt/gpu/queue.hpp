@@ -12,9 +12,11 @@ namespace volt::gpu {
 
 class device;
 
-template<command_type T>
+template<command_types T>
 class queue : public std::enable_shared_from_this<queue<T>> {
 public:
+	virtual ~queue() = default;
+
 	virtual std::shared_ptr<gpu::pool<T>> create_pool() = 0;
 
 	virtual void wait(const std::shared_ptr<gpu::fence> &fence, uint64_t value) = 0;
@@ -42,7 +44,7 @@ protected:
 			: device(std::move(device)) {}
 };
 
-using graphics_queue = queue<command_type::graphics>;
+using rasterization_queue = queue<command_type::rasterization>;
 using compute_queue = queue<command_type::compute>;
 using copy_queue = queue<command_type::copy>;
 

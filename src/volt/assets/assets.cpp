@@ -23,7 +23,7 @@ using namespace _internal;
 
 static void iterate_development_paths(const std::function<bool(fs::path &)> &callback) {
 	std::vector<std::string> paths = util::split(util::read_text_file(
-			fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "paths.txt"), "\n");
+			fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "packages.txt"), "\n");
 
 	auto path = fs::path(VOLT_DEVELOPMENT_PATH) / "assets";
 	if (fs::exists(path) && callback(path))
@@ -118,7 +118,7 @@ asset_ref<asset> load(const asset_path &path) {
 
 	if (!fs::exists(json_path)) {
 		std::vector<std::string> paths = util::split(util::read_text_file(
-				fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "paths.txt"), "\n");
+				fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "packages.txt"), "\n");
 
 		for (auto it = paths.rbegin(); it != paths.rend(); it++) {
 			json_path = fs::path(it->substr(it->find(' ') + 1)) / json_path_suffix;

@@ -128,6 +128,7 @@ target_link_libraries(${PROJECT_NAME}
 
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME}
+		D3D12MemoryAllocator::D3D12MemoryAllocator
 		"d3d12.lib" "dxgi.lib" "d3dcompiler.lib"
 	)
 endif()

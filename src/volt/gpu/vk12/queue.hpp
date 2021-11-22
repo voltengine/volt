@@ -19,7 +19,7 @@ struct _submit_node {
 	void clear();
 };
 
-template<command_type T>
+template<command_types T>
 class queue : public gpu::queue<T> {
 public:
 	VkQueue vk_queue;
@@ -44,7 +44,7 @@ public:
 	void wait() override;
 };
 
-using graphics_queue = queue<command_type::graphics>;
+using rasterization_queue = queue<command_type::rasterization>;
 using compute_queue = queue<command_type::compute>;
 using copy_queue = queue<command_type::copy>;
 

@@ -1,5 +1,6 @@
 #include <volt/gpu/vk12/fence.hpp>
 
+#include <volt/gpu/vk12/device.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
 
 namespace volt::gpu::vk12 {

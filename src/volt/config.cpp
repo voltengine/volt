@@ -92,7 +92,7 @@ namespace volt::config::_internal {
 void init() {
 #ifdef VOLT_DEVELOPMENT
 	std::vector<std::string> paths = util::split(util::read_text_file(
-			fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "paths.txt"), "\n");
+			fs::path(VOLT_DEVELOPMENT_PATH) / "cache" / "packages.txt"), "\n");
 
 	base_config = nl::json::object();
 	for (auto &path_item : paths) {

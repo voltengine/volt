@@ -4,12 +4,13 @@
 
 #include <volt/gpu/routine.hpp>
 
-namespace volt::gpu::vk12 {
+namespace volt::gpu::d3d12 {
 
 template<command_types T>
 class routine : public gpu::routine<T> {
 public:
-	VkCommandBuffer command_buffer;
+	ID3D12GraphicsCommandList *command_list;
+	ID3D12CommandAllocator *allocator;
 
 	routine(std::shared_ptr<gpu::pool<T>> &&pool);
 
@@ -18,6 +19,7 @@ public:
 	void begin() override;
 
 	void end() override;
+
 };
 
 using rasterization_routine = routine<command_type::rasterization>;

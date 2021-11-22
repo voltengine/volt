@@ -185,12 +185,12 @@ bool window::has_surface() const {
 	return surface_constructed;
 }
 
-void window::_construct_surface() {
-	VOLT_ASSERT(!surface_constructed, "Window already has a surface. It must be destroyed before creating a new one.");
+void window::_construct_swapchain() {
+	VOLT_ASSERT(!surface_constructed, "Window already has a swapchain. It must be destroyed before creating a new one.");
 	surface_constructed = true;
 }
 
-void window::_destruct_surface() {
+void window::_destruct_swapchain() {
 	surface_constructed = false;
 }
 

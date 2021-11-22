@@ -1,6 +1,7 @@
 #include <volt/gpu/d3d12/fence.hpp>
 
 #include <volt/gpu/d3d12/d3d12.hpp>
+#include <volt/gpu/d3d12/device.hpp>
 
 namespace volt::gpu::d3d12 {
 

@@ -4,23 +4,38 @@
 
 #include <memory>
 
+#include "../math/math.hpp"
 #include "enums.hpp"
 
 namespace volt::gpu {
 
-template<command_type T>
+template<command_types T>
 class pool;
 
-template<command_type T, bool Sub = false>
+template<command_types T>
 class routine {
 public:
-	virtual void begin(bool disposable) = 0;
+	virtual ~routine() = default;
 
-	// virtual void begin(bool disposable, render_pass, uint32_t subpass, framebuffer, bool occlusion_query, bool precise_query) = 0;
+	virtual void begin() = 0;
 
 	virtual void end() = 0;
+// TODO make pure
+	// virtual void viewport(math::uvec2 width, math::uvec2 height, math::uvec2 depth) = 0;
 
-	virtual void execute_subroutine(const std::shared_ptr<gpu::routine<T, true>> &subroutine) = 0;
+	// virtual void scissor(math::uvec2 width, math::uvec2 height) = 0;
+
+	// virtual void clear_color(math::fvec3 color) = 0;
+
+	// TODO: Might crash if vector is deleted after the call? To be tested
+	// virtual void vertex_buffers(uint32_t offset,
+	// 		const std::vector<std::pair<const std::shared_ptr<
+	// 		gpu::buffer> &, uint32_t>> &buffers_with_offsets) = 0;
+
+	// virtual void index_buffer(const std::shared_ptr<gpu::buffer> &buffer) = 0;
+
+	// virtual void draw(uint32_t index_count, uint32_t instance_count,
+	// 		uint32_t index_offset = 0, uint32_t instance_offset = 0, uint32_t vertex_offset = 0) = 0;
 
 	const std::shared_ptr<gpu::pool<T>> &get_pool() {
 		return pool;
@@ -33,18 +48,9 @@ protected:
 			: pool(std::move(pool)) {}
 };
 
-template<command_type T>
-using subroutine = routine<T, true>;
-
-using graphics_routine = routine<command_type::graphics>;
+using rasterization_routine = routine<command_type::rasterization>;
 using compute_routine = routine<command_type::compute>;
 using copy_routine = routine<command_type::copy>;
-
-using graphics_subroutine = subroutine<command_type::graphics>;
-using compute_subroutine = subroutine<command_type::compute>;
-using copy_subroutine = subroutine<command_type::copy>;
-
-// TODO: Specialize graphics, compute, copy routines
 
 }
 
@@ -65,7 +71,7 @@ using copy_subroutine = subroutine<command_type::copy>;
 	// //void barrier() // all-resource barrier, image barrier, buffer barrier
 	// // Graphics
 	// //void begin_pass() // framebuffer, renderArea, clear_color, + update in pass: viewport, scissor = renderArea // vkCmdBeginRenderPass, vkCmdSetViewport, vkCmdSetScissor
-	// //void graphics_pipeline() // vkCmdBindPipeline
+	// //void rasterization_pipeline() // vkCmdBindPipeline
 	// //void descriptors_sets() // vkCmdBindDescriptorSets
 	// void vertex_buffer(const std::shared_ptr<gpu::buffer> &buffer) // vkCmdBindVertexBuffers
 	// void index_buffer(const std::shared_ptr<gpu::buffer> &buffer) // vkCmdBindIndexBuffer

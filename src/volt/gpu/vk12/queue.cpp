@@ -15,17 +15,17 @@ void _submit_node::clear() {
 	signal_values.clear();
 }
 
-template<command_type T>
+template<command_types T>
 queue<T>::queue(std::shared_ptr<gpu::device> &&device, VkQueue vk_queue)
 		: gpu::queue<T>(std::move(device)), vk_queue(vk_queue) {}
 
-template<command_type T>
+template<command_types T>
 std::shared_ptr<gpu::pool<T>> queue<T>::create_pool() {
 	return std::shared_ptr<gpu::pool<T>>(
 			new vk12::pool<T>(queue<T>::shared_from_this()));
 }
 
-template<command_type T>
+template<command_types T>
 void queue<T>::wait(const std::shared_ptr<gpu::fence> &fence, uint64_t value) {
 	if (submission_build_stage > 0) {
 		if (submit_node_pool.size() == active_submit_nodes)
@@ -41,7 +41,7 @@ void queue<T>::wait(const std::shared_ptr<gpu::fence> &fence, uint64_t value) {
 	node.wait_values.push_back(value);
 }
 
-template<command_type T>
+template<command_types T>
 void queue<T>::execute(const std::shared_ptr<gpu::routine<T>> &routine) {
 	if (submission_build_stage > 1) {
 		if (submit_node_pool.size() == active_submit_nodes)
@@ -56,7 +56,7 @@ void queue<T>::execute(const std::shared_ptr<gpu::routine<T>> &routine) {
 	node.command_buffers.push_back(static_cast<vk12::routine<T> *>(routine.get())->command_buffer);
 }
 
-template<command_type T>
+template<command_types T>
 void queue<T>::signal(const std::shared_ptr<gpu::fence> &fence, uint64_t value) {
 	if (submission_build_stage > 2) {
 		if (submit_node_pool.size() == active_submit_nodes)
@@ -72,7 +72,7 @@ void queue<T>::signal(const std::shared_ptr<gpu::fence> &fence, uint64_t value) 
 	node.signal_values.push_back(value);
 }
 
-template<command_type T>
+template<command_types T>
 void queue<T>::flush() {
 	if (active_submit_nodes == 0)
 		return;
@@ -111,13 +111,13 @@ void queue<T>::flush() {
 	submission_build_stage = 3;
 }
 
-template<command_type T>
+template<command_types T>
 void queue<T>::wait() {
 	VOLT_VK12_DEBUG_CHECK(vkQueueWaitIdle(vk_queue),
 			"Failed to wait for queue.")
 }
 
-template class queue<command_type::graphics>;
+template class queue<command_type::rasterization>;
 template class queue<command_type::compute>;
 template class queue<command_type::copy>;
 

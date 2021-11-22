@@ -20,43 +20,42 @@ public:
 	void wait() override;
 
 	std::shared_ptr<gpu::buffer> create_buffer(
-			gpu::resource_type resource_type,
-			gpu::sync_queues sync_queues,
+			gpu::memory_type memory_type,
+			gpu::command_types sync_queues,
 			gpu::buffer_features features,
 			size_t size) override;
 
 	std::shared_ptr<gpu::fence> create_fence(uint64_t initial_value = 0) override;
 
-	std::shared_ptr<gpu::surface> create_surface(std::shared_ptr<os::window> window) override;
+	std::shared_ptr<gpu::swapchain> create_swapchain(std::shared_ptr<os::window> window) override;
 
 	std::shared_ptr<gpu::texture> create_texture(
-			gpu::resource_type resource_type,
-			gpu::sync_queues sync_queues,
+			gpu::memory_type memory_type,
+			gpu::command_types sync_queues,
 			gpu::texture_features features,
-			size_t size, uint32_t levels, uint32_t layers,
+			size_t size, uint32_t levels,
 			gpu::texture_format format) override;
 
 	std::shared_ptr<gpu::texture> create_texture(
-			gpu::resource_type resource_type,
-			gpu::sync_queues sync_queues,
+			gpu::memory_type memory_type,
+			gpu::command_types sync_queues,
 			gpu::texture_features features,
-			math::uvec2 size, uint32_t levels, uint32_t layers,
+			math::uvec2 size, uint32_t levels,
 			gpu::texture_format format) override;
 
 	std::shared_ptr<gpu::texture> create_texture(
-			gpu::resource_type resource_type,
-			gpu::sync_queues sync_queues,
+			gpu::memory_type memory_type,
+			gpu::command_types sync_queues,
 			gpu::texture_features features,
-			math::uvec3 size, uint32_t levels, uint32_t layers,
+			math::uvec3 size, uint32_t levels,
 			gpu::texture_format format) override;
 
 	// std::shared_ptr<gpu::pipeline> create_pipeline() override;
 
-
 private:
-	VkQueue vk_graphics_queue, vk_compute_queue, vk_copy_queue;
+	VkQueue vk_rasterization_queue, vk_compute_queue, vk_copy_queue;
 
-	std::shared_ptr<gpu::graphics_queue> new_graphics_queue() override;
+	std::shared_ptr<gpu::rasterization_queue> new_rasterization_queue() override;
 
 	std::shared_ptr<gpu::compute_queue> new_compute_queue() override;
 

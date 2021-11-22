@@ -10,13 +10,11 @@ class device;
 
 class _resource {
 public:
-	virtual void map(void **ptr) = 0;
+	virtual ~_resource() = default;
 
-	virtual void unmap() = 0;
+	virtual void map(void **ptr, size_t read_offset = 0, size_t read_size = 0) = 0;
 
-	virtual void read(size_t offset, size_t size) = 0;
-
-	virtual void write(size_t offset, size_t size) = 0;
+	virtual void unmap(size_t write_offset = 0, size_t write_size = 0) = 0;
 
 	const std::shared_ptr<gpu::device> &get_device() {
 		return device;

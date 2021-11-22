@@ -4,8 +4,9 @@
 #include <volt/gpu/vk12/adapter.hpp>
 #include <volt/gpu/vk12/buffer.hpp>
 #include <volt/gpu/vk12/fence.hpp>
+#include <volt/gpu/vk12/instance.hpp>
 #include <volt/gpu/vk12/queue.hpp>
-#include <volt/gpu/vk12/surface.hpp>
+#include <volt/gpu/vk12/swapchain.hpp>
 #include <volt/gpu/vk12/texture.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
 #include <volt/error.hpp>
@@ -73,7 +74,7 @@ device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(
 	allocator_info.instance = instance.vk_instance;
 	vmaCreateAllocator(&allocator_info, &allocator);
 
-	vkGetDeviceQueue(vk_device, _adapter.graphics_family, 0, &vk_graphics_queue);
+	vkGetDeviceQueue(vk_device, _adapter.graphics_family, 0, &vk_rasterization_queue);
 	vkGetDeviceQueue(vk_device, _adapter.compute_family, 0, &vk_compute_queue);
 	vkGetDeviceQueue(vk_device, _adapter.transfer_family, 0, &vk_copy_queue);
 }
@@ -89,12 +90,12 @@ void device::wait() {
 }
 
 std::shared_ptr<gpu::buffer> device::create_buffer(
-		gpu::resource_type resource_type,
-		gpu::sync_queues sync_queues,
+		gpu::memory_type memory_type,
+		gpu::command_types sync_queues,
 		gpu::buffer_features features,
 		size_t size) {
 	return std::shared_ptr<gpu::buffer>(new vk12::buffer(
-			shared_from_this(), resource_type, sync_queues, features, size));
+			shared_from_this(), memory_type, sync_queues, features, size));
 }
 
 std::shared_ptr<gpu::fence> device::create_fence(uint64_t initial_value) {
@@ -102,49 +103,47 @@ std::shared_ptr<gpu::fence> device::create_fence(uint64_t initial_value) {
 			shared_from_this(), initial_value));
 }
 
-std::shared_ptr<gpu::surface> device::create_surface(std::shared_ptr<os::window> window) {
-	return std::shared_ptr<gpu::surface>(new vk12::surface(shared_from_this(), std::move(window)));
+std::shared_ptr<gpu::swapchain> device::create_swapchain(std::shared_ptr<os::window> window) {
+	return std::shared_ptr<gpu::swapchain>(new vk12::swapchain(shared_from_this(), std::move(window)));
 }
 
 std::shared_ptr<gpu::texture> device::create_texture(
-		gpu::resource_type resource_type,
-		gpu::sync_queues sync_queues,
+		gpu::memory_type memory_type,
+		gpu::command_types sync_queues,
 		gpu::texture_features features,
-		size_t size, uint32_t levels, uint32_t layers,
+		size_t size, uint32_t levels,
 		gpu::texture_format format) {
 	return std::shared_ptr<gpu::texture>(new vk12::texture(
-			shared_from_this(), resource_type, sync_queues, features, size, levels, layers, format));
+			shared_from_this(), memory_type, sync_queues, features, size, format));
 }
 
 std::shared_ptr<gpu::texture> device::create_texture(
-		gpu::resource_type resource_type,
-		gpu::sync_queues sync_queues,
+		gpu::memory_type memory_type,
+		gpu::command_types sync_queues,
 		gpu::texture_features features,
-		math::uvec2 size, uint32_t levels, uint32_t layers,
+		math::uvec2 size, uint32_t levels,
 		gpu::texture_format format) {
 	return std::shared_ptr<gpu::texture>(new vk12::texture(
-			shared_from_this(), resource_type, sync_queues, features, size, levels, layers, format));
+			shared_from_this(), memory_type, sync_queues, features, size, format));
 }
 
 std::shared_ptr<gpu::texture> device::create_texture(
-		gpu::resource_type resource_type,
-		gpu::sync_queues sync_queues,
+		gpu::memory_type memory_type,
+		gpu::command_types sync_queues,
 		gpu::texture_features features,
-		math::uvec3 size, uint32_t levels, uint32_t layers,
+		math::uvec3 size, uint32_t levels,
 		gpu::texture_format format) {
-	return std::shared_ptr<gpu::texture>(
-			new vk12::texture(shared_from_this(),
-			resource_type, sync_queues, features,
-			size, levels, layers, format));
+	return std::shared_ptr<gpu::texture>(new vk12::texture(
+			shared_from_this(), memory_type, sync_queues, features, size, format));
 }
 
 // std::shared_ptr<gpu::pipeline> device::create_pipeline() {
 // 	return nullptr; // TODO: Implement
 // }
 
-std::shared_ptr<gpu::graphics_queue> device::new_graphics_queue() {
-	return std::shared_ptr<gpu::graphics_queue>(
-			new vk12::graphics_queue(shared_from_this(), vk_graphics_queue));
+std::shared_ptr<gpu::rasterization_queue> device::new_rasterization_queue() {
+	return std::shared_ptr<gpu::rasterization_queue>(
+			new vk12::rasterization_queue(shared_from_this(), vk_rasterization_queue));
 }
 
 std::shared_ptr<gpu::compute_queue> device::new_compute_queue() {

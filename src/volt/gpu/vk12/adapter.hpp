@@ -23,7 +23,7 @@ public:
 
 	adapter(std::shared_ptr<gpu::instance> &&instance, VkPhysicalDevice physical_device, VkSurfaceKHR vk_dummy_surface);
 
-	std::vector<uint32_t> unique_families(gpu::sync_queues sync_queues);
+	std::vector<uint32_t> unique_families(gpu::command_types sync_queues);
 
 	uint32_t vendor_id() override;
 

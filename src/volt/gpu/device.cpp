@@ -3,17 +3,17 @@
 
 namespace volt::gpu {
 
-std::shared_ptr<gpu::graphics_queue> device::access_graphics_queue() {
-	auto cache = graphics_queue.lock();
+std::shared_ptr<gpu::rasterization_queue> device::get_rasterization_queue() {
+	auto cache = rasterization_queue.lock();
 	if (cache)
 		return cache;
 	
-	auto queue = new_graphics_queue();
-	graphics_queue = queue;
+	auto queue = new_rasterization_queue();
+	rasterization_queue = queue;
 	return queue;
 }
 
-std::shared_ptr<gpu::compute_queue> device::access_compute_queue() {
+std::shared_ptr<gpu::compute_queue> device::get_compute_queue() {
 	auto cache = compute_queue.lock();
 	if (cache)
 		return cache;
@@ -23,7 +23,7 @@ std::shared_ptr<gpu::compute_queue> device::access_compute_queue() {
 	return queue;
 }
 
-std::shared_ptr<gpu::copy_queue> device::access_copy_queue() {
+std::shared_ptr<gpu::copy_queue> device::get_copy_queue() {
 	auto cache = copy_queue.lock();
 	if (cache)
 		return cache;

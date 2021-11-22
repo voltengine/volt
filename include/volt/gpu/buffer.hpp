@@ -10,6 +10,8 @@ namespace volt::gpu {
 
 class buffer : public gpu::_resource {
 public:
+	virtual ~buffer() = default;
+
 	// virtual buffer_view create_view();
 
 protected:

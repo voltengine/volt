@@ -37,27 +37,30 @@ int main() {
 
 		std::shared_ptr<gpu::instance> instance = gpu::create_instance(gpu::api::vk12);
 		std::vector<std::shared_ptr<gpu::adapter>> adapters = instance->enumerate_adapters();
+		std::cout << "Found " << adapters.size() << " adapter(s):" << std::endl;
+		for (auto &adapter : adapters)
+			std::cout << adapter->name() << std::endl;
 		std::shared_ptr<gpu::adapter> &adapter = adapters[0];
 		std::shared_ptr<gpu::device> device = adapter->create_device();
-		std::shared_ptr<gpu::surface> surface = device->create_surface(window);
-		std::shared_ptr<gpu::graphics_queue> queue = device->access_graphics_queue();
-		std::shared_ptr<gpu::graphics_pool> pool = queue->create_pool();
-		std::shared_ptr<gpu::graphics_routine> routine = pool->create_routine();
-		std::shared_ptr<gpu::graphics_subroutine> subroutine = pool->create_subroutine();
+		std::shared_ptr<gpu::swapchain> swapchain = device->create_swapchain(window);
+		std::shared_ptr<gpu::compute_queue> queue = device->get_compute_queue();
+		std::shared_ptr<gpu::compute_pool> pool = queue->create_pool();
+		std::shared_ptr<gpu::compute_routine> routine = pool->create_routine();
+		std::shared_ptr<gpu::compute_routine> routine2 = pool->create_routine();
 
-		// create_surface(window) emits an error if another surface is already created for that window.
-		// Dropping all references to surface will destroy it and in turn allow another call to create_surface(window).
+		// create_surface(window) emits an error if another swapchain is already created for that window.
+		// Dropping all references to swapchain will destroy it and in turn allow another call to create_surface(window).
 
 		auto buffer = device->create_buffer(
-				resource_type::internal,
-				sync_queue::graphics | sync_queue::copy,
+				memory_type::internal,
+				command_type::rasterization | command_type::copy,
 				buffer_feature::vertex | buffer_feature::destination,
 				1024
 		);
 
 		auto texture = device->create_texture(
-				resource_type::internal,
-				sync_queue::none,
+				memory_type::internal,
+				command_type::none,
 				texture_feature::sampler | texture_feature::destination,
 				{2048, 2048}, 1, 1, texture_format::bc1_srgb
 		);

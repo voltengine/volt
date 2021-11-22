@@ -183,6 +183,15 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 	vkDestroySurfaceKHR(vk_instance, vk_dummy_surface, nullptr);
 	glfwDestroyWindow(glfw_dummy_window);
 
+	// Sort adapters, so one with the largest amount of memory will end up at index 0
+	std::sort(
+		adapters.begin(),
+		adapters.end(),
+		[](auto &a1, auto &a2) {
+			return a1->dedicated_video_memory() > a2->dedicated_video_memory();
+		}
+	);
+
 	return adapters;
 }
 

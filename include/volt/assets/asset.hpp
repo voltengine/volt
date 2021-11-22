@@ -10,6 +10,8 @@ namespace volt::assets {
 
 class asset {
 public:
+	virtual ~asset() = default;
+
 	virtual void deserialize(const nlohmann::json &json) {}
 
 	virtual nlohmann::json serialize() const;

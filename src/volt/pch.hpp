@@ -23,16 +23,16 @@
 #ifdef VOLT_PLATFORM_WINDOWS
 	#include <Windows.h>
 	#include <d3d12.h>
+	#include <D3D12MemAlloc.h>
+	#include <d3d12sdklayers.h>
 	#include <dxgi.h>
 	#include <dxgi1_4.h>
-	#include <d3d12sdklayers.h>
 #endif
-
-#define GLFW_INCLUDE_NONE
 
 #include <date/date.h>
 #include <glad/vulkan.h>
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
 #include <nlohmann/json.hpp>
 #include <termcolor/termcolor.hpp>
 #include <vk_mem_alloc.h>

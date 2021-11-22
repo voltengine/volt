@@ -12,7 +12,7 @@ extern std::map<VkResult, std::string> result_messages;
 
 extern std::vector<const char *> device_extensions;
 
-extern std::map<gpu::resource_type, VmaMemoryUsage> vma_memory_usages;
+extern std::map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages;
 
 extern std::map<gpu::texture_format, VkFormat> texture_formats;
 
@@ -31,9 +31,3 @@ const std::vector<const char *> &validation_layers();
 #else
 	#define VOLT_VK12_DEBUG_CHECK(expression, message) expression;
 #endif
-
-
-#include <volt/gpu/vk12/adapter.hpp>
-#include <volt/gpu/vk12/device.hpp>
-#include <volt/gpu/vk12/instance.hpp>
-#include <volt/gpu/vk12/surface.hpp>

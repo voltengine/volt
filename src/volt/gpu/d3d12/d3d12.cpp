@@ -15,4 +15,11 @@ std::map<HRESULT, std::string> result_messages{
 	{ S_OK, "No error occurred. (S_OK)" }
 };
 
+std::map<memory_type, D3D12_HEAP_TYPE> heap_types{
+	{ memory_type::internal, D3D12_HEAP_TYPE_DEFAULT },
+	{ memory_type::staging, D3D12_HEAP_TYPE_UPLOAD },
+	{ memory_type::write, D3D12_HEAP_TYPE_UPLOAD },
+	{ memory_type::read, D3D12_HEAP_TYPE_READBACK }
+};
+
 }
