@@ -1,25 +1,25 @@
-#include <volt/gpu/d3d12/d3d12.hpp>
+// #include <volt/gpu/d3d12/d3d12.hpp>
 
-namespace volt::gpu::d3d12 {
+// namespace volt::gpu::d3d12 {
 
-std::map<HRESULT, std::string> result_messages{
-	{ D3D12_ERROR_ADAPTER_NOT_FOUND, "The specified cached PSO was created on a different adapter and cannot be reused on the current adapter. (D3D12_ERROR_ADAPTER_NOT_FOUND)" },
-	{ D3D12_ERROR_DRIVER_VERSION_MISMATCH, "The specified cached PSO was created on a different driver version and cannot be reused on the current adapter. (D3D12_ERROR_DRIVER_VERSION_MISMATCH)" },
-	{ DXGI_ERROR_INVALID_CALL, "The method call is invalid. For example, a method's parameter may not be a valid pointer. (DXGI_ERROR_INVALID_CALL)" },
-	{ DXGI_ERROR_WAS_STILL_DRAWING, "The previous blit operation that is transferring information to or from this surface is incomplete. (DXGI_ERROR_WAS_STILL_DRAWING)" },
-	{ E_FAIL, "Attempted to create a device with the debug layer enabled and the layer is not installed. (E_FAIL)" },
-	{ E_INVALIDARG, "An invalid parameter was passed to the returning function. (E_INVALIDARG)" },
-	{ E_OUTOFMEMORY, "Direct3D could not allocate sufficient memory to complete the call. (E_OUTOFMEMORY)" },
-	{ E_NOTIMPL, "The method call isn't implemented with the passed parameter combination. (E_NOTIMPL)" },
-	{ S_FALSE, "Alternate success value, indicating a successful but nonstandard completion (the precise meaning depends on context). (S_FALSE)" },
-	{ S_OK, "No error occurred. (S_OK)" }
-};
+// std::map<HRESULT, std::string> result_messages{
+// 	{ D3D12_ERROR_ADAPTER_NOT_FOUND, "The specified cached PSO was created on a different adapter and cannot be reused on the current adapter. (D3D12_ERROR_ADAPTER_NOT_FOUND)" },
+// 	{ D3D12_ERROR_DRIVER_VERSION_MISMATCH, "The specified cached PSO was created on a different driver version and cannot be reused on the current adapter. (D3D12_ERROR_DRIVER_VERSION_MISMATCH)" },
+// 	{ DXGI_ERROR_INVALID_CALL, "The method call is invalid. For example, a method's parameter may not be a valid pointer. (DXGI_ERROR_INVALID_CALL)" },
+// 	{ DXGI_ERROR_WAS_STILL_DRAWING, "The previous blit operation that is transferring information to or from this surface is incomplete. (DXGI_ERROR_WAS_STILL_DRAWING)" },
+// 	{ E_FAIL, "Attempted to create a device with the debug layer enabled and the layer is not installed. (E_FAIL)" },
+// 	{ E_INVALIDARG, "An invalid parameter was passed to the returning function. (E_INVALIDARG)" },
+// 	{ E_OUTOFMEMORY, "Direct3D could not allocate sufficient memory to complete the call. (E_OUTOFMEMORY)" },
+// 	{ E_NOTIMPL, "The method call isn't implemented with the passed parameter combination. (E_NOTIMPL)" },
+// 	{ S_FALSE, "Alternate success value, indicating a successful but nonstandard completion (the precise meaning depends on context). (S_FALSE)" },
+// 	{ S_OK, "No error occurred. (S_OK)" }
+// };
 
-std::map<memory_type, D3D12_HEAP_TYPE> heap_types{
-	{ memory_type::internal, D3D12_HEAP_TYPE_DEFAULT },
-	{ memory_type::staging, D3D12_HEAP_TYPE_UPLOAD },
-	{ memory_type::write, D3D12_HEAP_TYPE_UPLOAD },
-	{ memory_type::read, D3D12_HEAP_TYPE_READBACK }
-};
+// std::map<memory_type, D3D12_HEAP_TYPE> heap_types{
+// 	{ memory_type::internal, D3D12_HEAP_TYPE_DEFAULT },
+// 	{ memory_type::staging, D3D12_HEAP_TYPE_UPLOAD },
+// 	{ memory_type::write, D3D12_HEAP_TYPE_UPLOAD },
+// 	{ memory_type::read, D3D12_HEAP_TYPE_READBACK }
+// };
 
-}
+// }

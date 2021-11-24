@@ -9,11 +9,10 @@
 namespace volt::gpu::vk12 {
 
 template<command_types T>
-pool<T>::pool(std::shared_ptr<gpu::queue<T>> &&queue)
-		: gpu::pool<T>(std::move(queue)) {
-	auto &_device = *static_cast<vk12::device *>(this->queue->get_device().get());
-	device = _device.vk_device;
-	auto &adapter = *static_cast<vk12::adapter *>(_device.get_adapter().get());
+pool<T>::pool(std::shared_ptr<gpu::device> &&device)
+		: gpu::pool<T>(std::move(device)) {
+	vk_device = static_cast<vk12::device *>(this->device.get())->vk_device;
+	auto &adapter = *static_cast<vk12::adapter *>(this->device.get_adapter().get());
 
 	VkCommandPoolCreateInfo pool_info{};
 	pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -24,13 +23,13 @@ pool<T>::pool(std::shared_ptr<gpu::queue<T>> &&queue)
 	if constexpr (T == command_type::copy)
 		pool_info.queueFamilyIndex = adapter.transfer_family;
 
-	VOLT_VK12_CHECK(vkCreateCommandPool(device, &pool_info, nullptr, &command_pool),
+	VOLT_VK12_CHECK(vkCreateCommandPool(vk_device, &pool_info, nullptr, &command_pool),
 			"Failed to create command pool.")
 }
 
 template<command_types T>
 pool<T>::~pool() {
-	vkDestroyCommandPool(device, command_pool, nullptr);
+	vkDestroyCommandPool(vk_device, command_pool, nullptr);
 }
 
 template<command_types T>
@@ -41,7 +40,7 @@ std::shared_ptr<gpu::routine<T>> pool<T>::create_routine() {
 
 template<command_types T>
 void pool<T>::reset_routines() {
-	VOLT_VK12_DEBUG_CHECK(vkResetCommandPool(device, command_pool, 0),
+	VOLT_VK12_DEBUG_CHECK(vkResetCommandPool(vk_device, command_pool, 0),
 			"Failed to reset command pool.")
 }
 

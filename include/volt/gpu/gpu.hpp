@@ -21,6 +21,5 @@ VOLT_API std::shared_ptr<gpu::instance> create_instance(gpu::api api);
 #include "enums.hpp"
 #include "instance.hpp"
 #include "pool.hpp"
-#include "queue.hpp"
 #include "routine.hpp"
 #include "texture.hpp"

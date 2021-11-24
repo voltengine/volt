@@ -4,7 +4,6 @@
 
 #include <volt/gpu/adapter.hpp>
 #include <volt/gpu/instance.hpp>
-#include <volt/gpu/queue.hpp>
 
 namespace volt::gpu::vk12 {
 
@@ -22,8 +21,6 @@ public:
 	VkPhysicalDeviceMemoryProperties memory_properties;
 
 	adapter(std::shared_ptr<gpu::instance> &&instance, VkPhysicalDevice physical_device, VkSurfaceKHR vk_dummy_surface);
-
-	std::vector<uint32_t> unique_families(gpu::command_types sync_queues);
 
 	uint32_t vendor_id() override;
 

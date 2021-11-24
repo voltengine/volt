@@ -9,8 +9,7 @@
 
 namespace volt::gpu {
 
-template<command_types T>
-class queue;
+class device;
 
 template<command_types T>
 class pool : public std::enable_shared_from_this<pool<T>> {
@@ -21,15 +20,15 @@ public:
 
 	virtual void reset_routines() = 0;
 
-	const std::shared_ptr<gpu::queue<T>> &get_queue() {
-		return queue;
+	const std::shared_ptr<gpu::device> &get_device() {
+		return device;
 	}
 
 protected:
-	std::shared_ptr<gpu::queue<T>> queue;
+	std::shared_ptr<gpu::device> device;
 
-	pool(std::shared_ptr<gpu::queue<T>> &&queue)
-			: queue(std::move(queue)) {}
+	pool(std::shared_ptr<gpu::device> &&device)
+			: device(std::move(device)) {}
 };
 
 using rasterization_pool = pool<command_type::rasterization>;

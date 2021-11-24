@@ -11,7 +11,6 @@ namespace command_type {
 			rasterization = 1 << 0,
 			compute       = 1 << 1,
 			copy          = 1 << 2;
-			// raytracing = 1 << 3
 }
 
 enum class memory_type {
@@ -26,15 +25,13 @@ namespace buffer_feature {
 	constexpr buffer_features
 			source      = 1 << 0, // Source for copy operations 
 			destination = 1 << 1, // Destination for copy operations
+
 			constant    = 1 << 2, // Can be used as constant buffer / UBO
 			storage     = 1 << 3, // Can be used as storage buffer / SSBO
+
 			index       = 1 << 4, // Can be used as index buffer
 			vertex      = 1 << 5; // Can be used as vertex buffer / VBO
 }
-
-enum class buffer_view_type {
-	constant, storage
-};
 
 enum class texture_format {
 	r8,  rg8,  rgb8,  rgba8,       // 8-bit unsigned normalized
@@ -55,8 +52,10 @@ namespace texture_feature {
 	constexpr texture_features
 			source                   = 1 << 0, // Source for copy operations 
 			destination              = 1 << 1, // Destination for copy operations
+
 			sampler                  = 1 << 2, // Can be used as sampler
-			// storage                  = 1 << 3, // Can be used as storage texture
+			storage                  = 1 << 3, // Can be used as storage texture
+
 			color_attachment         = 1 << 4, // Can be used as color attachment
 			depth_stencil_attachment = 1 << 5; // Can be used as depth-stencil attachment
 }
@@ -82,39 +81,21 @@ enum class texture_type {
 	cube, cube_array    // Cube view and cube array view can access layered 2D texture;
 };
 
-// using texture_view_aspects = uint32_t;
-// namespace texture_view_aspect {
-// 	constexpr texture_view_aspects
-// 			color   = 1 << 0,
-// 			depth   = 1 << 1,
-// 			stencil = 1 << 2;
-// }
-
 enum class attachment_initializer {
 	none, clear, preserve
 };
 
-// using storage_usages = uint32_t;
-	// namespace storage_usage {
-	// 	constexpr storage_usages
-	// 			input  = 1 << 0,
-	// 			output = 1 << 1;
-	// }
-
-using shader_stages = uint32_t;
-namespace shader_stage {
-	constexpr shader_stages
-			vertex                 = 1 << 0,
-			tesselation_control    = 1 << 1,
-			tesselation_evaluation = 1 << 2,
-			geometry               = 1 << 3,
-			pixel                  = 1 << 4,
-			compute                = 1 << 5,
-			all                    = 0b111111;
-}
-
-enum class pipeline_stage { // Used for barriers
-	begin,//...
-};
+// using shader_stages = uint32_t;
+// namespace shader_stage {
+// 	constexpr shader_stages
+// 			none     = 0,
+// 			vertex   = 1 << 0,
+// 			domain   = 1 << 1,
+// 			hull     = 1 << 2,
+// 			geometry = 1 << 3,
+// 			pixel    = 1 << 4,
+// 			compute  = 1 << 5,
+// 			all      = 0b111111;
+// }
 
 }

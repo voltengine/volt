@@ -10,15 +10,17 @@ template<command_types T>
 class pool : public gpu::pool<T> {
 public:
 	VkCommandPool command_pool;
-	VkDevice device;
 
-	pool(std::shared_ptr<gpu::queue<T>> &&queue);
+	pool(std::shared_ptr<gpu::device> &&device);
 
 	~pool();
 
 	std::shared_ptr<gpu::routine<T>> create_routine() override;
 
 	void reset_routines() override;
+
+private:
+	VkDevice vk_device;
 };
 
 using rasterization_pool = pool<command_type::rasterization>;

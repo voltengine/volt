@@ -1,35 +1,35 @@
-#include <volt/gpu/d3d12/fence.hpp>
+// #include <volt/gpu/d3d12/fence.hpp>
 
-#include <volt/gpu/d3d12/d3d12.hpp>
-#include <volt/gpu/d3d12/device.hpp>
+// #include <volt/gpu/d3d12/d3d12.hpp>
+// #include <volt/gpu/d3d12/device.hpp>
 
-namespace volt::gpu::d3d12 {
+// namespace volt::gpu::d3d12 {
 
-fence::fence(std::shared_ptr<gpu::device> &&device, uint64_t initial_value)
-		: gpu::fence(std::move(device)) {
-	ID3D12Device *d3d_device = static_cast<d3d12::device *>(this->device.get())->d3d_device;
+// fence::fence(std::shared_ptr<gpu::device> &&device, uint64_t initial_value)
+// 		: gpu::fence(std::move(device)) {
+// 	ID3D12Device *d3d_device = static_cast<d3d12::device *>(this->device.get())->d3d_device;
 
-	VOLT_D3D12_CHECK(d3d_device->CreateFence(initial_value, D3D12_FENCE_FLAG_NONE,
-			IID_PPV_ARGS(&d3d_fence)), "Failed to create fence.")
+// 	VOLT_D3D12_CHECK(d3d_device->CreateFence(initial_value, D3D12_FENCE_FLAG_NONE,
+// 			IID_PPV_ARGS(&d3d_fence)), "Failed to create fence.")
 
-	wait_event = CreateEventEx(0, 0, 0, EVENT_ALL_ACCESS);
-}
+// 	wait_event = CreateEventEx(0, 0, 0, EVENT_ALL_ACCESS);
+// }
 
-fence::~fence() {
-	d3d_fence->Release();
-}
+// fence::~fence() {
+// 	d3d_fence->Release();
+// }
 
-uint64_t fence::value() {
-	return d3d_fence->GetCompletedValue();
-}
+// uint64_t fence::value() {
+// 	return d3d_fence->GetCompletedValue();
+// }
 
-void fence::signal(uint64_t value) {
-	VOLT_D3D12_CHECK(d3d_fence->Signal(value), "Host failed to signal fence.")
-}
+// void fence::signal(uint64_t value) {
+// 	VOLT_D3D12_CHECK(d3d_fence->Signal(value), "Host failed to signal fence.")
+// }
 
-void fence::wait(uint64_t value) {
-	d3d_fence->SetEventOnCompletion(value, wait_event);
-	WaitForSingleObject(wait_event, INFINITE);
-}
+// void fence::wait(uint64_t value) {
+// 	d3d_fence->SetEventOnCompletion(value, wait_event);
+// 	WaitForSingleObject(wait_event, INFINITE);
+// }
 
-}
+// }

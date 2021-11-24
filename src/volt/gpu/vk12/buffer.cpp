@@ -15,16 +15,15 @@ buffer::buffer(std::shared_ptr<gpu::device> &&device,
 			_device(*static_cast<vk12::device *>(this->device.get())) {
 	auto &adapter = *static_cast<vk12::adapter *>(_device.get_adapter().get());
 
-	// Buffer will never be used in presentation queue
-	std::vector<uint32_t> families = adapter.unique_families(sync_queues);
-		
+	uint32_t families[]{ adapter.graphics_family, adapter.compute_family, adapter.transfer_family };
+
 	VkBufferCreateInfo buffer_info{};
 	buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	buffer_info.size = size;
 	buffer_info.usage = (features & 0b11) | ((features & 0b111100) << 2);
-	buffer_info.sharingMode = (families.size() > 1 ? VK_SHARING_MODE_CONCURRENT : VK_SHARING_MODE_EXCLUSIVE);
-	buffer_info.queueFamilyIndexCount = families.size();
-	buffer_info.pQueueFamilyIndices = families.data();
+	buffer_info.sharingMode = VK_SHARING_MODE_CONCURRENT; // Force EXCLUSIVE + single queue on mobile
+	buffer_info.queueFamilyIndexCount = 3;
+	buffer_info.pQueueFamilyIndices = families;
 	
 	VmaAllocationCreateInfo allocation_info = {};
 	allocation_info.usage = vk12::vma_memory_usages[memory_type];

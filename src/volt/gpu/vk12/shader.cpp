@@ -1,12 +1,13 @@
 #include <volt/gpu/vk12/shader.hpp>
 
 #include <volt/gpu/vk12/device.hpp>
+#include <volt/gpu/vk12/vk12.hpp>
 
 namespace volt::gpu::vk12 {
 
 shader::shader(std::shared_ptr<gpu::device> &&device, const std::vector<uint8_t> &bytecode)
 		: gpu::shader(std::move(device)) {
-	vk_device = static_cast<vk12::device *>(this->device.get())->vk_device;
+	VkDevice vk_device = static_cast<vk12::device *>(this->device.get())->vk_device;
 
 	VkShaderModuleCreateInfo info{};
 	info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
@@ -19,7 +20,7 @@ shader::shader(std::shared_ptr<gpu::device> &&device, const std::vector<uint8_t>
 }
 
 shader::~shader() {
-	vk_device = static_cast<vk12::device *>(device.get())->vk_device;
+	VkDevice vk_device = static_cast<vk12::device *>(device.get())->vk_device;
 	vkDestroyShaderModule(vk_device, shader_module, nullptr);
 }
 

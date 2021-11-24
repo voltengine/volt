@@ -16,6 +16,16 @@ extern std::map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages;
 
 extern std::map<gpu::texture_format, VkFormat> texture_formats;
 
+void load_glad();
+
+void unload_glad();
+
+void load_glad_instance(VkInstance instance);
+
+void load_glad_physical_device(VkPhysicalDevice physical_device);
+
+void load_glad_device(VkDevice device);
+
 const std::vector<const char *> &validation_layers();
 
 }

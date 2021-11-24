@@ -41,7 +41,7 @@ static VkDebugUtilsMessengerCreateInfoEXT make_messenger_info() {
 namespace volt::gpu::vk12 {
 
 instance::instance() {
-	VOLT_ASSERT(gladLoaderLoadVulkan(nullptr, nullptr, nullptr), "Failed to load Vulkan base symbols.")
+	vk12::load_glad();
 
 	util::version version(VOLT_VERSION);
 	auto vk_version = VK_MAKE_VERSION(version.major, version.minor, version.patch);
@@ -92,8 +92,7 @@ instance::instance() {
 	// Initialize instance
 	VOLT_VK12_CHECK(vkCreateInstance(&instance_info, nullptr, &vk_instance),
 			"Failed to create instance.")
-	VOLT_ASSERT(gladLoaderLoadVulkan(vk_instance, nullptr, nullptr),
-			"Failed to load Vulkan instance symbols.")
+	vk12::load_glad_instance(vk_instance);
 
 	// Initialize debug messenger
 #ifdef VOLT_GPU_DEBUG
@@ -107,6 +106,7 @@ instance::~instance() {
 	vkDestroyDebugUtilsMessengerEXT(vk_instance, vk_messenger, nullptr);
 #endif
 	vkDestroyInstance(vk_instance, nullptr);
+	vk12::unload_glad();
 }
 
 std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {

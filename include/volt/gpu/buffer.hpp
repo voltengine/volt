@@ -12,8 +12,6 @@ class buffer : public gpu::_resource {
 public:
 	virtual ~buffer() = default;
 
-	// virtual buffer_view create_view();
-
 protected:
 	buffer(std::shared_ptr<gpu::device> &&device)
 			: gpu::_resource(std::move(device)) {}

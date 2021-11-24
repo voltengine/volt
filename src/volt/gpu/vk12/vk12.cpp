@@ -2,6 +2,11 @@
 
 #include <volt/log.hpp>
 
+static uint32_t glad_refcount = 0;
+static VkInstance glad_instance = VK_NULL_HANDLE;
+static VkPhysicalDevice glad_physical_device = VK_NULL_HANDLE;
+static VkDevice glad_device = VK_NULL_HANDLE;
+
 namespace volt::gpu::vk12 {
 
 std::map<VkResult, std::string> result_messages{
@@ -80,6 +85,46 @@ std::map<gpu::texture_format, VkFormat> texture_formats{
 	{ gpu::texture_format::bc6,        VK_FORMAT_BC6H_UFLOAT_BLOCK },
 	{ gpu::texture_format::bc7_srgb,   VK_FORMAT_BC7_SRGB_BLOCK }
 };
+
+void load_glad() {
+	if (glad_refcount++ == 0) {
+		VOLT_ASSERT(gladLoaderLoadVulkan(nullptr, nullptr, nullptr),
+				"Failed to load Vulkan base symbols.")
+	}
+}
+
+void unload_glad() {
+	if (--glad_refcount == 0) {
+		gladLoaderUnloadVulkan();
+		glad_instance = VK_NULL_HANDLE;
+		glad_physical_device = VK_NULL_HANDLE;
+		glad_device = VK_NULL_HANDLE;
+	}
+}
+
+void load_glad_instance(VkInstance instance) {
+	if (glad_instance == VK_NULL_HANDLE) {
+		glad_instance = instance;
+		VOLT_ASSERT(gladLoaderLoadVulkan(glad_instance, nullptr, nullptr),
+				"Failed to load Vulkan instance symbols.")
+	}
+}
+
+void load_glad_physical_device(VkPhysicalDevice physical_device) {
+	if (glad_instance == VK_NULL_HANDLE) {
+		glad_physical_device = physical_device;
+		VOLT_ASSERT(gladLoaderLoadVulkan(glad_instance, glad_physical_device, nullptr),
+				"Failed to load Vulkan physical device symbols.")
+	}
+}
+
+void load_glad_device(VkDevice device) {
+	if (glad_instance == VK_NULL_HANDLE) {
+		glad_device = device;
+		VOLT_ASSERT(gladLoaderLoadVulkan(glad_instance, glad_physical_device, glad_device),
+				"Failed to load Vulkan device symbols.")
+	}
+}
 
 const std::vector<const char *> &validation_layers() {
 	static std::vector<const char *> validation_layers = []() {

@@ -6,7 +6,6 @@
 #include <volt/gpu/vk12/device.hpp>
 #include <volt/gpu/enums.hpp>
 #include <volt/gpu/texture.hpp>
-#include <volt/gpu/queue.hpp>
 
 namespace volt::gpu::vk12 {
 
@@ -18,43 +17,18 @@ public:
 
 	VkImage image;
 	VmaAllocation allocation = VK_NULL_HANDLE;
-	VkFormat format;
+	VkImageView image_view;
 
 	texture(std::shared_ptr<gpu::device> &&device,
 			gpu::memory_type memory_type,
-			gpu::command_types sync_queues,
 			gpu::texture_features features,
-			uint32_t size, uint32_t levels,
-			gpu::texture_format format);
+			gpu::texture_format format,
+			math::uvec2 size, uint32_t levels);
 
-	texture(std::shared_ptr<gpu::device> &&device,
-			gpu::memory_type memory_type,
-			gpu::command_types sync_queues,
-			gpu::texture_features features,
-			uint32_t size, uint32_t layers, uint32_t levels,
-			gpu::texture_format format);
-
-	texture(std::shared_ptr<gpu::device> &&device,
-			gpu::memory_type memory_type,
-			gpu::command_types sync_queues,
-			gpu::texture_features features,
-			math::uvec2 size, uint32_t layers, uint32_t levels,
-			gpu::texture_format format);
-
-	texture(std::shared_ptr<gpu::device> &&device,
-			gpu::memory_type memory_type,
-			gpu::command_types sync_queues,
-			gpu::texture_features features,
-			math::uvec3 size, uint32_t levels,
-			gpu::texture_format format);
-
-	texture(std::shared_ptr<gpu::device> &&device, VkImage image, VkFormat format);
+	// Just for swapchain images
+	texture(std::shared_ptr<gpu::device> &&device, gpu::texture_format format, VkImage image, VkImageView image_view);
 
 	~texture();
-
-	std::shared_ptr<gpu::texture_view> create_view(
-			gpu::texture_view_type type,
-			gpu::texture_view_aspects aspects) override;
 
 	void map(void **ptr, size_t read_offset = 0, size_t read_size = 0) override;
 
@@ -62,12 +36,6 @@ public:
 
 private:
 	vk12::device &_device;
-
-	void create(VkImageCreateInfo &&image_info,
-			gpu::memory_type memory_type,
-			gpu::command_types sync_queues,
-			gpu::texture_features features,
-			uint32_t levels, gpu::texture_format format);
 };
 
 }

@@ -2,6 +2,7 @@
 
 #include <volt/gpu/vk12/device.hpp>
 #include <volt/gpu/vk12/instance.hpp>
+#include <volt/gpu/vk12/vk12.hpp>
 #include <volt/error.hpp>
 
 namespace volt::gpu::vk12 {
@@ -9,10 +10,7 @@ namespace volt::gpu::vk12 {
 adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 		VkPhysicalDevice physical_device, VkSurfaceKHR vk_dummy_surface)
 		: gpu::adapter(std::move(instance)), physical_device(physical_device) {
-	auto &_instance = *static_cast<vk12::instance *>(this->instance.get());
-
-	VOLT_ASSERT(gladLoaderLoadVulkan(_instance.vk_instance, physical_device, nullptr),
-			"Failed to load Vulkan physical device symbols.")
+	vk12::load_glad_physical_device(physical_device);
 
 	// Query adapter properties
 	vkGetPhysicalDeviceProperties(physical_device, &physical_device_properties);
@@ -97,23 +95,6 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	}
 
 	vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
-}
-
-std::vector<uint32_t> adapter::unique_families(gpu::command_types sync_queues) {
-	std::vector<uint32_t> families;
-
-	if (sync_queues & gpu::command_type::rasterization)
-		families.push_back(graphics_family);
-
-	if (sync_queues & gpu::command_type::compute && std::find(
-			families.begin(), families.end(), compute_family) == families.end())
-		families.push_back(compute_family);
-
-	if (sync_queues & gpu::command_type::copy && std::find(
-			families.begin(), families.end(), transfer_family) == families.end())
-		families.push_back(transfer_family);
-
-	return families;
 }
 
 uint32_t adapter::vendor_id() {

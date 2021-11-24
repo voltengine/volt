@@ -1,17 +1,16 @@
 #include <volt/gpu/vk12/device.hpp>
 
-#include <volt/math/math.hpp>
 #include <volt/gpu/vk12/adapter.hpp>
 #include <volt/gpu/vk12/buffer.hpp>
-#include <volt/gpu/vk12/fence.hpp>
 #include <volt/gpu/vk12/instance.hpp>
-#include <volt/gpu/vk12/queue.hpp>
 #include <volt/gpu/vk12/swapchain.hpp>
 #include <volt/gpu/vk12/texture.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
 #include <volt/error.hpp>
 
 namespace volt::gpu::vk12 {
+
+using namespace math;
 
 device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(adapter)) {
 	auto &_adapter = *static_cast<vk12::adapter *>(this->adapter.get());
@@ -64,8 +63,7 @@ device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(
 
 	VOLT_VK12_CHECK(vkCreateDevice(_adapter.physical_device, &device_info,
 			nullptr, &vk_device), "Failed to create device.")
-	VOLT_ASSERT(gladLoaderLoadVulkan(instance.vk_instance, _adapter.physical_device, vk_device),
-			"Failed to load Vulkan device symbols.")
+	vk12::load_glad_device(vk_device);
 
 	VmaAllocatorCreateInfo allocator_info{};
 	allocator_info.vulkanApiVersion = VK_API_VERSION_1_2;
@@ -91,69 +89,23 @@ void device::wait() {
 
 std::shared_ptr<gpu::buffer> device::create_buffer(
 		gpu::memory_type memory_type,
-		gpu::command_types sync_queues,
 		gpu::buffer_features features,
 		size_t size) {
 	return std::shared_ptr<gpu::buffer>(new vk12::buffer(
-			shared_from_this(), memory_type, sync_queues, features, size));
-}
-
-std::shared_ptr<gpu::fence> device::create_fence(uint64_t initial_value) {
-	return std::shared_ptr<gpu::fence>(new vk12::fence(
-			shared_from_this(), initial_value));
+			shared_from_this(), memory_type, features, size));
 }
 
 std::shared_ptr<gpu::swapchain> device::create_swapchain(std::shared_ptr<os::window> window) {
 	return std::shared_ptr<gpu::swapchain>(new vk12::swapchain(shared_from_this(), std::move(window)));
 }
 
-std::shared_ptr<gpu::texture> device::create_texture(
+std::shared_ptr<gpu::texture> device::create_2d_texture(
 		gpu::memory_type memory_type,
-		gpu::command_types sync_queues,
 		gpu::texture_features features,
-		size_t size, uint32_t levels,
-		gpu::texture_format format) {
+		gpu::texture_format format,
+		uvec2 size, uint32_t levels) {
 	return std::shared_ptr<gpu::texture>(new vk12::texture(
-			shared_from_this(), memory_type, sync_queues, features, size, format));
-}
-
-std::shared_ptr<gpu::texture> device::create_texture(
-		gpu::memory_type memory_type,
-		gpu::command_types sync_queues,
-		gpu::texture_features features,
-		math::uvec2 size, uint32_t levels,
-		gpu::texture_format format) {
-	return std::shared_ptr<gpu::texture>(new vk12::texture(
-			shared_from_this(), memory_type, sync_queues, features, size, format));
-}
-
-std::shared_ptr<gpu::texture> device::create_texture(
-		gpu::memory_type memory_type,
-		gpu::command_types sync_queues,
-		gpu::texture_features features,
-		math::uvec3 size, uint32_t levels,
-		gpu::texture_format format) {
-	return std::shared_ptr<gpu::texture>(new vk12::texture(
-			shared_from_this(), memory_type, sync_queues, features, size, format));
-}
-
-// std::shared_ptr<gpu::pipeline> device::create_pipeline() {
-// 	return nullptr; // TODO: Implement
-// }
-
-std::shared_ptr<gpu::rasterization_queue> device::new_rasterization_queue() {
-	return std::shared_ptr<gpu::rasterization_queue>(
-			new vk12::rasterization_queue(shared_from_this(), vk_rasterization_queue));
-}
-
-std::shared_ptr<gpu::compute_queue> device::new_compute_queue() {
-	return std::shared_ptr<gpu::compute_queue>(
-			new vk12::compute_queue(shared_from_this(), vk_compute_queue));
-}
-
-std::shared_ptr<gpu::copy_queue> device::new_copy_queue() {
-	return std::shared_ptr<gpu::copy_queue>(
-			new vk12::copy_queue(shared_from_this(), vk_copy_queue));
+			shared_from_this(), memory_type, features, format, size, levels));
 }
 
 }

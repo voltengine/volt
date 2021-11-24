@@ -4,7 +4,6 @@
 
 #include <volt/gpu/vk12/device.hpp>
 #include <volt/gpu/buffer.hpp>
-#include <volt/gpu/queue.hpp>
 
 namespace volt::gpu::vk12 {
 

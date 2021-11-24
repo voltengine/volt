@@ -30,83 +30,52 @@ public:
 	// 	final_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 	// };
 
-	rasterization_pass &set_record_callback(std::function<void(rasterization_routine &)> &&callback) {
-		record_callback = std::move(callback);
-		return *this;
-	}
+	rasterization_pass &viewport(math::fvec2 width, math::
+			fvec2 height, math::fvec2 depth = math::fvec2(0, 1));
 
-	rasterization_pass &set_vertex_shader(std::shared_ptr<gpu::shader> &&shader) {
-		vertex_shader = std::move(shader);
-		return *this;
-	}
+	rasterization_pass &vertex_shader(std::shared_ptr<gpu::shader> &&shader);
 
-	rasterization_pass &set_pixel_shader(std::shared_ptr<gpu::shader> &&shader) {
-		pixel_shader = std::move(shader);
-		return *this;
-	}
+	rasterization_pass &pixel_shader(std::shared_ptr<gpu::shader> &&shader);
 
-	// void set_sampler(uint32_t binding, std::shared_ptr<gpu::texture> &&texture, shader_stages stages);
-
-	rasterization_pass &set_attachment(uint32_t location,
+	rasterization_pass &color_attachment(uint32_t location,
 			std::shared_ptr<gpu::texture> &&texture,
 			attachment_initializer initializer,
-			math::fvec3 clear_color = math::fvec3::zero) {
-		attachment attachment{
-			.texture = std::move(texture),
-			.initializer = initializer,
-			.clear_color = clear_color
-		}
-		attachments[location] = attachment;
-		return *this;
-	}
+			math::fvec3 clear_color = math::fvec3::zero);
 
-	rasterization_pass &set_depth_stencil_attachment(
+	rasterization_pass &depth_stencil_attachment(
 			std::shared_ptr<gpu::texture> &&texture,
 			attachment_initializer initializer,
 			float clear_depth = 1,
-			float clear_stencil = 0) {
-		depth_stencil_attachment attachment{
-			.texture = std::move(texture),
-			.initializer = initializer,
-			.clear_depth = clear_depth,
-			.clear_stencil = clear_stencil
-		};
-		depth_stencil_attachment = attachment;
-		return *this;
-	}
+			float clear_stencil = 0);
+
+	// void set_sampler(uint32_t binding, std::shared_ptr<gpu::texture> &&texture, shader_stages stages);
 
 	// void set_vertex_buffer(uint32_t location, std::shared_ptr<gpu::buffer> &&buffer);
 
 	// void set_constant_buffer(uint32_t binding, std::shared_ptr<gpu::buffer> &&buffer, shader_stages stages);
 
-	rasterization_pass &set_viewport(fvec2 width, fvec2 height, fvec2 depth = fvec2(0, 1)) {
-		viewport = { width, height, depth };
-		return *this;
-	}
-
 private:
-	struct attachment {
+	struct _viewport {
+		math::fvec2 width, height, depth;
+	};
+
+	struct _color_attachment {
 		std::shared_ptr<gpu::texture> texture;
 		attachment_initializer initializer;
 		math::fvec3 clear_color;
 	};
 
-	struct depth_stencil_attachment {
+	struct _depth_stencil_attachment {
 		std::shared_ptr<gpu::texture> texture;
 		attachment_initializer initializer;
 		float clear_depth;
 		float clear_stencil;
 	};
 
-	struct viewport {
-		fvec2 width, height, depth;
-	}
-
-	std::function<void(rasterization_routine &)> record_callback;
-	std::shared_ptr<gpu::shader> vertex_shader, pixel_shader;
-	std::map<uint32_t, attachment> attachments;
-	depth_stencil_attachment depth_stencil_attachment;
-	viewport viewport;
+	_viewport _viewport;
+	std::shared_ptr<gpu::shader> _vertex_shader, _pixel_shader;
+	std::map<uint32_t, _color_attachment> color_attachments;
+	_depth_stencil_attachment _depth_stencil_attachment;
 };
 
 // class compute_pass {
