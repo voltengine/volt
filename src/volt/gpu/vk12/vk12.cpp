@@ -9,7 +9,7 @@ static VkDevice glad_device = VK_NULL_HANDLE;
 
 namespace volt::gpu::vk12 {
 
-std::map<VkResult, std::string> result_messages{
+std::unordered_map<VkResult, std::string> result_messages{
 	{ VK_SUCCESS, "Command successfully completed. (VK_SUCCESS)" },
 	{ VK_NOT_READY, "A fence or query has not yet completed. (VK_NOT_READY)" },
 	{ VK_TIMEOUT, "A wait operation has not completed in the specified time. (VK_TIMEOUT)" },
@@ -40,14 +40,14 @@ std::vector<const char *> device_extensions = {
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME
 };
 
-std::map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages{
+std::unordered_map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages{
 	{ gpu::memory_type::internal, VMA_MEMORY_USAGE_GPU_ONLY },
 	{ gpu::memory_type::staging,  VMA_MEMORY_USAGE_CPU_ONLY },
 	{ gpu::memory_type::write,    VMA_MEMORY_USAGE_CPU_TO_GPU },
 	{ gpu::memory_type::read,     VMA_MEMORY_USAGE_GPU_TO_CPU }
 };
 
-std::map<gpu::texture_format, VkFormat> texture_formats{
+std::unordered_map<gpu::texture_format, VkFormat> texture_formats{
 	{ gpu::texture_format::r8,    VK_FORMAT_R8_UNORM },
 	{ gpu::texture_format::rg8,   VK_FORMAT_R8G8_UNORM },
 	{ gpu::texture_format::rgb8,  VK_FORMAT_R8G8B8_UNORM },

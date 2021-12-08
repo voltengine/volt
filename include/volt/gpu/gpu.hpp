@@ -6,7 +6,18 @@
 namespace volt::gpu {
 
 enum class api {
-	d3d12, vk12
+#ifdef VOLT_PLATFORM_WINDOWS
+	d3d12,
+#endif
+#ifndef VOLT_PLATFORM_MACOS
+	gl46,
+#endif
+#ifdef VOLT_PLATFORM_MACOS
+	mtl,
+#endif
+#ifndef VOLT_PLATFORM_MACOS
+	vk12,
+#endif
 };
 
 class instance;
@@ -20,6 +31,8 @@ VOLT_API std::shared_ptr<gpu::instance> create_instance(gpu::api api);
 #include "device.hpp"
 #include "enums.hpp"
 #include "instance.hpp"
-#include "pool.hpp"
+#include "pass.hpp"
 #include "routine.hpp"
+#include "shader.hpp"
+#include "swapchain.hpp"
 #include "texture.hpp"

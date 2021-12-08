@@ -3,29 +3,34 @@
 
 namespace volt::gpu {
 
-swapchain_frame::~swapchain_frame() {
-	if (!swapchain)
-		return;
-	
-	// Transition texture to present
-	// Signal fence
-	// Flush
+float swapchain::framerate_limit() {
+	return 1 / frame_time;
 }
 
-bool swapchain_frame::acquired() const {
-	return swapchain != nullptr;
+void swapchain::limit_framerate(float fps) {
+	frame_time = 1 / fps;
 }
 
-uint32_t swapchain_frame::index() const {
-	return index;
+gpu::present_mode swapchain::present_mode() {
+	return _present_mode;
 }
 
-const std::shared_ptr<gpu::texture> &swapchain_frame::texture() const {
-	//return swapchain->textures[index];
-	return nullptr; // TODO: Implement
+void swapchain::request_present_mode(gpu::present_mode mode) {
+	_present_mode = mode;
+	reconstruct(); // Adjusts present_mode
 }
 
-swapchain_frame::swapchain_frame(gpu::swapchain *swapchain, uint32_t index)
-		: swapchain(swapchain), index(index) {}
+const std::shared_ptr<gpu::device> &swapchain::device() {
+	return _device;
+}
+
+const std::shared_ptr<os::window> &swapchain::window() {
+	return _window;
+}
+
+swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window)
+		: _device(std::move(device)), _window(std::move(window)) {
+	framerate_timer.start();
+}
 
 }

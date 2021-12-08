@@ -23,13 +23,13 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &num_families, families.data());
 
 	std::vector<uint32_t> present_score(num_families, 1), graphics_score(num_families, 1),
-			compute_score(num_families, 1), transfer_score(num_families, 1);
+			compute_score(num_families, 1), copy_score(num_families, 1);
 
 	for (uint32_t i = 0; i < families.size(); i++) {
 		VkBool32 present_support;
 		vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, vk_dummy_surface, &present_support);
 		auto family = families[i];
-		bool transfer_support = family.queueFlags & VK_QUEUE_TRANSFER_BIT
+		bool copy_support = family.queueFlags & VK_QUEUE_TRANSFER_BIT
 				|| family.queueFlags & VK_QUEUE_COMPUTE_BIT
 				|| family.queueFlags & VK_QUEUE_GRAPHICS_BIT;
 
@@ -37,30 +37,27 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 		// present when VK_QUEUE_GRAPHICS_BIT or VK_QUEUE_COMPUTE_BIT are there
 		present_score[i] += !(family.queueFlags & VK_QUEUE_GRAPHICS_BIT);
 		present_score[i] += !(family.queueFlags & VK_QUEUE_COMPUTE_BIT);
-		present_score[i] += !transfer_support;
+		present_score[i] += !copy_support;
 		
 		graphics_score[i] += (present_support == 0);
-		graphics_score[i] += !(family.queueFlags & VK_QUEUE_COMPUTE_BIT);
-		graphics_score[i] += !transfer_support;
 
 		compute_score[i] += (present_support == 0);
 		compute_score[i] += !(family.queueFlags & VK_QUEUE_GRAPHICS_BIT);
-		compute_score[i] += !transfer_support;
 
-		transfer_score[i] += (present_support == 0);
-		transfer_score[i] += !(family.queueFlags & VK_QUEUE_GRAPHICS_BIT);
-		transfer_score[i] += !(family.queueFlags & VK_QUEUE_COMPUTE_BIT);
+		copy_score[i] += (present_support == 0);
+		copy_score[i] += !(family.queueFlags & VK_QUEUE_GRAPHICS_BIT);
+		copy_score[i] += !(family.queueFlags & VK_QUEUE_COMPUTE_BIT);
 
 		present_score[i] *= (present_support != 0);
-		graphics_score[i] *= family.queueFlags & VK_QUEUE_GRAPHICS_BIT;
-		compute_score[i] *= family.queueFlags & VK_QUEUE_COMPUTE_BIT;
-		transfer_score[i] *= transfer_support;
+		graphics_score[i] *= (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) * (family.queueFlags & VK_QUEUE_COMPUTE_BIT); // copy_support is guaranteed
+		compute_score[i] *= family.queueFlags & VK_QUEUE_COMPUTE_BIT; // copy_support is guaranteed
+		copy_score[i] *= copy_support;
 	}
 
 	present_family = std::distance(present_score.begin(), std::max_element(present_score.begin(), present_score.end()));
 	graphics_family = std::distance(graphics_score.begin(), std::max_element(graphics_score.begin(), graphics_score.end()));
 	compute_family = std::distance(compute_score.begin(), std::max_element(compute_score.begin(), compute_score.end()));
-	transfer_family = std::distance(transfer_score.begin(), std::max_element(transfer_score.begin(), transfer_score.end()));
+	copy_family = std::distance(copy_score.begin(), std::max_element(copy_score.begin(), copy_score.end()));
 
 	if (present_score[present_family] == 0)
 		present_family = std::numeric_limits<uint32_t>::max();
@@ -68,8 +65,16 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 		graphics_family = std::numeric_limits<uint32_t>::max();
 	if (compute_score[compute_family] == 0)
 		compute_family = std::numeric_limits<uint32_t>::max();
-	if (transfer_score[transfer_family] == 0)
-		transfer_family = std::numeric_limits<uint32_t>::max();
+	if (copy_score[copy_family] == 0)
+		copy_family = std::numeric_limits<uint32_t>::max();
+
+	std::set<uint32_t> families{
+		present_family,
+		graphics_family,
+		compute_family,
+		copy_family
+	};
+	unique_families.assign(families.begin(), families.end());
 
 	// Extension support
 	uint32_t num_supported_extensions;

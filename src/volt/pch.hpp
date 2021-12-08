@@ -18,6 +18,7 @@
 #include <set>
 #include <stack>
 #include <typeindex>
+#include <unordered_map>
 #include <vector>
 
 #ifdef VOLT_PLATFORM_WINDOWS
@@ -34,5 +35,6 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 #include <nlohmann/json.hpp>
+#include <spirv_reflect.h>
 #include <termcolor/termcolor.hpp>
 #include <vk_mem_alloc.h>

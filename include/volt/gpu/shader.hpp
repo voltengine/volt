@@ -13,15 +13,15 @@ class shader {
 public:
 	virtual ~shader() = default;
 
-	const std::shared_ptr<gpu::device> &get_device() {
-		return device;
+	const std::shared_ptr<gpu::device> &device() {
+		return _device;
 	}
 
 protected:
-	std::shared_ptr<gpu::device> device;
+	std::shared_ptr<gpu::device> _device;
 
 	shader(std::shared_ptr<gpu::device> &&device)
-			: device(std::move(device)) {}
+			: _device(std::move(device)) {}
 };
 
 }

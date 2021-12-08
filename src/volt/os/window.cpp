@@ -194,10 +194,6 @@ void window::_destruct_swapchain() {
 	surface_constructed = false;
 }
 
-void window::_on_frame_resize(std::function<void()> &&callback) {
-	_frame_resize_callback = std::move(callback);
-}
-
 void window::key_callback(GLFWwindow *glfw_window, int32_t key, int32_t scancode, int32_t action, int32_t mods) {}
 
 void window::char_callback(GLFWwindow *glfw_window, uint32_t codepoint) {}
@@ -249,9 +245,6 @@ void window::framebuffer_size_callback(GLFWwindow *glfw_window, int32_t width, i
 
 	window->frame_size.x = math::max(width, 1);
 	window->frame_size.y = math::max(height, 1);
-
-	if (window->_frame_resize_callback)
-		window->_frame_resize_callback();
 }
 
 void window::apply_mode() {

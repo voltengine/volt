@@ -1,8 +1,8 @@
 #include <volt/gpu/vk12/instance.hpp>
 
-#include <volt/util/util.hpp>
 #include <volt/gpu/vk12/adapter.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
+#include <volt/util/util.hpp>
 #include <volt/error.hpp>
 #include <volt/log.hpp>
 
@@ -126,6 +126,7 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 	GLFWwindow *glfw_dummy_window = glfwCreateWindow(1280, 720, "", nullptr, nullptr);
 	VOLT_ASSERT(glfw_dummy_window, "Failed to create window.")
 
+
 	VkSurfaceKHR vk_dummy_surface;
 	VOLT_VK12_CHECK(glfwCreateWindowSurface(vk_instance, glfw_dummy_window, nullptr, &vk_dummy_surface),
 			"Failed to create window surface.")
@@ -140,21 +141,9 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 		if (adapter->present_family == std::numeric_limits<uint32_t>::max()
 			|| adapter->graphics_family == std::numeric_limits<uint32_t>::max()
 			|| adapter->compute_family == std::numeric_limits<uint32_t>::max()
-			|| adapter->transfer_family == std::numeric_limits<uint32_t>::max()) {
+			|| adapter->copy_family == std::numeric_limits<uint32_t>::max()) {
 			continue;
 		}
-
-		// Test if there's sufficient amount of queues available
-		// TODO: Drop this part and make queues shareable
-		auto families = adapter->families;
-		if (--families[adapter->present_family].queueCount < 0)
-			continue;
-		if (--families[adapter->graphics_family].queueCount < 0)
-			continue;
-		if (--families[adapter->compute_family].queueCount < 0)
-			continue;
-		if (--families[adapter->transfer_family].queueCount < 0)
-			continue;
 
 		// Check device extension support
 		if (!std::all_of(
@@ -193,6 +182,10 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 	);
 
 	return adapters;
+}
+
+uint32_t instance::concurrent_frames() {
+	return vk12::concurrent_frames;
 }
 
 }

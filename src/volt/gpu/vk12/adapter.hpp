@@ -13,7 +13,8 @@ public:
 	VkPhysicalDeviceProperties physical_device_properties;
 	VkPhysicalDeviceMemoryProperties physical_device_memory_properties;
 	std::vector<VkQueueFamilyProperties> families;
-	uint32_t present_family, graphics_family, compute_family, transfer_family;
+	uint32_t present_family, graphics_family, compute_family, copy_family;
+	std::vector<uint32_t> unique_families;
 	std::vector<VkExtensionProperties> supported_extensions;
 	VkSurfaceCapabilitiesKHR surface_capabilities;
 	std::vector<VkSurfaceFormatKHR> surface_formats;

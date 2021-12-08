@@ -26,15 +26,15 @@ public:
 
 	virtual std::shared_ptr<gpu::device> create_device() = 0;
 
-	const std::shared_ptr<gpu::instance> &get_instance() {
-		return instance;
+	const std::shared_ptr<gpu::instance> &instance() {
+		return _instance;
 	}
 
 protected:
-	std::shared_ptr<gpu::instance> instance;
+	std::shared_ptr<gpu::instance> _instance;
 
 	adapter(std::shared_ptr<gpu::instance> &&instance)
-			: instance(std::move(instance)) {}
+			: _instance(std::move(instance)) {}
 };
 
 }

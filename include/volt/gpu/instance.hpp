@@ -18,6 +18,9 @@ public:
 
 	virtual std::vector<std::shared_ptr<gpu::adapter>> enumerate_adapters() = 0;
 
+	// Usually returns 2, OpenGL always forces 1 frame
+	virtual uint32_t concurrent_frames() = 0;
+
 protected:
 	VOLT_API instance() = default;
 };

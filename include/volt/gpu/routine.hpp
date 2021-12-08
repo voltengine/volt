@@ -2,91 +2,129 @@
 
 #include "../macros.hpp"
 
+#include <functional>
 #include <memory>
 
 #include "../math/math.hpp"
 #include "enums.hpp"
+#include "pass.hpp"
+
+namespace volt::gpu::_internal {
+
+class routine_impl {
+public:
+	virtual void copy_buffer(
+			const std::shared_ptr<gpu::buffer> &src,
+			const std::shared_ptr<gpu::buffer> &dst,
+			size_t src_offset,
+			size_t dst_offset,
+			size_t size) = 0;
+
+	virtual void copy_texture_level(
+			const std::shared_ptr<gpu::texture> &src,
+			const std::shared_ptr<gpu::texture> &dst,
+			uint32_t src_level,
+			uint32_t dst_level,
+			math::uvec3 src_offset,
+			math::uvec3 dst_offset,
+			math::uvec3 size) = 0;
+
+	virtual void compute_pass(const compute_pass_info &info,
+			const std::function<void(gpu::compute_pass &)> &callback) = 0;
+
+	virtual void rasterization_pass(const rasterization_pass_info &info,
+			const std::function<void(gpu::rasterization_pass &)> &callback) = 0;
+};
+
+}
 
 namespace volt::gpu {
 
-template<command_types T>
-class pool;
+class copy_executor {
+public:
+	VOLT_API virtual ~copy_executor() = default;
 
-template<command_types T>
+	VOLT_API static copy_executor _new(_internal::routine_impl &impl);
+
+	VOLT_API void copy_buffer(
+			const std::shared_ptr<gpu::buffer> &src,
+			const std::shared_ptr<gpu::buffer> &dst,
+			size_t src_offset = 0,
+			size_t dst_offset = 0,
+			size_t size = 0);
+
+	VOLT_API void copy_texture(
+			const std::shared_ptr<gpu::texture> &src,
+			const std::shared_ptr<gpu::texture> &dst);
+
+	VOLT_API void copy_texture_level(
+			const std::shared_ptr<gpu::texture> &src,
+			const std::shared_ptr<gpu::texture> &dst,
+			uint32_t src_level,
+			uint32_t dst_level,
+			math::uvec3 src_offset = math::uvec3::zero,
+			math::uvec3 dst_offset = math::uvec3::zero,
+			math::uvec3 size = math::uvec3::zero);
+
+protected:
+	_internal::routine_impl &impl;
+
+	copy_executor(_internal::routine_impl &impl);
+};
+
+class compute_executor : public copy_executor {
+public:
+	VOLT_API virtual ~compute_executor() = default;
+
+	VOLT_API static compute_executor _new(_internal::routine_impl &impl);
+
+	VOLT_API void compute_pass(const compute_pass_info &info, const std::
+			function<void(gpu::compute_pass &)> &callback);
+
+protected:
+	compute_executor(_internal::routine_impl &impl);
+};
+
+class graphics_executor : public compute_executor {
+public:
+	VOLT_API static graphics_executor _new(_internal::routine_impl &impl);
+
+	VOLT_API void rasterization_pass(const rasterization_pass_info &info, const
+			std::function<void(gpu::rasterization_pass &)> &callback);
+
+private:
+	graphics_executor(_internal::routine_impl &impl);
+};
+
+}
+
+namespace volt::gpu::_internal {
+
+template<typename Executor>
 class routine {
 public:
 	virtual ~routine() = default;
 
-	virtual void begin() = 0;
+	virtual void execute(const std::function<void(Executor &)> &callback) = 0;
 
-	virtual void end() = 0;
-// TODO make pure
-	// virtual void viewport(math::uvec2 width, math::uvec2 height, math::uvec2 depth) = 0;
+	virtual bool finished() = 0;
 
-	// virtual void scissor(math::uvec2 width, math::uvec2 height) = 0;
+	virtual void wait() = 0;
 
-	// virtual void clear_color(math::fvec3 color) = 0;
-
-	// TODO: Might crash if vector is deleted after the call? To be tested
-	// virtual void vertex_buffers(uint32_t offset,
-	// 		const std::vector<std::pair<const std::shared_ptr<
-	// 		gpu::buffer> &, uint32_t>> &buffers_with_offsets) = 0;
-
-	// virtual void index_buffer(const std::shared_ptr<gpu::buffer> &buffer) = 0;
-
-	// virtual void draw(uint32_t index_count, uint32_t instance_count,
-	// 		uint32_t index_offset = 0, uint32_t instance_offset = 0, uint32_t vertex_offset = 0) = 0;
-
-	const std::shared_ptr<gpu::pool<T>> &get_pool() {
-		return pool;
-	}
+	const std::shared_ptr<gpu::device> &device();
 
 protected:
-	std::shared_ptr<gpu::pool<T>> pool;
+	std::shared_ptr<gpu::device> _device;
 
-	routine(std::shared_ptr<gpu::pool<T>> &&pool)
-			: pool(std::move(pool)) {}
+	routine(std::shared_ptr<gpu::device> &&device);
 };
-
-using rasterization_routine = routine<command_type::rasterization>;
-using compute_routine = routine<command_type::compute>;
-using copy_routine = routine<command_type::copy>;
 
 }
 
-// #pragma once
+namespace volt::gpu {
 
-// #include "../macros.hpp"
+using graphics_routine = _internal::routine<gpu::graphics_executor>;
+using compute_routine = _internal::routine<gpu::compute_executor>;
+using copy_routine = _internal::routine<gpu::copy_executor>;
 
-// namespace volt::video {
-
-// #ifndef NDEBUG
-// 	gpu::queue_type get_queue_type();
-// #endif
-
-	// Common
-	// void begin();
-	// void end();
-
-	// //void barrier() // all-resource barrier, image barrier, buffer barrier
-	// // Graphics
-	// //void begin_pass() // framebuffer, renderArea, clear_color, + update in pass: viewport, scissor = renderArea // vkCmdBeginRenderPass, vkCmdSetViewport, vkCmdSetScissor
-	// //void rasterization_pipeline() // vkCmdBindPipeline
-	// //void descriptors_sets() // vkCmdBindDescriptorSets
-	// void vertex_buffer(const std::shared_ptr<gpu::buffer> &buffer) // vkCmdBindVertexBuffers
-	// void index_buffer(const std::shared_ptr<gpu::buffer> &buffer) // vkCmdBindIndexBuffer
-	// //void draw() // vkCmdDraw, vkCmdDrawIndexed
-	// //void end_pass() // vkCmdEndRenderPass
-	// void blit_texture(const std::shared_ptr<gpu::texture> &src, const std::shared_ptr<gpu::texture> dst, bool filter)
-	// // Compute
-	// //void compute_pipeline() // vkCmdBindPipeline
-	//void descriptors_sets() // vkCmdBindDescriptorSets
-	//void dispatch() // vkCmdDispatch
-
-	// Copy
-	//void copy_image() // vkCmdCopyImage
-	//void copy_image_to_buffer() // vkCmdCopyImageToBuffer
-	//void copy_buffer_to_image() // vkCmdCopyBufferToImage
-	// void copy_buffer // vkCmdCopyBuffer
-
-
+}

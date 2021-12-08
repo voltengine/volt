@@ -69,8 +69,6 @@ public:
 
 	VOLT_API void _destruct_swapchain();
 
-	VOLT_API void _on_frame_resize(std::function<void()> &&callback);
-
 protected:
 	std::string title;
 	math::uvec2 windowed_pos, windowed_size;
@@ -80,7 +78,6 @@ protected:
 	std::shared_ptr<monitor> monitor = monitor::primary();
 	math::uvec2 frame_size;
 	bool surface_constructed = false;
-	std::function<void()> _frame_resize_callback;
 
 private:
 	VOLT_API static void key_callback(GLFWwindow *glfw_window, int32_t key, int32_t scancode, int32_t action, int32_t mods);

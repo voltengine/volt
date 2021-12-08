@@ -7,32 +7,36 @@
 #include <volt/gpu/vk12/vk12.hpp>
 #include <volt/error.hpp>
 
-static void frame_resize_callback() {
-	
-}
-
 namespace volt::gpu::vk12 {
 
 using namespace math;
 
-swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window)
-	: gpu::swapchain(std::move(device), std::move(window)) {
-	auto &_device = *static_cast<vk12::device *>(this->device.get());
-	auto &adapter = *static_cast<vk12::adapter *>(_device.get_adapter().get());
-	auto &instance = *static_cast<vk12::instance *>(adapter.get_instance().get());
+static void create_swapchain() {
 
-	this->window->_construct_swapchain();
+}
+
+static void frame_resize_callback() {
+	
+}
+
+swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window)
+		: gpu::swapchain(std::move(device), std::move(window)),
+		vk_device(static_cast<vk12::device *>(this->_device.get())->vk_device) {
+	this->_window->_construct_swapchain();
+
+	auto &adapter = *static_cast<vk12::adapter *>(_device->adapter().get());
+	VkInstance vk_instance = static_cast<vk12::instance *>(adapter.instance().get())->vk_instance;
 	
 	// Surface
-	VOLT_VK12_CHECK(glfwCreateWindowSurface(instance.vk_instance, this->window->_glfw_window, nullptr, &vk_surface),
+	VOLT_VK12_CHECK(glfwCreateWindowSurface(vk_instance, this->_window->_glfw_window, nullptr, &surface),
 			"Failed to create window surface.")
 
-	// Swapchain
 	VkBool32 present_support;
 	vkGetPhysicalDeviceSurfaceSupportKHR(adapter.physical_device,
-			adapter.present_family, vk_surface, &present_support);
+			adapter.present_family, surface, &present_support);
 	VOLT_ASSERT(present_support, "Adapter does not support presentation to chosen surface.")
 
+	// Swapchain
 	VkSurfaceFormatKHR surface_format = adapter.surface_formats[0];
 	for (VkSurfaceFormatKHR format : adapter.surface_formats) {
 		if (format.format == VK_FORMAT_B8G8R8A8_SRGB && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -52,7 +56,7 @@ swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::
 	VkExtent2D extent = adapter.surface_capabilities.currentExtent;
 	if (adapter.surface_capabilities.currentExtent.width
 			== std::numeric_limits<uint32_t>::max()) {
-		uvec2 frame_size = window->get_frame_size();	
+		frame_size = window->get_frame_size();	
 		extent = { frame_size.x, frame_size.y };
 
 		const VkExtent2D &min_extent = adapter.surface_capabilities.minImageExtent;
@@ -68,38 +72,32 @@ swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::
 
 	VkSwapchainCreateInfoKHR swapchain_info{};
 	swapchain_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	swapchain_info.surface = vk_surface;
-	swapchain_info.minImageCount = image_count;
+	swapchain_info.surface = surface;
+	swapchain_info.minImageCount = image_count; // Double-buffering forces 30 fps as soon as gpu goes over 16 ms, triple buffering requires more memory
 	swapchain_info.imageFormat = surface_format.format;
 	swapchain_info.imageColorSpace = surface_format.colorSpace;
 	swapchain_info.imageExtent = extent;
 	swapchain_info.imageArrayLayers = 1;
 	swapchain_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-	// We must enable concurrent mode if present and graphics families are different
-	std::array<uint32_t, 2> indices{ adapter.present_family, adapter.graphics_family };
-	if (indices[0] != indices[1]) {
-		swapchain_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-		swapchain_info.queueFamilyIndexCount = indices.size();
-		swapchain_info.pQueueFamilyIndices = indices.data();
-	} else
-		swapchain_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+	swapchain_info.imageSharingMode = adapter.unique_families.size() == 1 ? VK_SHARING_MODE_EXCLUSIVE : VK_SHARING_MODE_CONCURRENT;
+	swapchain_info.queueFamilyIndexCount = adapter.unique_families.size();
+	swapchain_info.pQueueFamilyIndices = adapter.unique_families.data();
 
 	swapchain_info.preTransform = adapter.surface_capabilities.currentTransform; // currentTransform means no additional transform 
 	swapchain_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // Disable window alpha blending in compositor
-	swapchain_info.presentMode = present_mode; // Use VK_PRESENT_MODE_MAILBOX_KHR or fall back to VK_PRESENT_MODE_FIFO_KHR
+	swapchain_info.presentMode = present_mode; // Use VK_PRESENT_MODE_MAILBOX_KHR or fall back to VK_PRESENT_MODE_FIFO_KHR which can cause input lag
 	swapchain_info.clipped = VK_TRUE; // Something about windows obscuring each other, always set this to VK_TRUE
 
 	swapchain_info.oldSwapchain = VK_NULL_HANDLE;
 
-	VOLT_VK12_CHECK(vkCreateSwapchainKHR(_device.vk_device, &swapchain_info, nullptr, &vk_swapchain),
+	VOLT_VK12_CHECK(vkCreateSwapchainKHR(vk_device, &swapchain_info, nullptr, &vk_swapchain),
 			"Failed to create swapchain.")
 
 	// Get swapchain textures
 	uint32_t num_images;
-	vkGetSwapchainImagesKHR(_device.vk_device, vk_swapchain, &num_images, nullptr);
+	vkGetSwapchainImagesKHR(vk_device, vk_swapchain, &num_images, nullptr);
 	std::vector<VkImage> images(num_images);
-	vkGetSwapchainImagesKHR(_device.vk_device, vk_swapchain, &num_images, images.data());
+	vkGetSwapchainImagesKHR(vk_device, vk_swapchain, &num_images, images.data());
 
 	// Create textures and views
 	// for (VkImage image : images) {
@@ -124,21 +122,62 @@ swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::
 	// 		throw std::runtime_error("Failed to create framebuffer.");
 	// }
 
-	this->window->_on_frame_resize(frame_resize_callback);
+	VkSemaphoreCreateInfo semaphore_info{};
+	semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+	for (uint32_t i = 0; i < vk12::concurrent_frames; i++) {
+		VOLT_VK12_CHECK(vkCreateSemaphore(vk_device, &semaphore_info, nullptr,
+				&frame_begin_semaphores[i]), "Failed to create semaphore.")
+		VOLT_VK12_CHECK(vkCreateSemaphore(vk_device, &semaphore_info, nullptr,
+				&frame_end_semaphores[i]), "Failed to create semaphore.")
+	}
 }
 
 swapchain::~swapchain() {
-	auto &_device = *static_cast<vk12::device *>(device.get());
-	auto &_instance = *static_cast<vk12::instance *>(device->get_adapter()->get_instance().get());
+	VkInstance instance = static_cast<vk12::instance *>(_device->adapter()->instance().get())->vk_instance;
 
-	vkDestroySwapchainKHR(_device.vk_device, vk_swapchain, nullptr);
-	vkDestroySurfaceKHR(_instance.vk_instance, vk_surface, nullptr);
+	vkDestroySwapchainKHR(vk_device, vk_swapchain, nullptr);
+	vkDestroySurfaceKHR(instance, surface, nullptr);
 
-	window->_destruct_swapchain();
+	_window->_destruct_swapchain();
 }
 
-// std::vector<const std::shared_ptr<gpu::texture>> &swapchain::get_frames() {
+void swapchain::next_frame(std::function<void(frame)> &&callback) {
+	if (framerate_timer.elapsed() < frame_time)
+		return;
+	framerate_timer.reset();
+
+	if (math::any(frame_size != _window->get_frame_size()))
+		reconstruct();
+
+	uint32_t texture_index;
+	VkResult result = vkAcquireNextImageKHR(vk_device, vk_swapchain, 0,
+			frame_begin_semaphores[current_frame], VK_NULL_HANDLE, &texture_index);
 	
-// }
+	if (result == VK_NOT_READY)
+		return;
+	else
+		VOLT_VK12_CHECK(result, "Failed to acquire image.")
+
+	// transition from present etc.
+
+	routines[current_frame]->execute([&](graphics_executor &executor) {
+		callback(frame{
+			.index = current_frame,
+			.texture = textures[texture_index],
+			.executor = executor
+		});
+
+		
+	});
+
+	// present to executor
+
+	current_frame = (current_frame + 1) % vk12::concurrent_frames;
+}
+
+void swapchain::reconstruct() {
+	
+}
 
 }

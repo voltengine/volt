@@ -119,13 +119,21 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME}
 	Date::Date
-	Glad::Glad
 	GLFW::GLFW
 	JSON::JSON
 	Termcolor::Termcolor
-	VulkanMemoryAllocator::VulkanMemoryAllocator
 )
 
+# Include Vulkan on non-Apple operating systems
+if(NOT APPLE)
+	target_link_libraries(${PROJECT_NAME}
+		Glad::Glad
+		SPIRV-Reflect::SPIRV-Reflect
+		VulkanMemoryAllocator::VulkanMemoryAllocator
+	)
+endif()
+
+# Include Direct3D 12 on Windows
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME}
 		D3D12MemoryAllocator::D3D12MemoryAllocator

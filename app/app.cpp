@@ -29,9 +29,6 @@ int main() {
 		for (auto &name : volt::modules::get_names())
 			std::cout << name << '\n';
 
-
-		using namespace gpu;
-
 		std::shared_ptr<os::window> window = std::make_shared<os::window>("Test Window", math::uvec2(1280, 720));
 		window->set_visible(true);
 
@@ -43,36 +40,58 @@ int main() {
 		std::shared_ptr<gpu::adapter> &adapter = adapters[0];
 		std::shared_ptr<gpu::device> device = adapter->create_device();
 		std::shared_ptr<gpu::swapchain> swapchain = device->create_swapchain(window);
-		std::shared_ptr<gpu::compute_queue> queue = device->get_compute_queue();
-		std::shared_ptr<gpu::compute_pool> pool = queue->create_pool();
-		std::shared_ptr<gpu::compute_routine> routine = pool->create_routine();
-		std::shared_ptr<gpu::compute_routine> routine2 = pool->create_routine();
+		std::shared_ptr<gpu::copy_routine> streaming_routine = device->create_copy_routine();
 
-		// create_surface(window) emits an error if another swapchain is already created for that window.
+		// create_swapchain(window) emits an error if another swapchain is already created for that window.
 		// Dropping all references to swapchain will destroy it and in turn allow another call to create_surface(window).
 
 		auto buffer = device->create_buffer(
-				memory_type::internal,
-				command_type::rasterization | command_type::copy,
-				buffer_feature::vertex | buffer_feature::destination,
-				1024
+			gpu::memory_type::internal,
+			gpu::buffer_feature::vertex | gpu::buffer_feature::copy_dst,
+			1024
 		);
 
-		auto texture = device->create_texture(
-				memory_type::internal,
-				command_type::none,
-				texture_feature::sampler | texture_feature::destination,
-				{2048, 2048}, 1, 1, texture_format::bc1_srgb
+		auto texture = device->create_2d_texture(
+				gpu::memory_type::internal,
+				gpu::texture_feature::sampler | gpu::texture_feature::copy_dst,
+				gpu::texture_format::bc1_srgb,
+				1, {2048, 2048}
 		);
-
-		auto fence = device->create_fence(0);
-		uint64_t fence_counter = 0;
 
 		while (!window->is_closing()) {
 			glfwPollEvents();
-			queue->signal(fence, ++fence_counter);
-			queue->flush();
-			fence->wait(fence_counter);
+
+			// next_frame() might return immediately if no work is available
+			swapchain->next_frame([](gpu::frame frame) {
+				gpu::rasterization_pass_info info;
+				// info.vertex_shader(nullptr);
+				info.color_attachment(0, frame.texture, gpu::attachment_initializer::clear);
+
+				frame.executor.rasterization_pass(info, [](gpu::rasterization_pass &pass) {
+					// pass.vertex_buffer(nullptr);
+					// pass.constant_buffer("u_ConstantBuffer", nullptr);
+					pass.draw(1);
+				}); // 1 = max number of threads
+
+				// executor.compute_pass(...);
+				
+				// executor.copy_texture_level(src, dst);
+
+				// ...
+			});
+
+			// Then we can do some texture streaming
+
+			// Swapchain does this check internally for each frame it tries to acquire
+			if (!streaming_routine->finished())
+				continue;
+
+			streaming_routine->execute([](gpu::copy_executor &executor) {
+				// executor.copy_texture_level(src, dst);
+				// ...
+			});
+
+			streaming_routine->wait();
 		}
 
 

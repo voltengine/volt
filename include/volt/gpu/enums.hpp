@@ -23,14 +23,13 @@ enum class memory_type {
 using buffer_features = uint32_t;
 namespace buffer_feature {
 	constexpr buffer_features
-			source      = 1 << 0, // Source for copy operations 
-			destination = 1 << 1, // Destination for copy operations
+			copy_src = 1 << 0, // Source for copy operations 
+			copy_dst = 1 << 1, // Destination for copy operations
 
-			constant    = 1 << 2, // Can be used as constant buffer / UBO
-			storage     = 1 << 3, // Can be used as storage buffer / SSBO
-
-			index       = 1 << 4, // Can be used as index buffer
-			vertex      = 1 << 5; // Can be used as vertex buffer / VBO
+			constant = 1 << 2, // Can be used as constant buffer (UBO)
+			storage  = 1 << 3, // Can be used as storage buffer (SSBO)
+			index    = 1 << 4, // Can be used as index buffer (EBO)
+			vertex   = 1 << 5; // Can be used as vertex buffer (VBO)
 }
 
 enum class texture_format {
@@ -50,29 +49,13 @@ enum class texture_format {
 using texture_features = uint32_t;
 namespace texture_feature {
 	constexpr texture_features
-			source                   = 1 << 0, // Source for copy operations 
-			destination              = 1 << 1, // Destination for copy operations
+			copy_src = 1 << 0, // Source for copy operations 
+			copy_dst = 1 << 1, // Destination for copy operations
 
-			sampler                  = 1 << 2, // Can be used as sampler
-			storage                  = 1 << 3, // Can be used as storage texture
-
-			color_attachment         = 1 << 4, // Can be used as color attachment
-			depth_stencil_attachment = 1 << 5; // Can be used as depth-stencil attachment
+			sampler    = 1 << 2, // Can be used as sampler
+			storage    = 1 << 3,
+			attachment = 1 << 4; // Can be used as color attachment
 }
-
-enum class texture_layout {
-	undefined, // Unknown
-	universal, // Slow, but supports all operations
-
-	source,      // Source for copy operations 
-	destination, // Destination for copy operations
-
-	color_attachment,         // Allow IO as render pass color input attachment 
-	depth_stencil_attachment, // Allow output as render pass color input attachment 
-
-	depth_stencil_read_only, // Use as input depth/stencil attachment or sampler
-	sampler                  // Use as sampler
-};
 
 enum class texture_type {
 	tex1d, tex1d_array, // 1D array view can access layered 1D texture
@@ -85,17 +68,10 @@ enum class attachment_initializer {
 	none, clear, preserve
 };
 
-// using shader_stages = uint32_t;
-// namespace shader_stage {
-// 	constexpr shader_stages
-// 			none     = 0,
-// 			vertex   = 1 << 0,
-// 			domain   = 1 << 1,
-// 			hull     = 1 << 2,
-// 			geometry = 1 << 3,
-// 			pixel    = 1 << 4,
-// 			compute  = 1 << 5,
-// 			all      = 0b111111;
-// }
+enum class present_mode {
+	tear,         // Results in tearing; Has no input lag
+	vsync,        // Big input lag + clamps to 30 fps for any framerate below 60
+	triple_buffer // Small input lag + Higher energy consumption (unavailable with OpenGL)
+};
 
 }

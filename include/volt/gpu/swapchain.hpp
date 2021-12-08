@@ -2,10 +2,12 @@
 
 #include "../macros.hpp"
 
+#include <functional>
 #include <memory>
 #include <vector>
 
 #include "../os/os.hpp"
+#include "routine.hpp"
 #include "texture.hpp"
 
 namespace volt::gpu {
@@ -13,46 +15,46 @@ namespace volt::gpu {
 class device;
 class swapchain;
 
-class swapchain_frame {
-public:
-	~swapchain_frame();
-
-	bool acquired() const;
-
-	uint32_t index() const;
-
-	const std::shared_ptr<gpu::texture> &texture() const;
-
-private:
-	friend gpu::swapchain;
-
-	gpu::swapchain *swapchain;
-	uint32_t index;
-
-	swapchain_frame(gpu::swapchain *swapchain, uint32_t index
-			= std::numeric_limits<uint32_t>::max());
+struct frame {
+	const uint32_t index; // The index of the frame in flight
+	std::shared_ptr<gpu::texture> &texture; // Output texture
+	graphics_executor &executor; // Guarded executor
 };
 
 class swapchain : public std::enable_shared_from_this<swapchain> {
 public:
 	virtual ~swapchain() = default;
 
-	virtual swapchain_frame acquire() = 0;
+	virtual void next_frame(std::function<void(frame)> &&callback) = 0;
 
-	const std::shared_ptr<gpu::device> &get_device() {
-		return device;
-	}
+	float framerate_limit();
 
-	const std::shared_ptr<os::window> &get_window() {
-		return window;
-	}
+	void limit_framerate(float fps);
+
+	gpu::present_mode present_mode();
+
+	// OpenGL will not allow triple buffering (no-op)
+	void request_present_mode(gpu::present_mode mode);
+
+	const std::shared_ptr<gpu::device> &device();
+
+	const std::shared_ptr<os::window> &window();
 
 protected:
-	std::shared_ptr<gpu::device> device;
-	std::shared_ptr<os::window> window;
+	std::shared_ptr<gpu::device> _device;
+	std::shared_ptr<os::window> _window;
 
-	swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window)
-			: device(std::move(device)), window(std::move(window)) {}
+	float frame_time = 0;
+	util::timer framerate_timer;
+	uint32_t current_frame = 0;
+	gpu::present_mode _present_mode = gpu::present_mode::triple_buffer; // Will be adjusted during construction
+
+	std::vector<std::shared_ptr<gpu::texture>> textures;
+	std::vector<std::shared_ptr<gpu::graphics_routine>> routines;
+
+	swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window);
+
+	virtual void reconstruct() = 0;
 };
 
 }
