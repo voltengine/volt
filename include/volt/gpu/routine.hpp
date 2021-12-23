@@ -6,8 +6,10 @@
 #include <memory>
 
 #include "../math/math.hpp"
+#include "buffer.hpp"
 #include "enums.hpp"
 #include "pass.hpp"
+#include "texture.hpp"
 
 namespace volt::gpu::_internal {
 
@@ -19,6 +21,10 @@ public:
 			size_t src_offset,
 			size_t dst_offset,
 			size_t size) = 0;
+
+	virtual void copy_texture(
+			const std::shared_ptr<gpu::texture> &src,
+			const std::shared_ptr<gpu::texture> &dst) = 0;
 
 	virtual void copy_texture_level(
 			const std::shared_ptr<gpu::texture> &src,
@@ -85,15 +91,15 @@ protected:
 	compute_executor(_internal::routine_impl &impl);
 };
 
-class graphics_executor : public compute_executor {
+class universal_executor : public compute_executor {
 public:
-	VOLT_API static graphics_executor _new(_internal::routine_impl &impl);
+	VOLT_API static universal_executor _new(_internal::routine_impl &impl);
 
 	VOLT_API void rasterization_pass(const rasterization_pass_info &info, const
 			std::function<void(gpu::rasterization_pass &)> &callback);
 
 private:
-	graphics_executor(_internal::routine_impl &impl);
+	universal_executor(_internal::routine_impl &impl);
 };
 
 }
@@ -123,7 +129,7 @@ protected:
 
 namespace volt::gpu {
 
-using graphics_routine = _internal::routine<gpu::graphics_executor>;
+using universal_routine = _internal::routine<gpu::universal_executor>;
 using compute_routine = _internal::routine<gpu::compute_executor>;
 using copy_routine = _internal::routine<gpu::copy_executor>;
 

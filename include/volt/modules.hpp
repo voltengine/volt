@@ -3,9 +3,9 @@
 #include "macros.hpp"
 
 #include <functional>
-#include <map>
 #include <set>
 #include <string>
+#include <unordered_map>
 
 #define VOLT_MODULE_LOAD_CALLBACK
 #define VOLT_MODULE_UNLOAD_CALLBACK
@@ -43,9 +43,9 @@ inline void register_unload_callback(const unload_callback &callback);
 
 namespace volt::modules::_internal {
 
-VOLT_API extern std::map<std::string, std::vector<
+VOLT_API extern std::unordered_map<std::string, std::vector<
 		unload_callback>> module_name_to_unload_callbacks;
-VOLT_API extern std::map<std::string, std::vector<
+VOLT_API extern std::unordered_map<std::string, std::vector<
 		load_callback>> module_name_to_load_callbacks;
 
 inline std::string path_to_name(const std::string &path);

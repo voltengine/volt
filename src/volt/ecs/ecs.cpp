@@ -45,15 +45,15 @@ namespace volt::ecs {
 
 using namespace _internal;
 
-size_t get_component_count() {
+size_t component_count() {
 	return component_type_index_to_name.size();
 }
 
-const std::map<std::string, std::set<std::string>> &get_component_names() {
+const std::unordered_map<std::string, std::set<std::string>> &component_names() {
 	return module_name_to_component_names;
 }
 
-const std::map<std::string, std::set<std::string>> &get_system_names() {
+const std::unordered_map<std::string, std::set<std::string>> &system_names() {
 	return module_name_to_system_names;
 }
 
@@ -121,25 +121,25 @@ void update_systems(float delta) {
 
 namespace volt::ecs::_internal {
 
-std::map<std::type_index, std::string> component_type_index_to_name;
-std::map<std::type_index, std::string> system_type_index_to_name;
+std::unordered_map<std::type_index, std::string> component_type_index_to_name;
+std::unordered_map<std::type_index, std::string> system_type_index_to_name;
 
-std::map<std::string, size_t> component_name_to_index;
-std::map<std::type_index, size_t> component_type_index_to_index;
+std::unordered_map<std::string, size_t> component_name_to_index;
+std::unordered_map<std::type_index, size_t> component_type_index_to_index;
 
-std::map<std::string, std::function<base_component_storage *
+std::unordered_map<std::string, std::function<base_component_storage *
 		()>> component_name_to_storage_constructor;
-std::map<std::string, std::function<system *
+std::unordered_map<std::string, std::function<system *
 		()>> system_name_to_constructor;
 
-std::map<std::string, std::unique_ptr<system>> system_instances;
+std::unordered_map<std::string, std::unique_ptr<system>> system_instances;
 
-std::map<std::string, std::set<std::string
+std::unordered_map<std::string, std::set<std::string
 		>> module_name_to_component_names;
-std::map<std::string, std::set<std::string
+std::unordered_map<std::string, std::set<std::string
 		>> module_name_to_system_names;
 
-size_t get_component_index(const std::string &name) {
+size_t component_index(const std::string &name) {
 	VOLT_DEVELOPMENT_ASSERT(component_name_to_index.contains(name),
 			"No such component name registered: " + name)
 	return component_name_to_index[name];
@@ -170,7 +170,7 @@ void module_unload_callback(const std::string &module_name) {
 #endif
 
 		size_t index = component_name_to_index[name];
-		size_t last_index = get_component_count() - 1;
+		size_t last_index = component_count() - 1;
 
 		// Erase name from component_type_index_to_name
 		auto type_index_it = std::find_if(

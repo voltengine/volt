@@ -1,9 +1,10 @@
 {
 	"dependencies": {
 		"voltengine/date": "3.0.1",
-		"voltengine/glad": "2.0.0-beta+vk12.core.loader.all-2021-11-12",
+		"voltengine/glad": "2.0.0-beta+gl46-vk12-core.all-2021-12-23-no-vk-khr-synchronization2.loader",
 		"voltengine/glfw": "3.3.5",
 		"voltengine/json": "3.9.1",
+		"voltengine/spirv-reflect": "1.0.0+snapshot.173ae4d9bbcc8fd0307bea9f126cb50619ceff23",
 		"voltengine/termcolor": "2.0.0",
 		"voltengine/vulkan-memory-allocator": "2.3.0+post-snapshot.c809ddca76f856674fc7922c608e31e9cc007709"
 	},

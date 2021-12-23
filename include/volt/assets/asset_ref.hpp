@@ -3,9 +3,9 @@
 #include "../macros.hpp"
 
 #include <list>
-#include <map>
 #include <memory>
 #include <concepts>
+#include <unordered_map>
 
 namespace volt::assets::_internal {
 	class asset_owner;
@@ -61,7 +61,7 @@ namespace volt::assets::_internal {
 
 class asset_owner {
 public:
-	using iterator = std::map<std::string, asset_owner *>::iterator;
+	using iterator = std::unordered_map<std::string, asset_owner *>::iterator;
 
 	std::unique_ptr<asset> ptr;
 	size_t count = 0;

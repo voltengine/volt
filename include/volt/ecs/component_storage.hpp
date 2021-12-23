@@ -14,9 +14,9 @@ class base_component_storage {
 public:
 	virtual ~base_component_storage() = default;
 
-	VOLT_API uint32_t get_cid(uint32_t eid) const;
+	VOLT_API uint32_t cid(uint32_t eid) const;
 
-	VOLT_API uint32_t get_eid(uint32_t cid) const;
+	VOLT_API uint32_t eid(uint32_t cid) const;
 
 	virtual void add_json(uint32_t eid, const nlohmann::json &json) = 0;
 
@@ -38,7 +38,7 @@ public:
 
 	const T &get(uint32_t cid) const;
 
-	std::vector<T> &get_components();
+	const std::vector<T> &components() const;
 
 	virtual void add_json(uint32_t eid, const nlohmann::json &json) override;
 
@@ -47,9 +47,7 @@ public:
 	void remove(uint32_t cid) override;
 
 private:
-	// TODO: Implement custom bucket storage
-	// like deque to reduce add() overhead
-	std::vector<T> components;
+	std::vector<T> _components;
 };
 
 }

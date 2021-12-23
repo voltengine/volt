@@ -9,6 +9,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../util/util.hpp"
 #include "component_storage.hpp"
 
 namespace volt::ecs {
@@ -23,13 +24,19 @@ public:
 
 	VOLT_API entity create();
 
-	VOLT_API entity get_root_entity();
+	VOLT_API entity root_entity();
 
 	template<typename T>
 	void each(const std::function<void(T &)> &func) const;
 
 	template<typename T, typename... Filters>
 	void each(const std::function<void(T &, Filters &...)> &func) const;
+
+	template<typename T>
+	void each(const std::function<void(uint32_t, T &)> &func, util::thread_pool &pool, uint32_t least_entities_per_job = 50) const;
+
+	template<typename T, typename... Filters>
+	void each(const std::function<void(uint32_t, T &, Filters &...)> &func, util::thread_pool &pool, uint32_t least_entities_per_job = 50) const;
 
 #ifdef VOLT_DEVELOPMENT
 	VOLT_API static void _register_development_component(const std::string &name);
@@ -49,11 +56,11 @@ private:
 	
 	std::list<world *>::iterator instance_it;
 	std::vector<entity_data> entities;
-	std::map<std::string, std::unique_ptr<_internal::base_component_storage>> storages;
+	std::unordered_map<std::string, std::unique_ptr<_internal::base_component_storage>> storages;
 	std::vector<uint32_t> free_eids;
 
 #ifdef VOLT_DEVELOPMENT
-	std::map<std::string, std::map<uint32_t, nlohmann::json>> development_reload_snapshot;
+	std::unordered_map<std::string, std::unordered_map<uint32_t, nlohmann::json>> development_reload_snapshot;
 #endif
 
 	VOLT_API bool expired(uint32_t eid, uint32_t version) const;

@@ -7,36 +7,35 @@
 #include <volt/gpu/vk12/swapchain.hpp>
 #include <volt/gpu/vk12/texture.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
+#include <volt/util/util.hpp>
 #include <volt/error.hpp>
+#include <volt/paths.hpp>
 
 namespace volt::gpu::vk12 {
 
+namespace fs = std::filesystem;
 using namespace math;
 
 device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(adapter)) {
-	auto &_adapter = *static_cast<vk12::adapter *>(this->_adapter.get());
-	auto &instance = *static_cast<vk12::instance *>(_adapter.instance().get());
+	auto &vk12_adapter = *static_cast<vk12::adapter *>(this->_adapter.get());
+	auto &vk12_instance = *static_cast<vk12::instance *>(vk12_adapter.instance().get());
 
-	std::set<uint32_t> families{
-		_adapter.present_family,  // 0
-		_adapter.graphics_family, // 1
-		_adapter.compute_family,  // 2
-		_adapter.copy_family      // 3
-	};
+	// Queue infos
 
-	std::vector<VkDeviceQueueCreateInfo> queue_infos(families.size());
-	std::array<float, 4> queue_priorities;
-	queue_priorities.fill(1);
+	std::vector<VkDeviceQueueCreateInfo> queue_infos(vk12_adapter.unique_families.size());
+	float priority = 1;
 
 	uint32_t i = 0;
-	for (uint32_t family : families) {
+	for (uint32_t family : vk12_adapter.unique_families) {
 		queue_infos[i] = {};
 		queue_infos[i].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 		queue_infos[i].queueFamilyIndex = family;
 		queue_infos[i].queueCount = 1;
-		queue_infos[i].pQueuePriorities = queue_priorities.data();
+		queue_infos[i].pQueuePriorities = &priority;
 		i++;
 	}
+
+	// Device
 
 	VkDeviceCreateInfo device_info{};
 	device_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -56,25 +55,96 @@ device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(
 	device_info.ppEnabledExtensionNames = vk12::device_extensions.data();
 	device_info.enabledExtensionCount = vk12::device_extensions.size();
 
-	VOLT_VK12_CHECK(vkCreateDevice(_adapter.physical_device, &device_info,
+	VOLT_VK12_CHECK(vkCreateDevice(vk12_adapter.physical_device, &device_info,
 			nullptr, &vk_device), "Failed to create device.")
 	vk12::load_glad_device(vk_device);
 
+	// Allocator
+
 	VmaAllocatorCreateInfo allocator_info{};
 	allocator_info.vulkanApiVersion = VK_API_VERSION_1_2;
-	allocator_info.physicalDevice = _adapter.physical_device;
+	allocator_info.physicalDevice = vk12_adapter.physical_device;
 	allocator_info.device = vk_device;
-	allocator_info.instance = instance.vk_instance;
+	allocator_info.instance = vk12_instance.vk_instance;
 	vmaCreateAllocator(&allocator_info, &allocator);
 
-	vkGetDeviceQueue(vk_device, _adapter.present_family, 0, &present_queue);
-	vkGetDeviceQueue(vk_device, _adapter.graphics_family, 0, &graphics_queue);
-	vkGetDeviceQueue(vk_device, _adapter.compute_family, 0, &compute_queue);
-	vkGetDeviceQueue(vk_device, _adapter.copy_family, 0, &copy_queue);
+	// Queues
+
+	vkGetDeviceQueue(vk_device, vk12_adapter.universal_family, 0, &universal_queue);
+	vkGetDeviceQueue(vk_device, vk12_adapter.compute_family, 0, &compute_queue);
+	vkGetDeviceQueue(vk_device, vk12_adapter.copy_family, 0, &copy_queue);
+
+	// Pipeline cache
+
+	VkPipelineCacheCreateInfo cache_info{};
+	cache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+
+	fs::path data_path = vk12::cache_path / (vk12_adapter.pipeline_cache_uuid + ".bin");
+	if (fs::exists(data_path)) {
+		std::vector<uint8_t> data = util::read_binary_file(data_path);
+
+		cache_info.initialDataSize = data.size();
+		cache_info.pInitialData = data.data();
+	}
+
+	VOLT_VK12_CHECK(vkCreatePipelineCache(vk_device, &cache_info,
+			nullptr, &pipeline_cache), "Failed to create pipeline cache.")
 }
 
 device::~device() {
 	wait();
+
+	// Update pipelines
+	auto &vk12_adapter = *static_cast<vk12::adapter *>(this->_adapter.get());
+
+	// Append to previous data - adapter can create multiple devices with common cache
+	fs::path data_path = vk12::cache_path / (vk12_adapter.pipeline_cache_uuid + ".bin");
+	bool failed = false;
+	while (fs::exists(data_path)) { // We use while loop as breakable conditional
+		std::vector<uint8_t> data = util::read_binary_file(data_path);
+
+		VkPipelineCacheCreateInfo dst_cache_info{};
+		dst_cache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+
+		VkPipelineCacheCreateInfo src_cache_info{};
+		src_cache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
+		src_cache_info.initialDataSize = data.size();
+		src_cache_info.pInitialData = data.data();
+
+		VkPipelineCache dst_cache, src_cache;
+		VkResult result = vkCreatePipelineCache(vk_device, &dst_cache_info,
+			nullptr, &dst_cache);
+		if (result != VK_SUCCESS) {
+			failed = true;
+			break;
+		}
+		result = vkCreatePipelineCache(vk_device, &src_cache_info,
+			nullptr, &src_cache);
+		if (result != VK_SUCCESS) {
+			vkDestroyPipelineCache(vk_device, dst_cache, nullptr);
+			failed = true;
+			break;
+		}
+
+		VkPipelineCache src_caches[] = { src_cache, pipeline_cache };
+		vkMergePipelineCaches(vk_device, dst_cache, 2 , src_caches);
+
+		vkDestroyPipelineCache(vk_device, src_cache, nullptr);
+		vkDestroyPipelineCache(vk_device, pipeline_cache, nullptr);
+		pipeline_cache = dst_cache;
+		break;
+	}
+
+	// Write merged data
+	if (!failed) {
+		size_t data_size;
+		vkGetPipelineCacheData(vk_device, pipeline_cache, &data_size, nullptr);
+		std::vector<uint8_t> data(data_size);
+		vkGetPipelineCacheData(vk_device, pipeline_cache, &data_size, data.data());
+		util::write_file(data_path, data);
+	}
+
+	vkDestroyPipelineCache(vk_device, pipeline_cache, nullptr);
 	vmaDestroyAllocator(allocator);
 	vkDestroyDevice(vk_device, nullptr);
 }
@@ -87,8 +157,8 @@ std::shared_ptr<gpu::swapchain> device::create_swapchain(std::shared_ptr<os::win
 	return std::shared_ptr<gpu::swapchain>(new vk12::swapchain(shared_from_this(), std::move(window)));
 }
 
-std::shared_ptr<gpu::graphics_routine> device::create_graphics_routine() {
-	return std::shared_ptr<gpu::graphics_routine>(new vk12::graphics_routine(shared_from_this()));
+std::shared_ptr<gpu::universal_routine> device::create_universal_routine() {
+	return std::shared_ptr<gpu::universal_routine>(new vk12::universal_routine(shared_from_this()));
 }
 
 std::shared_ptr<gpu::compute_routine> device::create_compute_routine() {

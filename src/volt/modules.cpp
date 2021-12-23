@@ -16,7 +16,7 @@ using module_handle = HINSTANCE;
 #endif
 
 static std::set<std::string> module_names;
-static std::map<std::string, module_handle> module_name_to_handle;
+static std::unordered_map<std::string, module_handle> module_name_to_handle;
 
 static fs::path name_to_path(const std::string &name) {
 	return fs::current_path() / (name + volt::modules::module_extension);
@@ -197,9 +197,9 @@ const std::set<std::string> &get_names() {
 
 namespace volt::modules::_internal {
 
-std::map<std::string, std::vector<
+std::unordered_map<std::string, std::vector<
 		load_callback>> module_name_to_load_callbacks;
-std::map<std::string, std::vector<
+std::unordered_map<std::string, std::vector<
 		unload_callback>> module_name_to_unload_callbacks;
 
 }

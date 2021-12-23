@@ -30,6 +30,7 @@ public:
 	VmaAllocation allocation;
 	state current_state = state::undefined;
 	access_pattern current_access_pattern = access_patterns[state::undefined];
+	VkDescriptorBufferInfo descriptor_info;
 
 	buffer(std::shared_ptr<gpu::device> &&device,
 			gpu::memory_type memory_type,

@@ -4,8 +4,8 @@
 
 namespace volt::gpu::d3d12 {
 
-extern std::map<HRESULT, std::string> result_messages;
-extern std::map<command_types, D3D12_COMMAND_LIST_TYPE> command_list_types;
+extern std::unordered_map<HRESULT, std::string> result_messages;
+extern std::unordered_map<command_types, D3D12_COMMAND_LIST_TYPE> command_list_types;
 
 template<command_types T>
 constexpr D3D12_COMMAND_LIST_TYPE command_list_type;
@@ -19,7 +19,7 @@ constexpr D3D12_COMMAND_LIST_TYPE command_list_type<command_type::compute> = D3D
 template<>
 constexpr D3D12_COMMAND_LIST_TYPE command_list_type<command_type::copy> = D3D12_COMMAND_LIST_TYPE_COPY;
 
-extern std::map<memory_type, D3D12_HEAP_TYPE> heap_types;
+extern std::unordered_map<memory_type, D3D12_HEAP_TYPE> heap_types;
 
 }
 

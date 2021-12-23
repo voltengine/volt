@@ -16,7 +16,7 @@ void register_component(const std::string &name) {
 			"\". It's already registered as \"" +
 			component_type_index_to_name[typeid(T)] + "\".")
 
-	size_t index = get_component_count();
+	size_t index = component_count();
 	VOLT_ASSERT(index < VOLT_MAX_COMPONENTS, "Too many components. "
 			"Please bump VOLT_MAX_COMPONENTS before building.")
 
@@ -51,7 +51,7 @@ void register_system(const std::string &name) {
 }
 
 template<typename T>
-const std::string &get_component_name() {
+const std::string &component_name() {
 	using namespace _internal;
 
 	VOLT_DEVELOPMENT_ASSERT(component_type_index_to_name.contains(typeid(T)),
@@ -60,7 +60,7 @@ const std::string &get_component_name() {
 }
 
 template<typename T>
-const std::string &get_system_name() {
+const std::string &system_name() {
 	using namespace _internal;
 
 	VOLT_DEVELOPMENT_ASSERT(system_type_index_to_name.contains(typeid(T)),
@@ -73,7 +73,7 @@ const std::string &get_system_name() {
 namespace volt::ecs::_internal {
 
 template<typename T>
-size_t get_component_index() {
+size_t component_index() {
 	VOLT_DEVELOPMENT_ASSERT(component_type_index_to_index.contains(typeid(T)),
 			"No such component type registered: " + typeid(T).name())
 	return component_type_index_to_index[typeid(T)];

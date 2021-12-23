@@ -24,7 +24,7 @@ public:
 
 	virtual std::shared_ptr<gpu::swapchain> create_swapchain(std::shared_ptr<os::window> window) = 0;
 
-	virtual std::shared_ptr<gpu::graphics_routine> create_graphics_routine() = 0;
+	virtual std::shared_ptr<gpu::universal_routine> create_universal_routine() = 0;
 
 	virtual std::shared_ptr<gpu::compute_routine> create_compute_routine() = 0;
 

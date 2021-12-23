@@ -3,6 +3,7 @@
 #include <volt/gpu/vk12/adapter.hpp>
 #include <volt/gpu/vk12/device.hpp>
 #include <volt/gpu/vk12/instance.hpp>
+#include <volt/gpu/vk12/routine.hpp>
 #include <volt/gpu/vk12/texture.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
 #include <volt/error.hpp>
@@ -33,7 +34,7 @@ swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::
 
 	VkBool32 present_support;
 	vkGetPhysicalDeviceSurfaceSupportKHR(adapter.physical_device,
-			adapter.present_family, surface, &present_support);
+			adapter.universal_family, surface, &present_support);
 	VOLT_ASSERT(present_support, "Adapter does not support presentation to chosen surface.")
 
 	// Swapchain
@@ -157,22 +158,38 @@ void swapchain::next_frame(std::function<void(frame)> &&callback) {
 	if (result == VK_NOT_READY)
 		return;
 	else
-		VOLT_VK12_CHECK(result, "Failed to acquire image.")
+		VOLT_VK12_DEBUG_CHECK(result, "Failed to acquire image.")
 
 	// transition from present etc.
 
-	routines[current_frame]->execute([&](graphics_executor &executor) {
+	auto *routine = static_cast<vk12::universal_routine *>(routines[current_frame].get());
+	auto &texture = textures[texture_index];
+
+	routine->execute([&](universal_executor &executor) {
 		callback(frame{
 			.index = current_frame,
-			.texture = textures[texture_index],
+			.texture = texture,
 			.executor = executor
 		});
 
 		
 	});
 
-	// present to executor
+	static_cast<vk12::texture *>(texture.get())->barrier(routine->impl.command_buffer, vk12::texture::state::present);
 
+	VkPresentInfoKHR present_info = {};
+	present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	present_info.swapchainCount = 1;
+	present_info.pSwapchains = &vk_swapchain;
+	present_info.pImageIndices = &texture_index;
+
+	result = vkQueuePresentKHR(routine->impl.queue, &present_info);
+	
+	// if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || just_resized)
+	// 	recreate_swapchain();
+	// else
+	VOLT_VK12_DEBUG_CHECK(result, "Failed to present swapchain image.");
+	
 	current_frame = (current_frame + 1) % vk12::concurrent_frames;
 }
 

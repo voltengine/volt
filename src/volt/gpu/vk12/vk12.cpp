@@ -1,6 +1,7 @@
 #include <volt/gpu/vk12/vk12.hpp>
 
 #include <volt/log.hpp>
+#include <volt/paths.hpp>
 
 static uint32_t glad_refcount = 0;
 static VkInstance glad_instance = VK_NULL_HANDLE;
@@ -85,6 +86,8 @@ std::unordered_map<gpu::texture_format, VkFormat> texture_formats{
 	{ gpu::texture_format::bc6,        VK_FORMAT_BC6H_UFLOAT_BLOCK },
 	{ gpu::texture_format::bc7_srgb,   VK_FORMAT_BC7_SRGB_BLOCK }
 };
+
+std::filesystem::path cache_path = paths::data() / "gpu-cache" / "vk12";
 
 void load_glad() {
 	if (glad_refcount++ == 0) {

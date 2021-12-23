@@ -10,7 +10,7 @@ namespace fs = std::filesystem;
 namespace nl = nlohmann;
 
 #ifdef VOLT_DEVELOPMENT
-static std::map<std::string, std::map<std::string, nlohmann::json>> development_reload_snapshot;
+static std::unordered_map<std::string, std::unordered_map<std::string, nlohmann::json>> development_reload_snapshot;
 #endif
 
 static std::string lang;
@@ -42,7 +42,7 @@ static asset *load_asset() {
 
 }
 
-const std::map<std::string, std::set<std::string>> &get_types() {
+const std::unordered_map<std::string, std::set<std::string>> &get_types() {
 	return module_name_to_types;
 }
 
@@ -165,10 +165,10 @@ void set_lang(const std::string &lang) {
 
 namespace volt::assets::_internal {
 
-std::map<std::string, std::set<std::string>> module_name_to_types;
-std::map<std::type_index, std::string> type_index_to_type;
-std::map<std::string, std::function<asset *()>> type_to_constructor;
-std::map<std::string, asset_owner *> path_to_cached_owner;
+std::unordered_map<std::string, std::set<std::string>> module_name_to_types;
+std::unordered_map<std::type_index, std::string> type_index_to_type;
+std::unordered_map<std::string, std::function<asset *()>> type_to_constructor;
+std::unordered_map<std::string, asset_owner *> path_to_cached_owner;
 
 #ifdef VOLT_DEVELOPMENT
 

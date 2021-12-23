@@ -11,7 +11,7 @@ copy_executor::copy_executor(_internal::routine_impl &impl)
 compute_executor::compute_executor(_internal::routine_impl &impl)
 		: copy_executor(impl) {}
 
-graphics_executor::graphics_executor(_internal::routine_impl &impl)
+universal_executor::universal_executor(_internal::routine_impl &impl)
 		: compute_executor(impl) {}
 
 copy_executor copy_executor::_new(_internal::routine_impl &impl) {
@@ -22,8 +22,8 @@ compute_executor compute_executor::_new(_internal::routine_impl &impl) {
 	return compute_executor(impl);
 }
 
-graphics_executor graphics_executor::_new(_internal::routine_impl &impl) {
-	return graphics_executor(impl);
+universal_executor universal_executor::_new(_internal::routine_impl &impl) {
+	return universal_executor(impl);
 }
 
 void copy_executor::copy_buffer(
@@ -38,9 +38,12 @@ void copy_executor::copy_buffer(
 void copy_executor::copy_texture(
 		const std::shared_ptr<gpu::texture> &src,
 		const std::shared_ptr<gpu::texture> &dst) {
-	uint32_t levels = math::min(src->levels(), dst->levels());
-	for (uint32_t i = 0; i < levels; i++)
-		copy_texture_level(src, dst, i, i);
+	#ifdef VOLT_GPU_DEBUG
+		VOLT_ASSERT(src->format() == dst->format(), "Textures must be of the same format to perform a copy.")
+		VOLT_ASSERT(math::all(src->size() == dst->size()), "Textures must be of the same size to perform a full copy.")
+	#endif
+
+	impl.copy_texture(src, dst);
 }
 
 void copy_executor::copy_texture_level(
@@ -51,6 +54,10 @@ void copy_executor::copy_texture_level(
 		math::uvec3 src_offset,
 		math::uvec3 dst_offset,
 		math::uvec3 size) {
+	#ifdef VOLT_GPU_DEBUG
+		VOLT_ASSERT(src->format() == dst->format(), "Textures must be of the same format to perform a copy.")
+	#endif
+	
 	impl.copy_texture_level(src, dst, src_level, dst_level, src_offset, dst_offset, size);
 }
 
@@ -59,7 +66,7 @@ void compute_executor::compute_pass(const compute_pass_info &info,
 	impl.compute_pass(info, callback);
 }
 
-void graphics_executor::rasterization_pass(const rasterization_pass_info &info,
+void universal_executor::rasterization_pass(const rasterization_pass_info &info,
 		const std::function<void(gpu::rasterization_pass &)> &callback) {
 	impl.rasterization_pass(info, callback);
 }
@@ -77,7 +84,7 @@ template<typename Executor>
 routine<Executor>::routine(std::shared_ptr<gpu::device> &&device)
 		: _device(std::move(device)) {}
 
-template class routine<graphics_executor>;
+template class routine<universal_executor>;
 template class routine<compute_executor>;
 template class routine<copy_executor>;
 

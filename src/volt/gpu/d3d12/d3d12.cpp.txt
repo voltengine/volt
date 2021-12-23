@@ -2,7 +2,7 @@
 
 // namespace volt::gpu::d3d12 {
 
-// std::map<HRESULT, std::string> result_messages{
+// std::unordered_map<HRESULT, std::string> result_messages{
 // 	{ D3D12_ERROR_ADAPTER_NOT_FOUND, "The specified cached PSO was created on a different adapter and cannot be reused on the current adapter. (D3D12_ERROR_ADAPTER_NOT_FOUND)" },
 // 	{ D3D12_ERROR_DRIVER_VERSION_MISMATCH, "The specified cached PSO was created on a different driver version and cannot be reused on the current adapter. (D3D12_ERROR_DRIVER_VERSION_MISMATCH)" },
 // 	{ DXGI_ERROR_INVALID_CALL, "The method call is invalid. For example, a method's parameter may not be a valid pointer. (DXGI_ERROR_INVALID_CALL)" },
@@ -15,7 +15,7 @@
 // 	{ S_OK, "No error occurred. (S_OK)" }
 // };
 
-// std::map<memory_type, D3D12_HEAP_TYPE> heap_types{
+// std::unordered_map<memory_type, D3D12_HEAP_TYPE> heap_types{
 // 	{ memory_type::internal, D3D12_HEAP_TYPE_DEFAULT },
 // 	{ memory_type::staging, D3D12_HEAP_TYPE_UPLOAD },
 // 	{ memory_type::write, D3D12_HEAP_TYPE_UPLOAD },

@@ -18,7 +18,7 @@ class swapchain;
 struct frame {
 	const uint32_t index; // The index of the frame in flight
 	std::shared_ptr<gpu::texture> &texture; // Output texture
-	graphics_executor &executor; // Guarded executor
+	universal_executor &executor; // Guarded executor
 };
 
 class swapchain : public std::enable_shared_from_this<swapchain> {
@@ -50,7 +50,7 @@ protected:
 	gpu::present_mode _present_mode = gpu::present_mode::triple_buffer; // Will be adjusted during construction
 
 	std::vector<std::shared_ptr<gpu::texture>> textures;
-	std::vector<std::shared_ptr<gpu::graphics_routine>> routines;
+	std::vector<std::shared_ptr<gpu::universal_routine>> routines;
 
 	swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window);
 

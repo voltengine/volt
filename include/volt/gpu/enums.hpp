@@ -52,7 +52,7 @@ namespace texture_feature {
 			copy_src = 1 << 0, // Source for copy operations 
 			copy_dst = 1 << 1, // Destination for copy operations
 
-			sampler    = 1 << 2, // Can be used as sampler
+			sampled    = 1 << 2, // Can be used as sampler
 			storage    = 1 << 3,
 			attachment = 1 << 4; // Can be used as color attachment
 }

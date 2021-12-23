@@ -22,7 +22,7 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	families.resize(num_families);
 	vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &num_families, families.data());
 
-	std::vector<uint32_t> present_score(num_families, 1), graphics_score(num_families, 1),
+	std::vector<uint32_t> universal_score(num_families, 1),
 			compute_score(num_families, 1), copy_score(num_families, 1);
 
 	for (uint32_t i = 0; i < families.size(); i++) {
@@ -33,14 +33,6 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 				|| family.queueFlags & VK_QUEUE_COMPUTE_BIT
 				|| family.queueFlags & VK_QUEUE_GRAPHICS_BIT;
 
-		// We must remember that VK_QUEUE_TRANSFER_BIT is optional and implicitly
-		// present when VK_QUEUE_GRAPHICS_BIT or VK_QUEUE_COMPUTE_BIT are there
-		present_score[i] += !(family.queueFlags & VK_QUEUE_GRAPHICS_BIT);
-		present_score[i] += !(family.queueFlags & VK_QUEUE_COMPUTE_BIT);
-		present_score[i] += !copy_support;
-		
-		graphics_score[i] += (present_support == 0);
-
 		compute_score[i] += (present_support == 0);
 		compute_score[i] += !(family.queueFlags & VK_QUEUE_GRAPHICS_BIT);
 
@@ -48,29 +40,24 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 		copy_score[i] += !(family.queueFlags & VK_QUEUE_GRAPHICS_BIT);
 		copy_score[i] += !(family.queueFlags & VK_QUEUE_COMPUTE_BIT);
 
-		present_score[i] *= (present_support != 0);
-		graphics_score[i] *= (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) * (family.queueFlags & VK_QUEUE_COMPUTE_BIT); // copy_support is guaranteed
-		compute_score[i] *= family.queueFlags & VK_QUEUE_COMPUTE_BIT; // copy_support is guaranteed
+		universal_score[i] *= (present_support != 0) && (family.queueFlags & VK_QUEUE_GRAPHICS_BIT) && (family.queueFlags & VK_QUEUE_COMPUTE_BIT); // copy_support is guaranteed
+		compute_score[i] *= static_cast<bool>(family.queueFlags & VK_QUEUE_COMPUTE_BIT); // copy_support is guaranteed
 		copy_score[i] *= copy_support;
 	}
 
-	present_family = std::distance(present_score.begin(), std::max_element(present_score.begin(), present_score.end()));
-	graphics_family = std::distance(graphics_score.begin(), std::max_element(graphics_score.begin(), graphics_score.end()));
+	universal_family = std::distance(universal_score.begin(), std::max_element(universal_score.begin(), universal_score.end()));
 	compute_family = std::distance(compute_score.begin(), std::max_element(compute_score.begin(), compute_score.end()));
 	copy_family = std::distance(copy_score.begin(), std::max_element(copy_score.begin(), copy_score.end()));
 
-	if (present_score[present_family] == 0)
-		present_family = std::numeric_limits<uint32_t>::max();
-	if (graphics_score[graphics_family] == 0)
-		graphics_family = std::numeric_limits<uint32_t>::max();
+	if (universal_score[universal_family] == 0)
+		universal_family = std::numeric_limits<uint32_t>::max();
 	if (compute_score[compute_family] == 0)
 		compute_family = std::numeric_limits<uint32_t>::max();
 	if (copy_score[copy_family] == 0)
 		copy_family = std::numeric_limits<uint32_t>::max();
 
 	std::set<uint32_t> families{
-		present_family,
-		graphics_family,
+		universal_family,
 		compute_family,
 		copy_family
 	};
@@ -100,6 +87,12 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	}
 
 	vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
+
+	std::stringstream ss;
+	ss << std::hex;
+	for (size_t i = 0; i < VK_UUID_SIZE; i++)
+		ss << physical_device_properties.pipelineCacheUUID[i];
+	pipeline_cache_uuid = ss.str();
 }
 
 uint32_t adapter::vendor_id() {

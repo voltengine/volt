@@ -4,10 +4,10 @@
 
 #include <concepts>
 #include <functional>
-#include <map>
 #include <set>
 #include <string>
 #include <typeindex>
+#include <unordered_map>
 
 #include "../modules.hpp"
 
@@ -25,7 +25,7 @@ using asset_path = std::string;
 template<std::derived_from<asset> T>
 void register_type(const std::string &type);
 
-VOLT_API const std::map<std::string, std::set<std::string>> &get_types();
+VOLT_API const std::unordered_map<std::string, std::set<std::string>> &get_types();
 
 #ifdef VOLT_DEVELOPMENT
 
@@ -63,10 +63,10 @@ namespace volt::assets::_internal {
 
 class asset_owner;
 
-VOLT_API extern std::map<std::string, std::set<std::string>> module_name_to_types;
-VOLT_API extern std::map<std::type_index, std::string> type_index_to_type;
-VOLT_API extern std::map<std::string, std::function<asset *()>> type_to_constructor;
-VOLT_API extern std::map<std::string, asset_owner *> path_to_cached_owner;
+VOLT_API extern std::unordered_map<std::string, std::set<std::string>> module_name_to_types;
+VOLT_API extern std::unordered_map<std::type_index, std::string> type_index_to_type;
+VOLT_API extern std::unordered_map<std::string, std::function<asset *()>> type_to_constructor;
+VOLT_API extern std::unordered_map<std::string, asset_owner *> path_to_cached_owner;
 
 #ifdef VOLT_DEVELOPMENT
 

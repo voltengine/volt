@@ -93,12 +93,14 @@ function(volt_add_module target)
 
 	# Add precompiler definitions and set build type
 	target_compile_definitions(${target} PUBLIC VOLT_MAX_COMPONENTS=${VOLT_MAX_COMPONENTS})
-	target_compile_definitions(${target} PUBLIC VOLT_GPU_DEBUG=${VOLT_GPU_DEBUG})
 	target_compile_definitions(${target} PUBLIC VOLT_VERSION="$CACHE{VOLT_VERSION}")
 	if(VOLT_DEVELOPMENT)
 		target_compile_definitions(${target} PUBLIC VOLT_DEVELOPMENT)
 		target_compile_definitions(${target} PUBLIC VOLT_DEVELOPMENT_PATH="${CMAKE_SOURCE_DIR}")
 		target_compile_definitions(${target} PUBLIC VOLT_DEVELOPMENT_MODULE="$CACHE{VOLT_DEVELOPMENT_MODULE}")
+	endif()
+	if (VOLT_GPU_DEBUG)
+		target_compile_definitions(${target} PUBLIC VOLT_GPU_DEBUG)
 	endif()
 
 	# Add module_main source file generation step
@@ -121,6 +123,7 @@ target_link_libraries(${PROJECT_NAME}
 	Date::Date
 	GLFW::GLFW
 	JSON::JSON
+	Sodium::Sodium
 	Termcolor::Termcolor
 )
 

@@ -3,7 +3,9 @@
 #include <volt/pch.hpp>
 
 #include <volt/gpu/device.hpp>
+#include <volt/gpu/pass.hpp>
 #include <volt/gpu/vk12/adapter.hpp>
+#include <volt/gpu/vk12/pass.hpp>
 
 namespace volt::gpu::vk12 {
 
@@ -11,7 +13,9 @@ class device : public gpu::device {
 public:
 	VkDevice vk_device;
 	VmaAllocator allocator;
-	VkQueue present_queue, graphics_queue, compute_queue, copy_queue;
+	VkQueue universal_queue, compute_queue, copy_queue;
+	VkPipelineCache pipeline_cache;
+	std::unordered_map<compute_pass_info, vk12::compute_pass> compute_pass_cache;
 
 	device(std::shared_ptr<gpu::adapter> &&adapter);
 	
@@ -21,7 +25,7 @@ public:
 
 	std::shared_ptr<gpu::swapchain> create_swapchain(std::shared_ptr<os::window> window) override;
 
-	std::shared_ptr<gpu::graphics_routine> create_graphics_routine() override;
+	std::shared_ptr<gpu::universal_routine> create_universal_routine() override;
 
 	std::shared_ptr<gpu::compute_routine> create_compute_routine() override;
 

@@ -31,7 +31,7 @@ rasterization_pass_info &rasterization_pass_info::color_attachment(
 		.initializer = initializer,
 		.clear_color = clear_color
 	};
-	color_attachments[location] = attachment;
+	_color_attachments[location] = attachment;
 	return *this;
 }
 
@@ -53,6 +53,29 @@ rasterization_pass_info &rasterization_pass_info::depth_stencil_attachment(
 compute_pass_info &compute_pass_info::compute_shader(std::shared_ptr<gpu::shader> shader) {
 	_compute_shader = std::move(shader);
 	return *this;
+}
+
+void _base_pass::constant_buffer(const std::string &slot, const std::shared_ptr<gpu::buffer> &buffer) {
+	constant_buffers[slot] = buffer.get();
+}
+
+void _base_pass::sampled_texture(const std::string &slot, const std::shared_ptr<gpu::texture> &texture) {
+	sampled_textures[slot] = texture.get();
+}
+
+void _base_pass::storage_buffer(const std::string &slot, const std::shared_ptr<gpu::buffer> &buffer, bool shared) {
+	storage_buffers[slot] = std::make_pair(buffer.get(), shared);
+}
+
+void _base_pass::storage_texture(const std::string &slot, const std::shared_ptr<gpu::texture> &texture, bool shared) {
+	storage_textures[slot] = std::make_pair(texture.get(), shared);
+}
+
+void _base_pass::reset() {
+	constant_buffers.clear();
+	sampled_textures.clear();
+	storage_buffers.clear();
+	storage_textures.clear();
 }
 
 }

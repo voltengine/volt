@@ -138,8 +138,7 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 		auto adapter = std::make_shared<vk12::adapter>(shared_from_this(), physical_device, vk_dummy_surface);
 
 		// Check queue families availability
-		if (adapter->present_family == std::numeric_limits<uint32_t>::max()
-			|| adapter->graphics_family == std::numeric_limits<uint32_t>::max()
+		if (adapter->universal_family == std::numeric_limits<uint32_t>::max()
 			|| adapter->compute_family == std::numeric_limits<uint32_t>::max()
 			|| adapter->copy_family == std::numeric_limits<uint32_t>::max()) {
 			continue;

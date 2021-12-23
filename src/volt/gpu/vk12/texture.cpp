@@ -75,7 +75,7 @@ texture::texture(std::shared_ptr<gpu::device> &&device,
 		usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 	if (features & texture_feature::copy_dst)
 		usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-	if (features & texture_feature::sampler)
+	if (features & texture_feature::sampled)
 		usage |= VK_IMAGE_USAGE_SAMPLED_BIT;
 	if (features & texture_feature::storage)
 		usage |= VK_IMAGE_USAGE_STORAGE_BIT;
@@ -125,7 +125,7 @@ texture::texture(std::shared_ptr<gpu::device> &&device,
 	VOLT_VK12_CHECK(vkCreateImageView(vk12_device.vk_device, &view_info, nullptr, &image_view),
 			"Failed to create image view.")
 
-	// if (!(features & texture_feature::sampler))
+	// if (!(features & texture_feature::sampled))
 	// 	return;
 
 	// // TODO: Configurable wrapping, filtering and anisotropy
@@ -183,6 +183,10 @@ texture::texture(std::shared_ptr<gpu::device> &&device, gpu::texture_format form
 
 	VOLT_VK12_CHECK(vkCreateImageView(vk12_device.vk_device, &view_info, nullptr, &image_view),
 			"Failed to create image view.")
+
+	descriptor_info.sampler = 0; // get from cache or create based on image requirements
+	descriptor_info.imageView = image_view;
+	descriptor_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 }
 
 texture::~texture() {

@@ -16,6 +16,8 @@ extern std::unordered_map<gpu::texture_format, VkFormat> texture_formats;
 
 constexpr uint32_t concurrent_frames = 2;
 
+extern std::filesystem::path cache_path;
+
 void load_glad();
 
 void unload_glad();

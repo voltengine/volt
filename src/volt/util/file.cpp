@@ -12,22 +12,32 @@ std::string read_text_file(const fs::path &path) {
 	VOLT_ASSERT(fs::exists(path), "File not found:\n" + path.string())
 
 	std::ifstream stream(path, std::ifstream::in);
-	std::string buffer;
+	return std::string(
+		std::istreambuf_iterator<char>(stream),
+		std::istreambuf_iterator<char>()
+	);
+}
 
-	stream.seekg(0, std::ios::end);
-	buffer.reserve(stream.tellg());
-	stream.seekg(0, std::ios::beg);
+std::vector<uint8_t> read_binary_file(const fs::path &path) {
+	VOLT_ASSERT(fs::exists(path), "File not found:\n" + path.string())
 
-	buffer.assign(
-			std::istreambuf_iterator<char>(stream),
-			std::istreambuf_iterator<char>());
-	return buffer;
+	std::ifstream stream(path, std::ifstream::in | std::ifstream::binary);
+	return std::vector<uint8_t>(
+		std::istreambuf_iterator<char>(stream),
+		std::istreambuf_iterator<char>()
+	);
 }
 
 void write_file(const fs::path &path, std::string_view str) {
 	fs::create_directories(path.parent_path());
 	std::ofstream stream(path, std::ofstream::out);
-    stream << str;
+	stream.write(str.data(), str.size());
+}
+
+void write_file(const fs::path &path, const std::vector<uint8_t> &buffer) {
+	fs::create_directories(path.parent_path());
+	std::ofstream stream(path, std::ofstream::out | std::ofstream::binary);
+    stream.write(reinterpret_cast<const char *>(buffer.data()), buffer.size());
 }
 
 void shell(std::string cmd, const std::function<void(std::string_view)>

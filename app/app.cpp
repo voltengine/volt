@@ -53,7 +53,7 @@ int main() {
 
 		auto texture = device->create_2d_texture(
 				gpu::memory_type::internal,
-				gpu::texture_feature::sampler | gpu::texture_feature::copy_dst,
+				gpu::texture_feature::sampled | gpu::texture_feature::copy_dst,
 				gpu::texture_format::bc1_srgb,
 				1, {2048, 2048}
 		);
@@ -93,7 +93,6 @@ int main() {
 
 			streaming_routine->wait();
 		}
-
 
 
 

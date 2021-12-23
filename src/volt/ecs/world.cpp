@@ -37,7 +37,7 @@ world::~world() {
 // 	return entity(this, eid, entities[eid].version);
 // }
 
-entity world::get_root_entity() {
+entity world::root_entity() {
 	// Root entity can never be destroyed, so its version is always zero
 	return entity(this, 0, 0);
 }
@@ -59,8 +59,8 @@ void world::_register_development_component(const std::string &name) {
 }
 
 void world::_unregister_development_component(const std::string &name) {
-	size_t index = get_component_index(name);
-	size_t last_index = get_component_count() - 1;
+	size_t index = component_index(name);
+	size_t last_index = component_count() - 1;
 
 	for (auto instance : instances) {
 		// Save state
@@ -74,7 +74,7 @@ void world::_unregister_development_component(const std::string &name) {
 			if (instance->entities[eid].mask.test(index)) {
 				auto storage = instance->storages[name].get();
 				instance->development_reload_snapshot[name][eid] =
-						storage->get_json(storage->get_cid(eid));
+						storage->get_json(storage->cid(eid));
 			}
 		}
 
@@ -108,7 +108,7 @@ void world::destroy(uint32_t eid) {
 	for (auto &item : component_name_to_index) {
 		if (data.mask.test(item.second)) {
 			auto &storage = storages[item.first];
-			storage->remove(storage->get_cid(eid));
+			storage->remove(storage->cid(eid));
 		}
 	}
 
@@ -120,26 +120,26 @@ void world::destroy(uint32_t eid) {
 
 bool world::has_component_by_name(
 		uint32_t eid, const std::string &name) const {
-	return entities[eid].mask.test(get_component_index(name));
+	return entities[eid].mask.test(component_index(name));
 }
 
 void world::add_component_by_name(uint32_t eid,
 		const std::string &name, const nlohmann::json &json) {
-	entities[eid].mask.set(get_component_index(name));
+	entities[eid].mask.set(component_index(name));
 	storages[name]->add_json(eid, json);
 }
 
 nlohmann::json world::get_component_by_name(
 		uint32_t eid, const std::string &name) {
 	auto storage = storages[name].get();
-	return storage->get_json(storage->get_cid(eid));
+	return storage->get_json(storage->cid(eid));
 }
 
 void world::remove_component_by_name(
 		uint32_t eid, const std::string &name) {
-	entities[eid].mask.reset(get_component_index(name));
+	entities[eid].mask.reset(component_index(name));
 	auto storage = storages[name].get();
-	storage->remove(storage->get_cid(eid));
+	storage->remove(storage->cid(eid));
 }
 
 }
