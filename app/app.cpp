@@ -52,10 +52,10 @@ int main() {
 		);
 
 		auto texture = device->create_2d_texture(
-				gpu::memory_type::internal,
-				gpu::texture_feature::sampled | gpu::texture_feature::copy_dst,
-				gpu::texture_format::bc1_srgb,
-				1, {2048, 2048}
+			gpu::memory_type::internal,
+			gpu::texture_feature::sampled | gpu::texture_feature::copy_dst,
+			gpu::texture_format::bc1_srgb,
+			1, {2048, 2048}
 		);
 
 		while (!window->is_closing()) {
@@ -63,19 +63,115 @@ int main() {
 
 			// next_frame() might return immediately if no work is available
 			swapchain->next_frame([](gpu::frame frame) {
-				gpu::rasterization_pass_info info;
-				// info.vertex_shader(nullptr);
-				info.color_attachment(0, frame.texture, gpu::attachment_initializer::clear);
+				gpu::universal_routine_context routine_context = frame.routine_context;
 
-				frame.executor.rasterization_pass(info, [](gpu::rasterization_pass &pass) {
-					// pass.vertex_buffer(nullptr);
-					// pass.constant_buffer("u_ConstantBuffer", nullptr);
-					pass.draw(1);
-				}); // 1 = max number of threads
+				gpu::pass_info info{
+					.color_attachments = {
+						{
+							.texture = frame.texture,
+							.initializer = gpu::attachment_initializer::clear
+						}
+					},
+					.depth_stencil_attachment = {
+						.texture = nullptr,
+						.initializer = gpu::attachment_initializer::clear
+					}
+				};
 
-				// executor.compute_pass(...);
+				gpu::descriptor_info descriptor_info{
+					.constant_buffers = {
+						{ "u_ConstantBuffer", nullptr }
+					},
+					.sampled_textures = {
+						{ "u_Texture", nullptr, nullptr }
+					},
+					.storage_buffers = {
+						{ "u_StorageBuffer", nullptr, true }
+					},
+					.storage_textures = {
+						{ "u_StorageTexture", nullptr, true }
+					}
+				};
+
+				routine_context.async_pass(info, [](gpu::async_pass_context pass_context) {				
+					world.each<model>([](uint32_t thread_index, model &model){
+						gpu::draw_info draw_info{
+							.descriptor_info = descriptor_info
+
+							// Pipeline state used to query pipeline
+							.vertex_shader = nullptr,
+							.hull_shader = nullptr,
+							.domain_shader = nullptr,
+							.geometry_shader = nullptr,
+							.pixel_shader = nullptr,
+							.instance_inputs = {},
+							.primitive_mode = gpu::topology::triangles,
+							.polygon_mode = gpu::topology::triangles,
+							.culling = false,
+							.line_width = 1,
+							.depth_test = false,
+							.depth_write = false,
+							.stencil_test = false,
+							.stencil_write = false,
+							.blending = gpu::blending::alpha,
+
+							// Actual dynamic draw info
+							.vertex_buffer = nullptr,
+							.index_buffer = nullptr,
+							.instance_buffer = nullptr,
+							.viewport = { { 0, 1280 }, { 0, 720 }, { 0, 1 } },
+							.index_count = 0,
+							.instance_count = 0
+						};
+
+						pass_context.draw(thread_index, draw_info);
+					}, pass_context.thread_pool);
+				});
+
+				routine_context.pass(info, [](gpu::pass_context pass_context) {				
+					gpu::draw_info draw_info{
+						.descriptor_info = descriptor_info
+
+						// Pipeline state used to query pipeline
+						.vertex_shader = nullptr,
+						.hull_shader = nullptr,
+						.domain_shader = nullptr,
+						.geometry_shader = nullptr,
+						.pixel_shader = nullptr,
+						.instance_inputs = {},
+						.primitive_mode = gpu::topology::triangles,
+						.polygon_mode = gpu::topology::triangles,
+						.culling = false,
+						.line_width = 1,
+						.depth_test = false,
+						.depth_write = false,
+						.stencil_test = false,
+						.stencil_write = false,
+						.blending = gpu::blending::alpha,
+
+						// Actual dynamic draw info
+						.vertex_buffer = nullptr,
+						.index_buffer = nullptr,
+						.instance_buffer = nullptr,
+						.viewport = { { 0, 1280 }, { 0, 720 }, { 0, 1 } },
+						.index_count = 0,
+						.instance_count = 0
+					};
+
+					pass_context.draw(draw_info);
+				});
+
+				gpu::dispatch_info dispatch_info{
+					.descriptor_info = descriptor_info
+					.compute_shader = nullptr,
+					.group_count = { 1, 1, 1 }
+				};
+				routine_context.dispatch(dispatch_info);
+			});
+
+				// routine_context.dispatch({ 128, 128, 4 });
 				
-				// executor.copy_texture_level(src, dst);
+				// routine_context.copy_texture(src, dst);
 
 				// ...
 			});
@@ -86,8 +182,8 @@ int main() {
 			if (!streaming_routine->finished())
 				continue;
 
-			streaming_routine->execute([](gpu::copy_executor &executor) {
-				// executor.copy_texture_level(src, dst);
+			streaming_routine->execute([](gpu::copy_routine_context &context) {
+				// context.copy_texture(src, dst);
 				// ...
 			});
 

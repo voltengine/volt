@@ -32,6 +32,17 @@ namespace buffer_feature {
 			vertex   = 1 << 5; // Can be used as vertex buffer (VBO)
 }
 
+using texture_features = uint32_t;
+namespace texture_feature {
+	constexpr texture_features
+			copy_src = 1 << 0, // Source for copy operations 
+			copy_dst = 1 << 1, // Destination for copy operations
+
+			sampled    = 1 << 2, // Can be used as sampler
+			storage    = 1 << 3,
+			attachment = 1 << 4; // Can be used as color attachment
+}
+
 enum class texture_format {
 	r8,  rg8,  rgb8,  rgba8,       // 8-bit unsigned normalized
 	r16, rg16, rgb16, rgba16,      // 16-bit unsigned normalized
@@ -46,22 +57,15 @@ enum class texture_format {
 	bc4, bc5_signed, bc6, bc7_srgb // Grayscale, normal, HDR, transparent
 };
 
-using texture_features = uint32_t;
-namespace texture_feature {
-	constexpr texture_features
-			copy_src = 1 << 0, // Source for copy operations 
-			copy_dst = 1 << 1, // Destination for copy operations
-
-			sampled    = 1 << 2, // Can be used as sampler
-			storage    = 1 << 3,
-			attachment = 1 << 4; // Can be used as color attachment
-}
-
 enum class texture_type {
 	tex1d, tex1d_array, // 1D array view can access layered 1D texture
 	tex2d, tex2d_array, // 2D array view can access layered 2D texture
 	tex3d,
 	cube, cube_array    // Cube view and cube array view can access layered 2D texture;
+};
+
+enum class texture_filter {
+	nearest, linear, trilinear
 };
 
 enum class attachment_initializer {
@@ -72,6 +76,14 @@ enum class present_mode {
 	tear,         // Results in tearing; Has no input lag
 	vsync,        // Big input lag + clamps to 30 fps for any framerate below 60
 	triple_buffer // Small input lag + Higher energy consumption (unavailable with OpenGL)
+};
+
+enum class topology {
+	triangles, lines, points
+};
+
+enum class blending {
+	alpha, add, multiply
 };
 
 }

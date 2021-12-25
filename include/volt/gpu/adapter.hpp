@@ -16,13 +16,13 @@ class adapter : public std::enable_shared_from_this<adapter> {
 public:
 	virtual ~adapter() = default;
 
-	virtual uint32_t vendor_id() = 0;
-
-	virtual uint32_t device_id() = 0;
+	virtual std::string vendor() = 0;
 
 	virtual std::string name() = 0;
 
-	virtual uint64_t dedicated_video_memory() = 0;
+	virtual uint64_t total_memory() = 0;
+
+	virtual uint64_t free_memory() = 0;
 
 	virtual std::shared_ptr<gpu::device> create_device() = 0;
 

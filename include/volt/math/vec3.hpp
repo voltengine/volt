@@ -212,4 +212,13 @@ vec3<X> saturate(const vec3<X> &x);
 
 }
 
+namespace std {
+
+template<volt::math::scalar T>
+struct hash<volt::math::vec3<T>> {
+	std::size_t operator()(volt::math::vec3<T> vec) const;
+};
+
+}
+
 #include "vec3.inl"

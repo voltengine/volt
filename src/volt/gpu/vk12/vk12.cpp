@@ -36,9 +36,20 @@ std::unordered_map<VkResult, std::string> result_messages{
 	{ VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS, "A buffer creation or memory allocation failed because the requested address is not available. A shader group handle assignment failed because the requested shader group handle information is no longer valid. (VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS)" }
 };
 
+std::unordered_map<uint32_t, std::string> vendor_names{
+	{ 0x1002, "AMD" },
+	{ 0x1010, "ImgTec"},
+	{ 0x10DE, "NVIDIA" },
+	{ 0x13B5, "Arm" },
+	{ 0x5143, "Qualcomm" },
+	{ 0x8086, "Intel" }
+};
+
 // More device extensions can be added here
-std::vector<const char *> device_extensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME
+std::vector<const char *> device_extensions{
+	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+	VK_EXT_MEMORY_BUDGET_EXTENSION_NAME,
+	VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME
 };
 
 std::unordered_map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages{

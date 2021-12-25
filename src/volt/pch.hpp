@@ -31,6 +31,7 @@
 #endif
 
 #include <date/date.h>
+#include <glad/gl.h>
 #include <glad/vulkan.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>

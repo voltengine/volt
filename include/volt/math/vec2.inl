@@ -276,3 +276,13 @@ vec2<Ret> mod(const vec2<X> &x, const vec2<Y> &y) {
 #pragma endregion
 
 }
+
+namespace std {
+
+template<volt::math::scalar T>
+std::size_t hash<volt::math::vec2<T>>::operator()(volt::math::vec2<T> vec) const {
+	return static_cast<size_t>(vec.x) * 859433 ^
+			static_cast<size_t>(vec.y);
+}
+
+}

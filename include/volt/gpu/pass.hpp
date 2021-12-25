@@ -6,80 +6,83 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "../math/math.hpp"
 #include "enums.hpp"
 #include "buffer.hpp"
+#include "sampler.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 
 namespace volt::gpu {
 
+class device;
+
 #pragma region Pass information structures
 
 class ray_tracing_pass_info;
 
+class viewport {
+public:
+	math::fvec2 width, height, depth = { 0, 1 };
+};
+
 class rasterization_pass_info {
 public:
-	struct _viewport {
-		math::fvec2 width, height, depth;
-	};
-
-	struct _color_attachment {
+	class color_attachment_info {
+	public:
 		std::shared_ptr<gpu::texture> texture;
-		attachment_initializer initializer;
-		math::fvec3 clear_color;
+		attachment_initializer initializer = attachment_initializer::none;
+		math::fvec3 clear_color = math::fvec3::zero;
+
+		bool operator==(const color_attachment_info &other) const;
 	};
 
-	struct _depth_stencil_attachment {
+	class depth_stencil_attachment_info {
+	public:
 		std::shared_ptr<gpu::texture> texture;
-		attachment_initializer initializer;
-		float clear_depth;
-		float clear_stencil;
+		attachment_initializer initializer = attachment_initializer::none;
+		float clear_depth = 1;
+		float clear_stencil = 0;
 	};
 
-	_viewport _viewport;
-	std::shared_ptr<gpu::shader> _vertex_shader, _pixel_shader;
-	std::unordered_map<uint32_t, _color_attachment> _color_attachments;
-	_depth_stencil_attachment _depth_stencil_attachment;
-
-	VOLT_API rasterization_pass_info &viewport(math::fvec2 width, math::
-			fvec2 height, math::fvec2 depth = math::fvec2(0, 1));
-
-	VOLT_API rasterization_pass_info &vertex_shader(std::shared_ptr<gpu::shader> shader);
-
-	VOLT_API rasterization_pass_info &pixel_shader(std::shared_ptr<gpu::shader> shader);
-
-	VOLT_API rasterization_pass_info &color_attachment(uint32_t location,
-			std::shared_ptr<gpu::texture> texture,
-			attachment_initializer initializer,
-			math::fvec3 clear_color = math::fvec3::zero);
-
-	VOLT_API rasterization_pass_info &depth_stencil_attachment(
-			std::shared_ptr<gpu::texture> texture,
-			attachment_initializer initializer,
-			float clear_depth = 1,
-			float clear_stencil = 0);
+	const std::shared_ptr<gpu::shader> vertex_shader; // Required
+	const std::shared_ptr<gpu::shader> hull_shader;
+	const std::shared_ptr<gpu::shader> domain_shader;
+	const std::shared_ptr<gpu::shader> geometry_shader;
+	const std::shared_ptr<gpu::shader> pixel_shader; // Required
+	const std::unordered_set<std::string> instance_inputs; // Others will become vertex inputs
+	const gpu::topology primitive_mode = gpu::topology::triangles; // How vertices are interconnected
+	const gpu::topology polygon_mode = gpu::topology::triangles; // How polygons are displayed when primitive_mode == triangles
+	const bool culling = true;
+	const float line_width = 1;
+	const bool depth_test = false, depth_write = false, stencil_test = false, stencil_write = false;
+	const gpu::blending blending = gpu::blending::alpha;
+	const std::vector<color_attachment_info> color_attachments;
+	const depth_stencil_attachment_info depth_stencil_attachment;
 };
 
 class compute_pass_info {
 public:
-	std::shared_ptr<gpu::shader> _compute_shader;
-
-	auto operator<=>(const compute_pass_info &other) const = default;
-
-	VOLT_API compute_pass_info &compute_shader(std::shared_ptr<gpu::shader> shader);
+	const std::shared_ptr<gpu::shader> compute_shader;
 };
 
 #pragma endregion
 
 class _base_pass {
 public:
+	// Those are raw pointers so any bound resources must not be destroyed until dispatch
+	std::unordered_map<std::string, gpu::buffer *> _constant_buffers;
+	std::unordered_map<std::string, std::pair<gpu::texture *, gpu::sampler *>> _sampled_textures;
+	std::unordered_map<std::string, std::pair<gpu::buffer *, bool>> _storage_buffers;
+	std::unordered_map<std::string, std::pair<gpu::texture *, bool>> _storage_textures;
+
 	// Readonly access; Guarantees at most 16 KiB to be available
 	VOLT_API void constant_buffer(const std::string &slot, const std::shared_ptr<gpu::buffer> &buffer);
 
-	VOLT_API void sampled_texture(const std::string &slot, const std::shared_ptr<gpu::texture> &texture);
+	VOLT_API void sampled_texture(const std::string &slot, const std::shared_ptr<gpu::texture> &texture, const std::shared_ptr<gpu::sampler> &sampler);
 
 	// Large data; Optionally writeable; Slower on some hardware
 	VOLT_API void storage_buffer(const std::string &slot, const std::shared_ptr<gpu::buffer> &buffer, bool shared);
@@ -88,12 +91,12 @@ public:
 
 	VOLT_API void reset();
 
+	VOLT_API const std::shared_ptr<gpu::device> &device();
+
 protected:
-	// Those are raw pointers so any bound resources must not be destroyed until dispatch
-	std::unordered_map<std::string, gpu::buffer *> constant_buffers;
-	std::unordered_map<std::string, gpu::texture *> sampled_textures;
-	std::unordered_map<std::string, std::pair<gpu::buffer *, bool>> storage_buffers;
-	std::unordered_map<std::string, std::pair<gpu::texture *, bool>> storage_textures;
+	std::shared_ptr<gpu::device> _device;
+
+	VOLT_API _base_pass(std::shared_ptr<gpu::device> &&device);
 };
 
 // class ray_tracing_pass;
@@ -104,12 +107,18 @@ public:
 
 	virtual void draw(uint32_t index_count, uint32_t instance_count = 1) = 0;
 
-	virtual void index_buffer(uint32_t location, const std::shared_ptr<gpu::buffer> &buffer) = 0;
+	virtual void index_buffer(const std::shared_ptr<gpu::buffer> &buffer) = 0;
 
-	virtual void vertex_buffer(uint32_t location, const std::shared_ptr<gpu::buffer> &buffer) = 0;
+	// Vertex buffer that advances for each vertex
+	virtual void vertex_buffer(const std::shared_ptr<gpu::buffer> &buffer) = 0;
+
+	// Vertex buffer that advances for each instance
+	virtual void instance_buffer(const std::shared_ptr<gpu::buffer> &buffer) = 0; 
+
+	virtual void viewport(gpu::viewport viewport) = 0;
 
 protected:
-	rasterization_pass() = default;
+	rasterization_pass(std::shared_ptr<gpu::device> &&device);
 };
 
 class compute_pass : public _base_pass {
@@ -119,18 +128,7 @@ public:
 	virtual void dispatch(math::uvec3 group_count) = 0;
 
 protected:	
-	compute_pass() = default;
-};
-
-}
-
-namespace std {
-
-template<>
-struct hash<volt::gpu::compute_pass_info> {
-	std::size_t operator()(const volt::gpu::compute_pass_info& info) const {
-		return reinterpret_cast<size_t>(info._compute_shader.get());
-	}
+	compute_pass(std::shared_ptr<gpu::device> &&device);
 };
 
 }

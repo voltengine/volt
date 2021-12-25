@@ -76,6 +76,11 @@ void universal_executor::rasterization_pass(const rasterization_pass_info &info,
 namespace volt::gpu::_internal {
 
 template<typename Executor>
+routine<Executor>::~routine() {
+	wait();
+}
+
+template<typename Executor>
 const std::shared_ptr<gpu::device> &routine<Executor>::device() {
 	return _device;
 }

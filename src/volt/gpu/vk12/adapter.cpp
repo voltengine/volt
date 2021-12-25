@@ -13,8 +13,8 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	vk12::load_glad_physical_device(physical_device);
 
 	// Query adapter properties
-	vkGetPhysicalDeviceProperties(physical_device, &physical_device_properties);
-	vkGetPhysicalDeviceMemoryProperties(physical_device, &physical_device_memory_properties);
+	vkGetPhysicalDeviceProperties(physical_device, &properties);
+	vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
 
 	// Queue family details
 	uint32_t num_families;
@@ -86,38 +86,48 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 		vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, vk_dummy_surface, &num_modes, surface_present_modes.data());
 	}
 
-	vkGetPhysicalDeviceMemoryProperties(physical_device, &memory_properties);
-
 	std::stringstream ss;
 	ss << std::hex;
 	for (size_t i = 0; i < VK_UUID_SIZE; i++)
-		ss << physical_device_properties.pipelineCacheUUID[i];
+		ss << properties.pipelineCacheUUID[i];
 	pipeline_cache_uuid = ss.str();
 }
 
-uint32_t adapter::vendor_id() {
-	return physical_device_properties.vendorID;
-}
-
-uint32_t adapter::device_id() {
-	return physical_device_properties.deviceID;
+std::string adapter::vendor() {
+	return vk12::vendor_names[properties.vendorID];
 }
 
 std::string adapter::name() {
-	return physical_device_properties.deviceName;
+	return properties.deviceName;
 }
 
-uint64_t adapter::dedicated_video_memory() {
-	static VkDeviceSize memory = [&]() {
-		VkDeviceSize memory = 0;
-		for (uint32_t i = 0; i < physical_device_memory_properties.memoryHeapCount; i++) {
-			VkMemoryHeap heap = physical_device_memory_properties.memoryHeaps[i];
-			if (heap.flags & VkMemoryHeapFlagBits::VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
-				memory += heap.size;
-		}
-		return memory;
-	}();
+uint64_t adapter::total_memory() {
+	VkDeviceSize memory = 0;
+
+	for (uint32_t i = 0; i < memory_properties.memoryHeapCount; i++) {
+		VkMemoryHeap heap = memory_properties.memoryHeaps[i];
+		if (heap.flags & VkMemoryHeapFlagBits::VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
+			memory += heap.size;
+	}
+
+	return memory;
+}
+
+uint64_t adapter::free_memory() {
+	VkPhysicalDeviceMemoryBudgetPropertiesEXT budget_properties{};
+	budget_properties.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_BUDGET_PROPERTIES_EXT;
+
+	VkPhysicalDeviceMemoryProperties2 memory_properties2;
+	memory_properties2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2;
+	memory_properties2.pNext = &budget_properties;
+
+	vkGetPhysicalDeviceMemoryProperties2(physical_device, &memory_properties2);
+
+	VkDeviceSize memory = 0;
 	
+	for (uint32_t i = 0; i < memory_properties.memoryHeapCount; i++)
+		memory += budget_properties.heapBudget[i];
+
 	return memory;
 }
 

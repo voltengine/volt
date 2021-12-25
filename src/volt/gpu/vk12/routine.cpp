@@ -190,16 +190,23 @@ void routine_impl::compute_pass(const compute_pass_info &info,
 	// Init pass
 	if (!vk12_device.compute_pass_cache.contains(info))
 		vk12_device.compute_pass_cache.emplace(info, vk12::compute_pass(*this, info));
-
 	vk12::compute_pass &pass = vk12_device.compute_pass_cache.at(info);
-	callback(pass);
-	pass.reset();
 
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_COMPUTE, pass.pipeline);
+	callback(pass);
+	pass.reset(); // Clear cached bindings
 }
 
 void routine_impl::rasterization_pass(const rasterization_pass_info &info,
 		const std::function<void(gpu::rasterization_pass &)> &callback) {
-	vk12::rasterization_pass pass(*this);
+	// Init pass
+	if (!vk12_device.rasterization_pass_cache.contains(info))
+		vk12_device.rasterization_pass_cache.emplace(info, vk12::rasterization_pass(*this, info));
+	vk12::rasterization_pass &pass = vk12_device.rasterization_pass_cache.at(info);
+
+	vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pass.pipeline);
+	callback(pass);
+	pass.reset(); // Clear cached bindings
 	
 }
 
@@ -275,11 +282,6 @@ template<typename Executor>
 routine<Executor>::routine(std::shared_ptr<gpu::device> &&device)
 		: gpu::_internal::routine<Executor>(std::move(device)),
 		impl(routine_impl::_new<Executor>(*static_cast<vk12::device *>(this->_device.get()))) {}
-
-template<typename Executor>
-routine<Executor>::~routine() {
-	wait();
-}
 
 template<typename Executor>
 void routine<Executor>::execute(const std::function<void(Executor &)> &callback) {

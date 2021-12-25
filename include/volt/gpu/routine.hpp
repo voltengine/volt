@@ -109,13 +109,13 @@ namespace volt::gpu::_internal {
 template<typename Executor>
 class routine {
 public:
-	virtual ~routine() = default;
+	virtual ~routine();
 
 	virtual void execute(const std::function<void(Executor &)> &callback) = 0;
 
 	virtual bool finished() = 0;
 
-	virtual void wait() = 0;
+	virtual void wait() {}
 
 	const std::shared_ptr<gpu::device> &device();
 

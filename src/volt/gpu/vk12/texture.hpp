@@ -36,13 +36,12 @@ public:
 	};
 
 	VkImage image;
+	VkFormat vk_format;
 	VmaAllocation allocation = VK_NULL_HANDLE;
 	VkImageAspectFlags aspect_mask;
 	VkImageView image_view;
-	// VkSampler sampler = VK_NULL_HANDLE;
 	state current_state = state::undefined;
 	access_pattern current_access_pattern = access_patterns[state::undefined];
-	VkDescriptorImageInfo descriptor_info;
 
 	texture(std::shared_ptr<gpu::device> &&device,
 			gpu::memory_type memory_type,

@@ -160,8 +160,6 @@ void swapchain::next_frame(std::function<void(frame)> &&callback) {
 	else
 		VOLT_VK12_DEBUG_CHECK(result, "Failed to acquire image.")
 
-	// transition from present etc.
-
 	auto *routine = static_cast<vk12::universal_routine *>(routines[current_frame].get());
 	auto &texture = textures[texture_index];
 
@@ -171,8 +169,6 @@ void swapchain::next_frame(std::function<void(frame)> &&callback) {
 			.texture = texture,
 			.executor = executor
 		});
-
-		
 	});
 
 	static_cast<vk12::texture *>(texture.get())->barrier(routine->impl.command_buffer, vk12::texture::state::present);

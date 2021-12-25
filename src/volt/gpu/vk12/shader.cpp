@@ -13,6 +13,7 @@ shader::shader(std::shared_ptr<gpu::device> &&device, const std::vector<uint8_t>
 			
 	VkDevice vk_device = static_cast<vk12::device *>(this->_device.get())->vk_device;
 
+	// Shader module
 	VkShaderModuleCreateInfo info{};
 	info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	info.codeSize = bytecode.size();
@@ -21,23 +22,25 @@ shader::shader(std::shared_ptr<gpu::device> &&device, const std::vector<uint8_t>
 	// vkCreateShaderModule makes its own copy of bytecode
 	VOLT_VK12_CHECK(vkCreateShaderModule(vk_device, &info, nullptr, &shader_module),
 			"Failed to create shader module.")
+	
+	// Stage info dos not copy entry point name from reflection, so we must cache it
+	stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	stage_info.stage = static_cast<VkShaderStageFlagBits>(refl_module.shader_stage);
+	stage_info.module = shader_module;
+	stage_info.pName = (entry_point_name = refl_module.entry_point_name).c_str();
 
-	// for (uint32_t i = 0; i < refl_module.input_variable_count; i++) {
-	// 	auto *var = refl_module.input_variables[i];
-	// 	input_locations[var->name] = var->location;
-	// }
-
+	// Descriptor set layout
 	set_layout_infos.resize(refl_module.descriptor_set_count);
 
 	for (uint32_t i = 0; i < refl_module.descriptor_set_count; i++) {
-		auto refl_set = refl_module.descriptor_sets[i];
+		SpvReflectDescriptorSet refl_set = refl_module.descriptor_sets[i];
 
 		set_layout_infos[i].set = refl_set.set;
 		std::vector<VkDescriptorSetLayoutBinding> &layout_bindings = set_layout_infos[i].bindings;
 		layout_bindings.resize(refl_set.binding_count);
 
 		for (uint32_t j = 0; j < refl_set.binding_count; j++) {
-			auto &refl_binding = *refl_set.bindings[j];
+			SpvReflectDescriptorBinding &refl_binding = *refl_set.bindings[j];
 			binding_points[refl_binding.name] = { refl_set.set, refl_binding.binding };
 
 			VkDescriptorSetLayoutBinding &layout_binding = layout_bindings[j];
@@ -48,6 +51,15 @@ shader::shader(std::shared_ptr<gpu::device> &&device, const std::vector<uint8_t>
 				layout_binding.descriptorCount *= refl_binding.array.dims[k];
     		layout_binding.stageFlags = static_cast<VkShaderStageFlagBits>(refl_module.shader_stage);
 		}
+	}
+
+	if (refl_module.shader_stage != SpvReflectShaderStageFlagBits::SPV_REFLECT_SHADER_STAGE_VERTEX_BIT)
+		return;
+
+	// Only for vertex shaders
+	for (uint32_t i = 0; i < refl_module.input_variable_count; i++) {
+		SpvReflectInterfaceVariable &refl_var = *refl_module.input_variables[i];
+		vertex_inputs[refl_var.name] = { refl_var.location, static_cast<VkFormat>(refl_var.format) };	
 	}
 }
 

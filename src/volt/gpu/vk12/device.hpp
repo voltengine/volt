@@ -15,7 +15,6 @@ public:
 	VmaAllocator allocator;
 	VkQueue universal_queue, compute_queue, copy_queue;
 	VkPipelineCache pipeline_cache;
-	std::unordered_map<compute_pass_info, vk12::compute_pass> compute_pass_cache;
 
 	device(std::shared_ptr<gpu::adapter> &&adapter);
 	
@@ -40,13 +39,13 @@ public:
 			gpu::memory_type memory_type,
 			gpu::texture_features features,
 			gpu::texture_format format,
-			uint32_t levels, uint32_t size, uint32_t layers = 1) override;
+			uint32_t levels, uint32_t size, uint32_t layers) override;
 
 	std::shared_ptr<gpu::texture> create_2d_texture(
 			gpu::memory_type memory_type,
 			gpu::texture_features features,
 			gpu::texture_format format,
-			uint32_t levels, math::uvec2 size, uint32_t layers = 1) override;
+			uint32_t levels, math::uvec2 size, uint32_t layers) override;
 
 	std::shared_ptr<gpu::texture> create_3d_texture(
 			gpu::memory_type memory_type,
@@ -58,7 +57,10 @@ public:
 			gpu::memory_type memory_type,
 			gpu::texture_features features,
 			gpu::texture_format format,
-			uint32_t levels, math::uvec2 size, uint32_t layers = 1) override;
+			uint32_t levels, math::uvec2 size, uint32_t layers) override;
+
+	std::shared_ptr<gpu::sampler> create_sampler(
+			gpu::texture_filter filter, bool blur, float anisotropy) override;
 };
 
 }

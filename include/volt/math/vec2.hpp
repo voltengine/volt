@@ -179,4 +179,13 @@ vec2<Ret> mod(const vec2<X> &x, const vec2<Y> &y);
 
 }
 
+namespace std {
+
+template<volt::math::scalar T>
+struct hash<volt::math::vec2<T>> {
+	std::size_t operator()(volt::math::vec2<T> vec) const;
+};
+
+}
+
 #include "vec2.inl"

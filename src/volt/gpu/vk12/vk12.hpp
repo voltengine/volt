@@ -8,6 +8,8 @@ namespace volt::gpu::vk12 {
 
 extern std::unordered_map<VkResult, std::string> result_messages;
 
+extern std::unordered_map<uint32_t, std::string> vendor_names;
+
 extern std::vector<const char *> device_extensions;
 
 extern std::unordered_map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages;

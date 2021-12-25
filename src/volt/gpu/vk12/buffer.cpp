@@ -26,10 +26,6 @@ buffer::buffer(std::shared_ptr<gpu::device> &&device,
 	allocation_info.usage = vk12::vma_memory_usages[memory_type];
 
 	vmaCreateBuffer(vk12_device.allocator, &buffer_info, &allocation_info, &vk_buffer, &allocation, nullptr);
-
-	descriptor_info.buffer = vk_buffer;
-	descriptor_info.offset = 0;
-	descriptor_info.range = VK_WHOLE_SIZE;
 }
 
 buffer::~buffer() {
@@ -57,8 +53,16 @@ void buffer::barrier(VkCommandBuffer command_buffer, state state) {
 	access_pattern access_pattern = access_patterns[state];
 
 	// Some access types do not need synchronization
-	if ((state == buffer::state::copy_src || state == buffer::state::vertex_input || state == buffer::state::rasterization_shared || state == buffer::state::compute_shared) && // read -> read
-			(current_state == buffer::state::copy_src || current_state == buffer::state::vertex_input || current_state == buffer::state::rasterization_shared || current_state == buffer::state::compute_shared)) {
+	if ((state == buffer::state::copy_src
+			|| state == buffer::state::vertex_input
+			|| state == buffer::state::index_input
+			|| state == buffer::state::rasterization_shared
+			|| state == buffer::state::compute_shared) && // read -> read
+			(current_state == buffer::state::copy_src
+			|| current_state == buffer::state::vertex_input
+			|| current_state == buffer::state::index_input
+			|| current_state == buffer::state::rasterization_shared
+			|| current_state == buffer::state::compute_shared)) {
 		current_access_pattern.stage_mask |= access_pattern.stage_mask;
 		current_access_pattern.access_mask |= access_pattern.access_mask;
 		return;

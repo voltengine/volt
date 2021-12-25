@@ -74,8 +74,6 @@ public:
 
 	routine(std::shared_ptr<gpu::device> &&device);
 
-	~routine();
-
 	void execute(const std::function<void(Executor &)> &callback) override;
 
 	bool finished() override;

@@ -69,7 +69,7 @@ texture::texture(std::shared_ptr<gpu::device> &&device,
 	else
 		aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT;
 
-	VkFormat vk_format = vk12::texture_formats[format];
+	vk_format = vk12::texture_formats[format];
 	VkImageUsageFlags usage = 0;
 	if (features & texture_feature::copy_src)
 		usage |= VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
@@ -124,31 +124,6 @@ texture::texture(std::shared_ptr<gpu::device> &&device,
 
 	VOLT_VK12_CHECK(vkCreateImageView(vk12_device.vk_device, &view_info, nullptr, &image_view),
 			"Failed to create image view.")
-
-	// if (!(features & texture_feature::sampled))
-	// 	return;
-
-	// // TODO: Configurable wrapping, filtering and anisotropy
-	// VkSamplerCreateInfo sampler_info{};
-	// sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	// sampler_info.magFilter = VK_FILTER_LINEAR;
-	// sampler_info.minFilter = VK_FILTER_LINEAR;
-	// sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-	// sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	// sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	// sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-	// sampler_info.mipLodBias = 0;
-	// sampler_info.anisotropyEnable = VK_TRUE;
-	// sampler_info.maxAnisotropy = adapter.physical_device_properties.limits.maxSamplerAnisotropy;
-	// sampler_info.compareEnable = VK_FALSE;
-	// sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
-	// sampler_info.minLod = 0;
-	// sampler_info.maxLod = VK_LOD_CLAMP_NONE;
-	// sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-	// sampler_info.unnormalizedCoordinates = VK_FALSE;
-
-	// VOLT_VK12_CHECK(vkCreateSampler(vk12_device.vk_device, &sampler_info, nullptr, &sampler),
-	// 		"Failed to create image view.")
 }
 
 texture::texture(std::shared_ptr<gpu::device> &&device, gpu::texture_format format, math::uvec2 size, VkImage image) :
@@ -183,10 +158,6 @@ texture::texture(std::shared_ptr<gpu::device> &&device, gpu::texture_format form
 
 	VOLT_VK12_CHECK(vkCreateImageView(vk12_device.vk_device, &view_info, nullptr, &image_view),
 			"Failed to create image view.")
-
-	descriptor_info.sampler = 0; // get from cache or create based on image requirements
-	descriptor_info.imageView = image_view;
-	descriptor_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 }
 
 texture::~texture() {

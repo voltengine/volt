@@ -4,6 +4,7 @@
 #include <volt/gpu/vk12/buffer.hpp>
 #include <volt/gpu/vk12/instance.hpp>
 #include <volt/gpu/vk12/routine.hpp>
+#include <volt/gpu/vk12/sampler.hpp>
 #include <volt/gpu/vk12/swapchain.hpp>
 #include <volt/gpu/vk12/texture.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
@@ -214,6 +215,12 @@ std::shared_ptr<gpu::texture> device::create_cube_texture(
 	vk12::texture::type type = layers == 1 ? vk12::texture::type::cube : vk12::texture::type::cube_array;
 	return std::shared_ptr<gpu::texture>(new vk12::texture(
 			shared_from_this(), memory_type, features, format, levels, uvec3(size, layers * 6), type));
+}
+
+std::shared_ptr<gpu::sampler> device::create_sampler(
+		texture_filter filter, bool blur, float anisotropy) {
+	return std::shared_ptr<gpu::sampler>(new vk12::sampler(
+			shared_from_this(), filter, blur, anisotropy));
 }
 
 }

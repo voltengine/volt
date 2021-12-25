@@ -321,3 +321,15 @@ vec4<Ret> mod(const vec4<X> &x, const vec4<Y> &y) {
 #pragma endregion
 
 }
+
+namespace std {
+
+template<volt::math::scalar T>
+std::size_t hash<volt::math::vec4<T>>::operator()(volt::math::vec4<T> vec) const {
+	return ((static_cast<size_t>(vec.x) * 859433 ^
+			static_cast<size_t>(vec.y)) * 19937 ^
+			static_cast<size_t>(vec.z)) * 216091 ^
+			static_cast<size_t>(vec.w);
+}
+
+}
