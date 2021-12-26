@@ -40,154 +40,51 @@ int main() {
 		std::shared_ptr<gpu::adapter> &adapter = adapters[0];
 		std::shared_ptr<gpu::device> device = adapter->create_device();
 		std::shared_ptr<gpu::swapchain> swapchain = device->create_swapchain(window);
-		std::shared_ptr<gpu::copy_routine> streaming_routine = device->create_copy_routine();
 
-		// create_swapchain(window) emits an error if another swapchain is already created for that window.
-		// Dropping all references to swapchain will destroy it and in turn allow another call to create_surface(window).
+		std::vector<uint8_t> vert = util::read_binary_file("D:/Library/Source/voltengine/voltcraft/shaders/triangle.vert.spv");
+		std::vector<uint8_t> frag = util::read_binary_file("D:/Library/Source/voltengine/voltcraft/shaders/triangle.frag.spv");
+		// std::vector<uint8_t> comp = util::read_binary_file("D:/Library/Source/voltengine/voltcraft/shaders/compute.comp.spv");
 
-		auto buffer = device->create_buffer(
-			gpu::memory_type::internal,
-			gpu::buffer_feature::vertex | gpu::buffer_feature::copy_dst,
-			1024
-		);
+		auto vertex_shader = device->create_shader(vert);
+		auto pixel_shader = device->create_shader(frag);
+		// auto compute_shader = device->create_shader(comp);
 
-		auto texture = device->create_2d_texture(
-			gpu::memory_type::internal,
-			gpu::texture_feature::sampled | gpu::texture_feature::copy_dst,
-			gpu::texture_format::bc1_srgb,
-			1, {2048, 2048}
-		);
+		util::timer timer;
+		timer.start();
 
 		while (!window->is_closing()) {
 			glfwPollEvents();
 
-			// next_frame() might return immediately if no work is available
-			swapchain->next_frame([](gpu::frame frame) {
-				gpu::universal_routine_context routine_context = frame.routine_context;
+			swapchain->next_frame([&](gpu::frame frame) {
+				math::uvec2 frame_size = window->get_frame_size();
 
-				gpu::pass_info info{
+				gpu::pass_info pass_info{
 					.color_attachments = {
-						{
-							.texture = frame.texture,
-							.initializer = gpu::attachment_initializer::clear
-						}
-					},
-					.depth_stencil_attachment = {
-						.texture = nullptr,
-						.initializer = gpu::attachment_initializer::clear
+						{ frame.texture, gpu::attachment_initializer::clear /* , math::fvec4(1, 1, math::sin(timer.elapsed()), 1) */ }
 					}
 				};
 
-				gpu::descriptor_info descriptor_info{
-					.constant_buffers = {
-						{ "u_ConstantBuffer", nullptr }
-					},
-					.sampled_textures = {
-						{ "u_Texture", nullptr, nullptr }
-					},
-					.storage_buffers = {
-						{ "u_StorageBuffer", nullptr, true }
-					},
-					.storage_textures = {
-						{ "u_StorageTexture", nullptr, true }
-					}
-				};
+				// gpu::dispatch_info dispatch_info{
+				// 	.compute_shader = compute_shader.get(),
+				// 	.group_count = { 1, 1, 1 }
+				// };
+				// frame.routine_context.dispatch(dispatch_info);
 
-				routine_context.async_pass(info, [](gpu::async_pass_context pass_context) {				
-					world.each<model>([](uint32_t thread_index, model &model){
-						gpu::draw_info draw_info{
-							.descriptor_info = descriptor_info
-
-							// Pipeline state used to query pipeline
-							.vertex_shader = nullptr,
-							.hull_shader = nullptr,
-							.domain_shader = nullptr,
-							.geometry_shader = nullptr,
-							.pixel_shader = nullptr,
-							.instance_inputs = {},
-							.primitive_mode = gpu::topology::triangles,
-							.polygon_mode = gpu::topology::triangles,
-							.culling = false,
-							.line_width = 1,
-							.depth_test = false,
-							.depth_write = false,
-							.stencil_test = false,
-							.stencil_write = false,
-							.blending = gpu::blending::alpha,
-
-							// Actual dynamic draw info
-							.vertex_buffer = nullptr,
-							.index_buffer = nullptr,
-							.instance_buffer = nullptr,
-							.viewport = { { 0, 1280 }, { 0, 720 }, { 0, 1 } },
-							.index_count = 0,
-							.instance_count = 0
-						};
-
-						pass_context.draw(thread_index, draw_info);
-					}, pass_context.thread_pool);
-				});
-
-				routine_context.pass(info, [](gpu::pass_context pass_context) {				
+				frame.routine_context.pass(pass_info, [&](gpu::pass_context &pass_context) {
 					gpu::draw_info draw_info{
-						.descriptor_info = descriptor_info
-
-						// Pipeline state used to query pipeline
-						.vertex_shader = nullptr,
-						.hull_shader = nullptr,
-						.domain_shader = nullptr,
-						.geometry_shader = nullptr,
-						.pixel_shader = nullptr,
-						.instance_inputs = {},
-						.primitive_mode = gpu::topology::triangles,
-						.polygon_mode = gpu::topology::triangles,
+						.vertex_shader = vertex_shader.get(),
+						.pixel_shader = pixel_shader.get(),
+						.viewport = {
+							{ 0, static_cast<float>(frame_size.x) },
+							{ 0, static_cast<float>(frame_size.y) }
+						},
 						.culling = false,
-						.line_width = 1,
-						.depth_test = false,
-						.depth_write = false,
-						.stencil_test = false,
-						.stencil_write = false,
-						.blending = gpu::blending::alpha,
-
-						// Actual dynamic draw info
-						.vertex_buffer = nullptr,
-						.index_buffer = nullptr,
-						.instance_buffer = nullptr,
-						.viewport = { { 0, 1280 }, { 0, 720 }, { 0, 1 } },
-						.index_count = 0,
-						.instance_count = 0
+						.draw_count = 3
 					};
-
+					
 					pass_context.draw(draw_info);
 				});
-
-				gpu::dispatch_info dispatch_info{
-					.descriptor_info = descriptor_info
-					.compute_shader = nullptr,
-					.group_count = { 1, 1, 1 }
-				};
-				routine_context.dispatch(dispatch_info);
 			});
-
-				// routine_context.dispatch({ 128, 128, 4 });
-				
-				// routine_context.copy_texture(src, dst);
-
-				// ...
-			});
-
-			// Then we can do some texture streaming
-
-			// Swapchain does this check internally for each frame it tries to acquire
-			if (!streaming_routine->finished())
-				continue;
-
-			streaming_routine->execute([](gpu::copy_routine_context &context) {
-				// context.copy_texture(src, dst);
-				// ...
-			});
-
-			streaming_routine->wait();
 		}
 
 

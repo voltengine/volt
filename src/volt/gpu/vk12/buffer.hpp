@@ -30,6 +30,7 @@ public:
 	VmaAllocation allocation;
 	state current_state = state::undefined;
 	access_pattern current_access_pattern = access_patterns[state::undefined];
+	vk12::routine_impl *current_routine_impl = nullptr;
 
 	buffer(std::shared_ptr<gpu::device> &&device,
 			gpu::memory_type memory_type,
@@ -42,7 +43,7 @@ public:
 
 	void unmap(size_t write_offset = 0, size_t write_size = 0) override;
 
-	void barrier(VkCommandBuffer command_buffer, state state);
+	void barrier(vk12::routine_impl &impl, state state);
 
 private:
 	static std::unordered_map<vk12::buffer::state, access_pattern> access_patterns;

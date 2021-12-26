@@ -11,6 +11,19 @@
 #include "pass.hpp"
 #include "texture.hpp"
 
+namespace volt::gpu {
+
+struct dispatch_info {
+	std::vector<constant_buffer_binding> constant_buffers;
+	std::vector<sampled_texture_binding> sampled_textures;
+	std::vector<storage_buffer_binding> storage_buffers;
+	std::vector<storage_texture_binding> storage_textures;
+	gpu::shader *compute_shader;
+	math::uvec3 group_count;
+};
+
+}
+
 namespace volt::gpu::_internal {
 
 class routine_impl {
@@ -35,22 +48,24 @@ public:
 			math::uvec3 dst_offset,
 			math::uvec3 size) = 0;
 
-	virtual void compute_pass(const compute_pass_info &info,
-			const std::function<void(gpu::compute_pass &)> &callback) = 0;
+	virtual void dispatch(const dispatch_info &info) = 0;
 
-	virtual void rasterization_pass(const rasterization_pass_info &info,
-			const std::function<void(gpu::rasterization_pass &)> &callback) = 0;
+	virtual void pass(const pass_info &info,
+			const std::function<void(gpu::pass_context &)> &callback) = 0;
+
+	virtual void async_pass(const pass_info &info,
+			const std::function<void(gpu::async_pass_context &)> &callback) = 0;
 };
 
 }
 
 namespace volt::gpu {
 
-class copy_executor {
+class copy_routine_context {
 public:
-	VOLT_API virtual ~copy_executor() = default;
+	VOLT_API virtual ~copy_routine_context() = default;
 
-	VOLT_API static copy_executor _new(_internal::routine_impl &impl);
+	VOLT_API static copy_routine_context _new(_internal::routine_impl &impl);
 
 	VOLT_API void copy_buffer(
 			const std::shared_ptr<gpu::buffer> &src,
@@ -75,47 +90,49 @@ public:
 protected:
 	_internal::routine_impl &impl;
 
-	copy_executor(_internal::routine_impl &impl);
+	copy_routine_context(_internal::routine_impl &impl);
 };
 
-class compute_executor : public copy_executor {
+class compute_routine_context : public copy_routine_context {
 public:
-	VOLT_API virtual ~compute_executor() = default;
+	VOLT_API virtual ~compute_routine_context() = default;
 
-	VOLT_API static compute_executor _new(_internal::routine_impl &impl);
+	VOLT_API static compute_routine_context _new(_internal::routine_impl &impl);
 
-	VOLT_API void compute_pass(const compute_pass_info &info, const std::
-			function<void(gpu::compute_pass &)> &callback);
+	VOLT_API void dispatch(const dispatch_info &info);
 
 protected:
-	compute_executor(_internal::routine_impl &impl);
+	compute_routine_context(_internal::routine_impl &impl);
 };
 
-class universal_executor : public compute_executor {
+class universal_routine_context : public compute_routine_context {
 public:
-	VOLT_API static universal_executor _new(_internal::routine_impl &impl);
+	VOLT_API static universal_routine_context _new(_internal::routine_impl &impl);
 
-	VOLT_API void rasterization_pass(const rasterization_pass_info &info, const
-			std::function<void(gpu::rasterization_pass &)> &callback);
+	VOLT_API void pass(const pass_info &info, const
+			std::function<void(gpu::pass_context &)> &callback);
+
+	VOLT_API void async_pass(const pass_info &info, const
+			std::function<void(gpu::async_pass_context &)> &callback);
 
 private:
-	universal_executor(_internal::routine_impl &impl);
+	universal_routine_context(_internal::routine_impl &impl);
 };
 
 }
 
 namespace volt::gpu::_internal {
 
-template<typename Executor>
+template<typename RoutineContext>
 class routine {
 public:
-	virtual ~routine();
+	virtual ~routine() = default;
 
-	virtual void execute(const std::function<void(Executor &)> &callback) = 0;
+	virtual void execute(const std::function<void(RoutineContext &)> &callback) = 0;
 
 	virtual bool finished() = 0;
 
-	virtual void wait() {}
+	virtual void wait() = 0;
 
 	const std::shared_ptr<gpu::device> &device();
 
@@ -129,8 +146,8 @@ protected:
 
 namespace volt::gpu {
 
-using universal_routine = _internal::routine<gpu::universal_executor>;
-using compute_routine = _internal::routine<gpu::compute_executor>;
-using copy_routine = _internal::routine<gpu::copy_executor>;
+using universal_routine = _internal::routine<gpu::universal_routine_context>;
+using compute_routine = _internal::routine<gpu::compute_routine_context>;
+using copy_routine = _internal::routine<gpu::copy_routine_context>;
 
 }

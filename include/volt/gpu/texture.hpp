@@ -4,9 +4,12 @@
 
 #include <memory>
 
+#include "../math/math.hpp"
 #include "enums.hpp"
 
 namespace volt::gpu {
+
+class device;
 
 class texture : public std::enable_shared_from_this<texture> {
 public:

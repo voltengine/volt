@@ -127,7 +127,7 @@ texture::texture(std::shared_ptr<gpu::device> &&device,
 }
 
 texture::texture(std::shared_ptr<gpu::device> &&device, gpu::texture_format format, math::uvec2 size, VkImage image) :
-		gpu::texture(std::move(device), format, 1, 1),
+		gpu::texture(std::move(device), format, 1, math::uvec3(size, 1)),
 		vk12_device(*static_cast<vk12::device *>(this->_device.get())),
 		image(image) {
 	aspect_mask = 0;
@@ -145,7 +145,7 @@ texture::texture(std::shared_ptr<gpu::device> &&device, gpu::texture_format form
 	view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	view_info.image = image;
 	view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	view_info.format = vk12::texture_formats[format];
+	view_info.format = vk_format = vk12::texture_formats[format];
 	view_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
 	view_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
 	view_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -161,8 +161,6 @@ texture::texture(std::shared_ptr<gpu::device> &&device, gpu::texture_format form
 }
 
 texture::~texture() {
-	// if (sampler != VK_NULL_HANDLE)
-	// 	vkDestroySampler(vk12_device.vk_device, sampler, nullptr);
 	vkDestroyImageView(vk12_device.vk_device, image_view, nullptr);
 	if (allocation != VK_NULL_HANDLE)
 		vmaDestroyImage(vk12_device.allocator, image, allocation);
@@ -185,7 +183,7 @@ void texture::unmap(size_t write_offset, size_t write_size) {
 				"Failed to flush allocation.");
 }
 
-void texture::barrier(VkCommandBuffer command_buffer, texture::state state) {
+void texture::barrier(vk12::routine_impl &impl, texture::state state) {
 	access_pattern access_pattern = access_patterns[state];
 
 	// Some access types do not need synchronization and transitions
@@ -213,11 +211,21 @@ void texture::barrier(VkCommandBuffer command_buffer, texture::state state) {
 	barrier.subresourceRange.baseArrayLayer = 0;
 	barrier.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
 
-	vkCmdPipelineBarrier(command_buffer,
+	vkCmdPipelineBarrier(impl.command_buffer,
     		current_access_pattern.stage_mask, access_pattern.stage_mask,
     		0, 0, nullptr, 0, nullptr, 1, &barrier);
 
 	current_access_pattern = access_pattern;
+
+	if (swapchain_acquire_semaphore != VK_NULL_HANDLE) {
+		impl.wait_semaphores.insert({ swapchain_acquire_semaphore, access_pattern.stage_mask, 0 });
+		swapchain_acquire_semaphore = VK_NULL_HANDLE;
+	}
+	
+	if (current_routine_impl != &impl && current_routine_impl != nullptr) {
+		impl.wait_semaphores.insert({ current_routine_impl->finish_semaphore, access_pattern.stage_mask, current_routine_impl->finish_value });
+		current_routine_impl = &impl;
+	}
 }
 
 std::unordered_map<vk12::texture::state, texture::access_pattern> texture::access_patterns{

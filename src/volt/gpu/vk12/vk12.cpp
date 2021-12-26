@@ -49,7 +49,7 @@ std::unordered_map<uint32_t, std::string> vendor_names{
 std::vector<const char *> device_extensions{
 	VK_KHR_SWAPCHAIN_EXTENSION_NAME,
 	VK_EXT_MEMORY_BUDGET_EXTENSION_NAME,
-	VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME
+	// VK_EXT_BLEND_OPERATION_ADVANCED_EXTENSION_NAME TODO: Uncomment - only commented out for RenderDoc
 };
 
 std::unordered_map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages{
@@ -95,10 +95,16 @@ std::unordered_map<gpu::texture_format, VkFormat> texture_formats{
 	{ gpu::texture_format::bc4,        VK_FORMAT_BC4_UNORM_BLOCK },
 	{ gpu::texture_format::bc5_signed, VK_FORMAT_BC5_SNORM_BLOCK },
 	{ gpu::texture_format::bc6,        VK_FORMAT_BC6H_UFLOAT_BLOCK },
-	{ gpu::texture_format::bc7_srgb,   VK_FORMAT_BC7_SRGB_BLOCK }
+	{ gpu::texture_format::bc7_srgb,   VK_FORMAT_BC7_SRGB_BLOCK },
+
+	{ gpu::texture_format::present, VK_FORMAT_B8G8R8A8_SRGB }
 };
 
-std::filesystem::path cache_path = paths::data() / "gpu-cache" / "vk12";
+std::unordered_map<gpu::topology, VkPrimitiveTopology> primitive_topologies{
+	{ gpu::topology::triangles, VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST },
+	{ gpu::topology::lines, VK_PRIMITIVE_TOPOLOGY_LINE_LIST },
+	{ gpu::topology::points, VK_PRIMITIVE_TOPOLOGY_POINT_LIST }
+};
 
 void load_glad() {
 	if (glad_refcount++ == 0) {
@@ -125,7 +131,7 @@ void load_glad_instance(VkInstance instance) {
 }
 
 void load_glad_physical_device(VkPhysicalDevice physical_device) {
-	if (glad_instance == VK_NULL_HANDLE) {
+	if (glad_physical_device == VK_NULL_HANDLE) {
 		glad_physical_device = physical_device;
 		VOLT_ASSERT(gladLoaderLoadVulkan(glad_instance, glad_physical_device, nullptr),
 				"Failed to load Vulkan physical device symbols.")
@@ -133,7 +139,7 @@ void load_glad_physical_device(VkPhysicalDevice physical_device) {
 }
 
 void load_glad_device(VkDevice device) {
-	if (glad_instance == VK_NULL_HANDLE) {
+	if (glad_device == VK_NULL_HANDLE) {
 		glad_device = device;
 		VOLT_ASSERT(gladLoaderLoadVulkan(glad_instance, glad_physical_device, glad_device),
 				"Failed to load Vulkan device symbols.")

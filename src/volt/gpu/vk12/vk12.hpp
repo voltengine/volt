@@ -16,9 +16,9 @@ extern std::unordered_map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages;
 
 extern std::unordered_map<gpu::texture_format, VkFormat> texture_formats;
 
-constexpr uint32_t concurrent_frames = 2;
+extern std::unordered_map<gpu::topology, VkPrimitiveTopology> primitive_topologies;
 
-extern std::filesystem::path cache_path;
+constexpr uint32_t concurrent_frames = 2;
 
 void load_glad();
 

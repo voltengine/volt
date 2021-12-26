@@ -5,9 +5,11 @@
 #include <volt/gpu/vk12/instance.hpp>
 #include <volt/gpu/vk12/routine.hpp>
 #include <volt/gpu/vk12/sampler.hpp>
+#include <volt/gpu/vk12/shader.hpp>
 #include <volt/gpu/vk12/swapchain.hpp>
 #include <volt/gpu/vk12/texture.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
+#include <volt/math/math.hpp>
 #include <volt/util/util.hpp>
 #include <volt/error.hpp>
 #include <volt/paths.hpp>
@@ -17,7 +19,10 @@ namespace volt::gpu::vk12 {
 namespace fs = std::filesystem;
 using namespace math;
 
-device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(adapter)) {
+device::device(std::shared_ptr<gpu::adapter> &&adapter)
+		: gpu::device(std::move(adapter)),
+		thread_pool(math::min(std::thread::hardware_concurrency(), 8Ui32)),
+		jit(*this) {
 	auto &vk12_adapter = *static_cast<vk12::adapter *>(this->_adapter.get());
 	auto &vk12_instance = *static_cast<vk12::instance *>(vk12_adapter.instance().get());
 
@@ -37,14 +42,18 @@ device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(
 	}
 
 	// Device
+	VkPhysicalDeviceFeatures device_features{};
+	device_features.samplerAnisotropy = VK_TRUE;
+
+	VkPhysicalDeviceRobustness2FeaturesEXT robustness_features{};
+	robustness_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ROBUSTNESS_2_FEATURES_EXT;
+	robustness_features.nullDescriptor = VK_TRUE; // Rquired to bind NULL vertex buffers
 
 	VkDeviceCreateInfo device_info{};
 	device_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	device_info.pNext = &robustness_features;
 	device_info.queueCreateInfoCount = queue_infos.size();
 	device_info.pQueueCreateInfos = queue_infos.data();
-
-	VkPhysicalDeviceFeatures device_features{};
-	device_features.samplerAnisotropy = VK_TRUE;
 	device_info.pEnabledFeatures = &device_features;
 
 #ifdef VOLT_GPU_DEBUG
@@ -54,7 +63,7 @@ device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(
 #endif
 
 	device_info.ppEnabledExtensionNames = vk12::device_extensions.data();
-	device_info.enabledExtensionCount = vk12::device_extensions.size();
+	device_info.enabledExtensionCount = static_cast<uint32_t>(vk12::device_extensions.size());
 
 	VOLT_VK12_CHECK(vkCreateDevice(vk12_adapter.physical_device, &device_info,
 			nullptr, &vk_device), "Failed to create device.")
@@ -80,7 +89,7 @@ device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(
 	VkPipelineCacheCreateInfo cache_info{};
 	cache_info.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
 
-	fs::path data_path = vk12::cache_path / (vk12_adapter.pipeline_cache_uuid + ".bin");
+	fs::path data_path = paths::data() / "gpu-cache" / "vk12" / (vk12_adapter.pipeline_cache_uuid + ".bin");
 	if (fs::exists(data_path)) {
 		std::vector<uint8_t> data = util::read_binary_file(data_path);
 
@@ -94,12 +103,13 @@ device::device(std::shared_ptr<gpu::adapter> &&adapter) : gpu::device(std::move(
 
 device::~device() {
 	wait();
+	jit.clear();
 
 	// Update pipelines
 	auto &vk12_adapter = *static_cast<vk12::adapter *>(this->_adapter.get());
 
 	// Append to previous data - adapter can create multiple devices with common cache
-	fs::path data_path = vk12::cache_path / (vk12_adapter.pipeline_cache_uuid + ".bin");
+	fs::path data_path = paths::data() / "gpu-cache" / "vk12" / (vk12_adapter.pipeline_cache_uuid + ".bin");
 	bool failed = false;
 	while (fs::exists(data_path)) { // We use while loop as breakable conditional
 		std::vector<uint8_t> data = util::read_binary_file(data_path);
@@ -221,6 +231,12 @@ std::shared_ptr<gpu::sampler> device::create_sampler(
 		texture_filter filter, bool blur, float anisotropy) {
 	return std::shared_ptr<gpu::sampler>(new vk12::sampler(
 			shared_from_this(), filter, blur, anisotropy));
+}
+
+std::shared_ptr<gpu::shader> device::create_shader(
+		const std::vector<uint8_t> &bytecode) {
+	return std::shared_ptr<gpu::shader>(new vk12::shader(
+			shared_from_this(), bytecode));
 }
 
 }

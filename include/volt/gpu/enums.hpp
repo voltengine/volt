@@ -4,15 +4,6 @@
 
 namespace volt::gpu {
 
-using command_types = uint32_t;
-namespace command_type {
-	constexpr command_types
-			none          = 0,
-			rasterization = 1 << 0,
-			compute       = 1 << 1,
-			copy          = 1 << 2;
-}
-
 enum class memory_type {
 	internal, // Stored in local device memory, very fast access from GPU
 	staging,  // For uploading data to staging buffer
@@ -54,7 +45,8 @@ enum class texture_format {
 	d16_s8, d32f_s8, d24_s8,       // Depth unsigned normalized + stencil unsigned
 
 	bc1, bc1_srgb, bc1_srgb_rgba,  // Channel-packed PBR, opaque, masked
-	bc4, bc5_signed, bc6, bc7_srgb // Grayscale, normal, HDR, transparent
+	bc4, bc5_signed, bc6, bc7_srgb, // Grayscale, normal, HDR, transparent
+	present
 };
 
 enum class texture_type {

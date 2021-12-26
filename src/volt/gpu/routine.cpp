@@ -3,30 +3,30 @@
 
 namespace volt::gpu {
 
-// Executors
+// RoutineContexts
 
-copy_executor::copy_executor(_internal::routine_impl &impl)
+copy_routine_context::copy_routine_context(_internal::routine_impl &impl)
 		: impl(impl) {}
 
-compute_executor::compute_executor(_internal::routine_impl &impl)
-		: copy_executor(impl) {}
+compute_routine_context::compute_routine_context(_internal::routine_impl &impl)
+		: copy_routine_context(impl) {}
 
-universal_executor::universal_executor(_internal::routine_impl &impl)
-		: compute_executor(impl) {}
+universal_routine_context::universal_routine_context(_internal::routine_impl &impl)
+		: compute_routine_context(impl) {}
 
-copy_executor copy_executor::_new(_internal::routine_impl &impl) {
-	return copy_executor(impl);
+copy_routine_context copy_routine_context::_new(_internal::routine_impl &impl) {
+	return copy_routine_context(impl);
 }
 
-compute_executor compute_executor::_new(_internal::routine_impl &impl) {
-	return compute_executor(impl);
+compute_routine_context compute_routine_context::_new(_internal::routine_impl &impl) {
+	return compute_routine_context(impl);
 }
 
-universal_executor universal_executor::_new(_internal::routine_impl &impl) {
-	return universal_executor(impl);
+universal_routine_context universal_routine_context::_new(_internal::routine_impl &impl) {
+	return universal_routine_context(impl);
 }
 
-void copy_executor::copy_buffer(
+void copy_routine_context::copy_buffer(
 		const std::shared_ptr<gpu::buffer> &src,
 		const std::shared_ptr<gpu::buffer> &dst,
 		size_t src_offset,
@@ -35,7 +35,7 @@ void copy_executor::copy_buffer(
 	impl.copy_buffer(src, dst, src_offset, dst_offset, size);
 }
 
-void copy_executor::copy_texture(
+void copy_routine_context::copy_texture(
 		const std::shared_ptr<gpu::texture> &src,
 		const std::shared_ptr<gpu::texture> &dst) {
 	#ifdef VOLT_GPU_DEBUG
@@ -46,7 +46,7 @@ void copy_executor::copy_texture(
 	impl.copy_texture(src, dst);
 }
 
-void copy_executor::copy_texture_level(
+void copy_routine_context::copy_texture_level(
 		const std::shared_ptr<gpu::texture> &src,
 		const std::shared_ptr<gpu::texture> &dst,
 		uint32_t src_level,
@@ -61,36 +61,35 @@ void copy_executor::copy_texture_level(
 	impl.copy_texture_level(src, dst, src_level, dst_level, src_offset, dst_offset, size);
 }
 
-void compute_executor::compute_pass(const compute_pass_info &info,
-			const std::function<void(gpu::compute_pass &)> &callback) {
-	impl.compute_pass(info, callback);
+void compute_routine_context::dispatch(const dispatch_info &info) {
+	impl.dispatch(info);
 }
 
-void universal_executor::rasterization_pass(const rasterization_pass_info &info,
-		const std::function<void(gpu::rasterization_pass &)> &callback) {
-	impl.rasterization_pass(info, callback);
+void universal_routine_context::pass(const pass_info &info,
+		const std::function<void(gpu::pass_context &)> &callback) {
+	impl.pass(info, callback);
+}
+
+void universal_routine_context::async_pass(const pass_info &info,
+		const std::function<void(gpu::async_pass_context &)> &callback) {
+	impl.async_pass(info, callback);
 }
 
 }
 
 namespace volt::gpu::_internal {
 
-template<typename Executor>
-routine<Executor>::~routine() {
-	wait();
-}
-
-template<typename Executor>
-const std::shared_ptr<gpu::device> &routine<Executor>::device() {
+template<typename RoutineContext>
+const std::shared_ptr<gpu::device> &routine<RoutineContext>::device() {
 	return _device;
 }
 
-template<typename Executor>
-routine<Executor>::routine(std::shared_ptr<gpu::device> &&device)
+template<typename RoutineContext>
+routine<RoutineContext>::routine(std::shared_ptr<gpu::device> &&device)
 		: _device(std::move(device)) {}
 
-template class routine<universal_executor>;
-template class routine<compute_executor>;
-template class routine<copy_executor>;
+template class routine<universal_routine_context>;
+template class routine<compute_routine_context>;
+template class routine<copy_routine_context>;
 
 }

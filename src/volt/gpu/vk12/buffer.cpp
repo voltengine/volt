@@ -49,7 +49,7 @@ void buffer::unmap(size_t write_offset, size_t write_size) {
 				"Failed to flush allocation.");
 }
 
-void buffer::barrier(VkCommandBuffer command_buffer, state state) {
+void buffer::barrier(vk12::routine_impl &impl, state state) {
 	access_pattern access_pattern = access_patterns[state];
 
 	// Some access types do not need synchronization
@@ -78,11 +78,16 @@ void buffer::barrier(VkCommandBuffer command_buffer, state state) {
 	barrier.offset = 0;
 	barrier.size = VK_WHOLE_SIZE;
 
-	vkCmdPipelineBarrier(command_buffer,
+	vkCmdPipelineBarrier(impl.command_buffer,
     		current_access_pattern.stage_mask, access_pattern.stage_mask,
     		0, 0, nullptr, 1, &barrier, 0, nullptr);
 
 	current_access_pattern = access_pattern;
+
+	if (current_routine_impl != &impl && current_routine_impl != nullptr) {
+		impl.wait_semaphores.insert({ current_routine_impl->finish_semaphore, access_pattern.stage_mask, current_routine_impl->finish_value });
+		current_routine_impl = &impl;
+	}
 }
 
 std::unordered_map<vk12::buffer::state, buffer::access_pattern> buffer::access_patterns{

@@ -70,8 +70,6 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &num_supported_extensions, supported_extensions.data());
 
 	// Surface support
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, vk_dummy_surface, &surface_capabilities);
-
 	uint32_t num_formats;
 	vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, vk_dummy_surface, &num_formats, nullptr);
 	if (num_formats != 0) {
@@ -90,6 +88,7 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	ss << std::hex;
 	for (size_t i = 0; i < VK_UUID_SIZE; i++)
 		ss << properties.pipelineCacheUUID[i];
+	
 	pipeline_cache_uuid = ss.str();
 }
 

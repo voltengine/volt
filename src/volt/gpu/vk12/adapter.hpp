@@ -16,7 +16,6 @@ public:
 	uint32_t universal_family, compute_family, copy_family;
 	std::vector<uint32_t> unique_families;
 	std::vector<VkExtensionProperties> supported_extensions;
-	VkSurfaceCapabilitiesKHR surface_capabilities;
 	std::vector<VkSurfaceFormatKHR> surface_formats;
 	std::vector<VkPresentModeKHR> surface_present_modes;
 	std::string pipeline_cache_uuid;

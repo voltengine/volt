@@ -141,6 +141,7 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 		if (adapter->universal_family == std::numeric_limits<uint32_t>::max()
 			|| adapter->compute_family == std::numeric_limits<uint32_t>::max()
 			|| adapter->copy_family == std::numeric_limits<uint32_t>::max()) {
+			VOLT_LOG_INFO("Skipping adapter " + adapter->name() + " because it doesn't have all required queues.")
 			continue;
 		}
 
@@ -158,12 +159,15 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 				) != adapter->supported_extensions.end();
 			}
 		)) {
+			VOLT_LOG_INFO("Skipping adapter " + adapter->name() + " because it doesn't support all required device extensions.")
 			continue;
 		}
 
 		// Check swapchain support
-		if (adapter->surface_formats.empty() || adapter->surface_present_modes.empty())
+		if (adapter->surface_formats.empty() || adapter->surface_present_modes.empty()) {
+			VOLT_LOG_INFO("Skipping adapter " + adapter->name() + " because it doesn't support swapchain.")
 			continue;
+		}
 
 		adapters.push_back(adapter);
 	}

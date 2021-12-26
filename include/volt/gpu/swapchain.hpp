@@ -18,7 +18,7 @@ class swapchain;
 struct frame {
 	const uint32_t index; // The index of the frame in flight
 	std::shared_ptr<gpu::texture> &texture; // Output texture
-	universal_executor &executor; // Guarded executor
+	universal_routine_context &routine_context; // Guarded routine_context
 };
 
 class swapchain : public std::enable_shared_from_this<swapchain> {
@@ -27,18 +27,18 @@ public:
 
 	virtual void next_frame(std::function<void(frame)> &&callback) = 0;
 
-	float framerate_limit();
+	VOLT_API float framerate_limit();
 
-	void limit_framerate(float fps);
+	VOLT_API void framerate_limit(float fps);
 
-	gpu::present_mode present_mode();
+	VOLT_API gpu::present_mode present_mode();
 
 	// OpenGL will not allow triple buffering (no-op)
-	void request_present_mode(gpu::present_mode mode);
+	VOLT_API void present_mode(gpu::present_mode mode);
 
-	const std::shared_ptr<gpu::device> &device();
+	VOLT_API const std::shared_ptr<gpu::device> &device();
 
-	const std::shared_ptr<os::window> &window();
+	VOLT_API const std::shared_ptr<os::window> &window();
 
 protected:
 	std::shared_ptr<gpu::device> _device;
@@ -50,11 +50,12 @@ protected:
 	gpu::present_mode _present_mode = gpu::present_mode::triple_buffer; // Will be adjusted during construction
 
 	std::vector<std::shared_ptr<gpu::texture>> textures;
-	std::vector<std::shared_ptr<gpu::universal_routine>> routines;
 
 	swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window);
 
-	virtual void reconstruct() = 0;
+	virtual void create() {};
+
+	virtual void destroy() {};
 };
 
 }

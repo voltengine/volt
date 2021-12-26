@@ -26,7 +26,7 @@ public:
 
 	VkShaderModule shader_module;
 	std::string entry_point_name;
-	VkPipelineShaderStageCreateInfo stage_info;
+	VkPipelineShaderStageCreateInfo stage_info{};
 	std::vector<set_layout_info> set_layout_infos;
 	std::unordered_map<std::string, binding_point> binding_points;
 	std::unordered_map<std::string, vertex_input> vertex_inputs;

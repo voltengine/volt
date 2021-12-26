@@ -123,7 +123,6 @@ target_link_libraries(${PROJECT_NAME}
 	Date::Date
 	GLFW::GLFW
 	JSON::JSON
-	Sodium::Sodium
 	Termcolor::Termcolor
 )
 

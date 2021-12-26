@@ -5,7 +5,9 @@
 #include <volt/gpu/device.hpp>
 #include <volt/gpu/pass.hpp>
 #include <volt/gpu/vk12/adapter.hpp>
+#include <volt/gpu/vk12/jit.hpp>
 #include <volt/gpu/vk12/pass.hpp>
+#include <volt/util/util.hpp>
 
 namespace volt::gpu::vk12 {
 
@@ -15,6 +17,8 @@ public:
 	VmaAllocator allocator;
 	VkQueue universal_queue, compute_queue, copy_queue;
 	VkPipelineCache pipeline_cache;
+	util::thread_pool thread_pool;
+	vk12::jit jit;
 
 	device(std::shared_ptr<gpu::adapter> &&adapter);
 	
@@ -61,6 +65,8 @@ public:
 
 	std::shared_ptr<gpu::sampler> create_sampler(
 			gpu::texture_filter filter, bool blur, float anisotropy) override;
+
+	std::shared_ptr<gpu::shader> create_shader(const std::vector<uint8_t> &bytecode) override;
 };
 
 }

@@ -7,17 +7,21 @@ float swapchain::framerate_limit() {
 	return 1 / frame_time;
 }
 
-void swapchain::limit_framerate(float fps) {
-	frame_time = 1 / fps;
+void swapchain::framerate_limit(float fps) {
+	if (fps == 0)
+		frame_time = 0;
+	else
+		frame_time = 1 / fps;
 }
 
 gpu::present_mode swapchain::present_mode() {
 	return _present_mode;
 }
 
-void swapchain::request_present_mode(gpu::present_mode mode) {
+void swapchain::present_mode(gpu::present_mode mode) {
 	_present_mode = mode;
-	reconstruct(); // Adjusts present_mode
+	destroy();
+	create();
 }
 
 const std::shared_ptr<gpu::device> &swapchain::device() {

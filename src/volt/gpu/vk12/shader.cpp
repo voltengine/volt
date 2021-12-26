@@ -59,6 +59,12 @@ shader::shader(std::shared_ptr<gpu::device> &&device, const std::vector<uint8_t>
 	// Only for vertex shaders
 	for (uint32_t i = 0; i < refl_module.input_variable_count; i++) {
 		SpvReflectInterfaceVariable &refl_var = *refl_module.input_variables[i];
+
+		// Built-in variable i.e. gl_VertexIndex
+		// Based on observations and debugging due to lack of documentation
+		if (refl_var.location == 0xFFFFFFFF)
+			continue;
+
 		vertex_inputs[refl_var.name] = { refl_var.location, static_cast<VkFormat>(refl_var.format) };	
 	}
 }
