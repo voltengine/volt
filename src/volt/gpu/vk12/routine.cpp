@@ -170,12 +170,12 @@ void routine_impl::pass(const pass_info &info,
 			}
 		};
 
-		auto &vk12_texture = *static_cast<vk12::texture *>(attachment.texture.get());
+		auto &vk12_texture = *static_cast<vk12::texture *>(attachment.texture);
 		vk12_texture.barrier(*this, vk12::texture::state::color_attachment);
 
 		color_attachment_formats.push_back(vk12_texture.vk_format);
 		color_attachment_initializers.push_back(attachment.initializer);
-		color_attachments.push_back(attachment.texture.get());
+		color_attachments.push_back(attachment.texture);
 		clear_values.push_back(clear_value);
 	}
 
@@ -198,7 +198,7 @@ void routine_impl::pass(const pass_info &info,
 		};
 		clear_values.push_back(std::move(clear_value));
 
-		depth_stencil_attachment = value.texture.get();
+		depth_stencil_attachment = value.texture;
 		auto &vk12_texture = *static_cast<vk12::texture *>(depth_stencil_attachment);
 		vk12_texture.barrier(*this, vk12::texture::state::depth_stencil_attachment);
 
@@ -238,7 +238,15 @@ void routine_impl::pass(const pass_info &info,
 
 void routine_impl::async_pass(const pass_info &info,
 		const std::function<void(gpu::async_pass_context &)> &callback) {
-	// TODO: Implement
+	pass(info, [](gpu::pass_context &context) {
+		// TODO: Create contextless execute_pass() function for pass() and async_pass()
+		// Init parallel mode
+
+		// gpu::async_pass_context async_context(*this);
+		// callback(async_context)
+
+		// Collect parallel work
+	});
 }
 
 template<typename DescriptorInfo>
@@ -251,7 +259,7 @@ void routine_impl::_update_descriptor_sets(const DescriptorInfo &info, const pip
 
 	VkDescriptorSetAllocateInfo allocate_info{};
 	allocate_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocate_info.descriptorPool = descriptor_pools[current_pool];
+	allocate_info.descriptorPool = descriptor_pools[current_descriptor_pool];
 	allocate_info.descriptorSetCount = pipeline.set_layouts.size();
 	allocate_info.pSetLayouts = pipeline.set_layouts.data();
 
@@ -259,10 +267,10 @@ void routine_impl::_update_descriptor_sets(const DescriptorInfo &info, const pip
 	VkResult result = vkAllocateDescriptorSets(vk12_device.vk_device, &allocate_info, descriptor_sets.data());
 
 	if (result == VK_ERROR_OUT_OF_POOL_MEMORY) {
-		if (++current_pool == descriptor_pools.size())
+		if (++current_descriptor_pool == descriptor_pools.size())
 			_add_descriptor_pool();
 		
-		allocate_info.descriptorPool = descriptor_pools[current_pool];
+		allocate_info.descriptorPool = descriptor_pools[current_descriptor_pool];
 		result = vkAllocateDescriptorSets(vk12_device.vk_device, &allocate_info, descriptor_sets.data());
 	}
 
@@ -280,7 +288,7 @@ void routine_impl::_update_descriptor_sets(const DescriptorInfo &info, const pip
 		// Translate slot name to binding point
 		vk12::shader::binding_point binding_point = pipeline.binding_points.at(item.slot);
 
-		auto *vk12_buffer = static_cast<vk12::buffer *>(item.buffer.get());
+		auto *vk12_buffer = static_cast<vk12::buffer *>(item.buffer);
 
 		if constexpr (std::is_same_v<DescriptorInfo, draw_info>)
 			vk12_buffer->barrier(*this, vk12::buffer::state::rasterization_shared);
@@ -307,8 +315,8 @@ void routine_impl::_update_descriptor_sets(const DescriptorInfo &info, const pip
 	for (auto &item : info.sampled_textures) {
 		vk12::shader::binding_point binding_point = pipeline.binding_points.at(item.slot);
 
-		auto *vk12_texture = static_cast<vk12::texture *>(item.texture.get());
-		auto *vk12_sampler = static_cast<vk12::sampler *>(item.sampler.get());
+		auto *vk12_texture = static_cast<vk12::texture *>(item.texture);
+		auto *vk12_sampler = static_cast<vk12::sampler *>(item.sampler);
 
 		if constexpr (std::is_same_v<DescriptorInfo, draw_info>)
 			vk12_texture->barrier(*this, vk12::texture::state::rasterization_shared);
@@ -335,7 +343,7 @@ void routine_impl::_update_descriptor_sets(const DescriptorInfo &info, const pip
 	for (auto &item : info.storage_buffers) {
 		vk12::shader::binding_point binding_point = pipeline.binding_points.at(item.slot);
 
-		auto *vk12_buffer = static_cast<vk12::buffer *>(item.buffer.get());
+		auto *vk12_buffer = static_cast<vk12::buffer *>(item.buffer);
 		if (item.shared) {
 			if constexpr (std::is_same_v<DescriptorInfo, draw_info>)
 				vk12_buffer->barrier(*this, vk12::buffer::state::rasterization_shared);
@@ -368,7 +376,7 @@ void routine_impl::_update_descriptor_sets(const DescriptorInfo &info, const pip
 	for (auto &item : info.storage_textures) {
 		vk12::shader::binding_point binding_point = pipeline.binding_points.at(item.slot);
 
-		auto *vk12_texture = static_cast<vk12::texture *>(item.texture.get());
+		auto *vk12_texture = static_cast<vk12::texture *>(item.texture);
 		if (item.shared) {
 			if constexpr (std::is_same_v<DescriptorInfo, draw_info>)
 				vk12_texture->barrier(*this, vk12::texture::state::rasterization_shared);
@@ -514,7 +522,7 @@ void routine<RoutineContext>::execute(const std::function<void(RoutineContext &)
 	// Reset descriptor pools
 	for (VkDescriptorPool pool : impl.descriptor_pools)
 		vkResetDescriptorPool(impl.vk12_device.vk_device, pool, 0);
-	impl.current_pool = 0;
+	impl.current_descriptor_pool = 0;
 
 	// Begin command buffer
 	VkCommandBufferBeginInfo begin_info{};

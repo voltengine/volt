@@ -18,7 +18,7 @@ struct dispatch_info {
 	std::vector<sampled_texture_binding> sampled_textures;
 	std::vector<storage_buffer_binding> storage_buffers;
 	std::vector<storage_texture_binding> storage_textures;
-	gpu::shader *compute_shader;
+	util::optional_shared_ptr_ref<gpu::shader> compute_shader;
 	math::uvec3 group_count;
 };
 

@@ -4,6 +4,7 @@
 
 #include <volt/gpu/routine.hpp>
 #include <volt/gpu/vk12/jit.hpp>
+#include <volt/gpu/vk12/vk12.hpp>
 
 namespace volt::gpu::vk12 {
 
@@ -14,23 +15,46 @@ public:
 	struct wait_semaphore {
 		VkSemaphore semaphore;
 		VkPipelineStageFlags stage_mask;
-		uint64_t value = 0; // 0 means binary semaphore
+		uint64_t value = 0;
 
 		auto operator<=>(const wait_semaphore &other) const = default;
 	};
 
+	struct thread_data {
+		VkCommandPool command_pool;
+		std::vector<VkCommandBuffer> command_buffers;
+		std::vector<VkDescriptorPool> descriptor_pools;
+
+		size_t current_command_buffer = 0;
+		size_t current_descriptor_pool = 0;
+
+		uint32_t sets_allocated_from_current_pool             = 1;
+		uint32_t constant_buffers_allocated_from_current_pool = 1;
+		uint32_t sampled_textures_allocated_from_current_pool = 1;
+		uint32_t storage_buffers_allocated_from_current_pool  = 1;
+		uint32_t storage_textures_allocated_from_current_pool = 1;
+	};
+
 	vk12::device &vk12_device;
 	VkQueue queue;
-	VkCommandPool command_pool;
-	VkCommandBuffer command_buffer;
+
 	VkSemaphore finish_semaphore;
 	uint64_t finish_value = 0;
+
 	std::set<wait_semaphore> wait_semaphores;
-	std::vector<VkDescriptorPool> descriptor_pools;
-	size_t current_pool = 0;
 	VkRenderPass current_render_pass = VK_NULL_HANDLE;
 
-	// Statistics for optimizing descriptor pool sizes
+	// Thread zero data is used for the main thread
+	// std::vector<thread_data> threads;
+	// bool async_mode = false;
+
+	VkCommandPool command_pool;
+	VkCommandBuffer command_buffer;
+	std::vector<VkDescriptorPool> descriptor_pools;
+
+	size_t current_command_buffer = 0;
+	size_t current_descriptor_pool = 0;
+
 	uint32_t sets_allocated_from_current_pool             = 1;
 	uint32_t constant_buffers_allocated_from_current_pool = 1;
 	uint32_t sampled_textures_allocated_from_current_pool = 1;

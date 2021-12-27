@@ -21,7 +21,7 @@ using namespace math;
 
 device::device(std::shared_ptr<gpu::adapter> &&adapter)
 		: gpu::device(std::move(adapter)),
-		thread_pool(math::min(std::thread::hardware_concurrency(), 8Ui32)),
+		thread_pool(math::min(std::thread::hardware_concurrency(), vk12::max_thread_count)),
 		jit(*this) {
 	auto &vk12_adapter = *static_cast<vk12::adapter *>(this->_adapter.get());
 	auto &vk12_instance = *static_cast<vk12::instance *>(vk12_adapter.instance().get());

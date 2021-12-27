@@ -60,7 +60,7 @@ int main() {
 
 				gpu::pass_info pass_info{
 					.color_attachments = {
-						{ frame.texture, gpu::attachment_initializer::clear /* , math::fvec4(1, 1, math::sin(timer.elapsed()), 1) */ }
+						{ frame.texture, gpu::attachment_initializer::clear, math::fvec4(math::sin(timer.elapsed()) * 0.5F + 0.5F) }
 					}
 				};
 
@@ -70,10 +70,24 @@ int main() {
 				// };
 				// frame.routine_context.dispatch(dispatch_info);
 
+				// static resources can be accessed without explicit entry in pass_info
+
+				// static_texture - sampled texture, 
+				// dynamic_texture - writeable storage_texture
+
+				// stream_texture - static texture streamed from CPU (for videos)
+				// readback_texture - 
+
+				// static_buffer - vertex buffer, index buffer, constant buffer, read storage buffer
+				// dynamic_buffer - read-write storage_buffer
+				
+				// stream_buffer - constant buffer, shared storage buffer
+				// readback_buffer - unique storage_buffer
+
 				frame.routine_context.pass(pass_info, [&](gpu::pass_context &pass_context) {
 					gpu::draw_info draw_info{
-						.vertex_shader = vertex_shader.get(),
-						.pixel_shader = pixel_shader.get(),
+						.vertex_shader = vertex_shader,
+						.pixel_shader = pixel_shader,
 						.viewport = {
 							{ 0, static_cast<float>(frame_size.x) },
 							{ 0, static_cast<float>(frame_size.y) }

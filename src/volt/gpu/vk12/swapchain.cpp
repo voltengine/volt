@@ -207,7 +207,7 @@ void swapchain::destroy() {
 		return;
 
 	vk12_device.wait();
-	vk12_device.jit.clear();
+	vk12_device.jit.clear_framebuffers();
 
 	textures.clear();
 	vkDestroySwapchainKHR(vk12_device.vk_device, vk_swapchain, nullptr);

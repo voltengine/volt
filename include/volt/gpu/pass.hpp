@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "../math/math.hpp"
+#include "../util/util.hpp"
 #include "enums.hpp"
 #include "buffer.hpp"
 #include "sampler.hpp"
@@ -19,13 +20,13 @@
 namespace volt::gpu {
 
 struct color_attachment_info {
-	const std::shared_ptr<gpu::texture> &texture;
+	util::optional_shared_ptr_ref<gpu::texture> texture;
 	attachment_initializer initializer = attachment_initializer::none;
 	math::fvec4 clear_color = math::fvec4::zero;
 };
 
 struct depth_stencil_attachment_info {
-	const std::shared_ptr<gpu::texture> &texture;
+	util::optional_shared_ptr_ref<gpu::texture> texture;
 	attachment_initializer initializer = attachment_initializer::none;
 	float clear_depth = 1;
 	bool clear_stencil = false;
@@ -38,24 +39,24 @@ struct pass_info {
 
 struct constant_buffer_binding {
 	std::string slot;
-	const std::shared_ptr<gpu::buffer> &buffer;
+	util::optional_shared_ptr_ref<gpu::buffer> buffer;
 };
 
 struct sampled_texture_binding {
 	std::string slot;
-	const std::shared_ptr<gpu::texture> &texture;
-	const std::shared_ptr<gpu::sampler> &sampler;
+	util::optional_shared_ptr_ref<gpu::texture> texture;
+	util::optional_shared_ptr_ref<gpu::sampler> sampler;
 };
 
 struct storage_buffer_binding {
 	std::string slot;
-	const std::shared_ptr<gpu::buffer> &buffer;
+	util::optional_shared_ptr_ref<gpu::buffer> buffer;
 	bool shared;
 };
 
 struct storage_texture_binding {
 	std::string slot;
-	const std::shared_ptr<gpu::texture> &texture;
+	util::optional_shared_ptr_ref<gpu::texture> texture;
 	bool shared;
 };
 
@@ -77,11 +78,11 @@ struct draw_info {
 	std::vector<storage_texture_binding> storage_textures;
 	
 	// Shaders
-	gpu::shader *vertex_shader; // Required
-	gpu::shader *hull_shader = nullptr;
-	gpu::shader *domain_shader = nullptr;
-	gpu::shader *geometry_shader = nullptr;
-	gpu::shader *pixel_shader; // Required
+	util::optional_shared_ptr_ref<gpu::shader> vertex_shader; // Required
+	util::optional_shared_ptr_ref<gpu::shader> hull_shader;
+	util::optional_shared_ptr_ref<gpu::shader> domain_shader;
+	util::optional_shared_ptr_ref<gpu::shader> geometry_shader;
+	util::optional_shared_ptr_ref<gpu::shader> pixel_shader; // Required
 
 	// Pipeline State
 	viewport viewport; // Required
@@ -94,9 +95,9 @@ struct draw_info {
 
 	// Draw Info
 	std::unordered_set<std::string> instance_inputs; // Other inputs will become vertex inputs
-	gpu::buffer *index_buffer;
-	gpu::buffer *vertex_buffer;
-	gpu::buffer *instance_buffer;
+	util::optional_shared_ptr_ref<gpu::buffer> index_buffer;
+	util::optional_shared_ptr_ref<gpu::buffer> vertex_buffer;
+	util::optional_shared_ptr_ref<gpu::buffer> instance_buffer;
 	uint32_t draw_count; // Required
 	uint32_t instance_count = 1;
 };

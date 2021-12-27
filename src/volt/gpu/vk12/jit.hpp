@@ -92,6 +92,8 @@ public:
 
 	~jit();
 
+	// Thread safe methods (they only lock when initializing)
+
 	pipeline &compute_pipeline(compute_pipeline_key &&key);
 
 	VkRenderPass render_pass(render_pass_key &&key);
@@ -100,14 +102,26 @@ public:
 
 	VkFramebuffer framebuffer(framebuffer_key &&key);
 
+	// End of thread safe methods
+
+	void optimize();
+
+	void clear_framebuffers();
+
 	void clear();
 
 private:
+	struct cache {
+		std::unordered_map<compute_pipeline_key, pipeline> compute_pipelines;
+		std::unordered_map<render_pass_key, VkRenderPass> render_passes;
+		std::unordered_map<rasterization_pipeline_key, pipeline> rasterization_pipelines;
+		std::unordered_map<framebuffer_key, VkFramebuffer> framebuffers;
+	};
+
 	vk12::device &device;
-	std::unordered_map<compute_pipeline_key, pipeline> compute_pipelines;
-	std::unordered_map<render_pass_key, VkRenderPass> render_passes;
-	std::unordered_map<rasterization_pipeline_key, pipeline> rasterization_pipelines;
-	std::unordered_map<framebuffer_key, VkFramebuffer> framebuffers;
+	cache immutable_cache;
+	cache mutable_cache;
+	std::mutex mutable_cache_mutex;
 
 	template<typename Key>
 	pipeline create_pipeline(Key &key, const std::vector<vk12::shader *> &shaders);

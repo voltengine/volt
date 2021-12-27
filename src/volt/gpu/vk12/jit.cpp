@@ -82,22 +82,17 @@ size_t hash<volt::gpu::vk12::rasterization_pipeline_key>::operator()(const volt:
 		hash ^= std::hash<std::string>{}(input);
 		hash *= 281; // Prime
 	}
-	hash ^= static_cast<size_t>(key.polygon_mode);
-	hash *= 181; // Prime
-	hash ^= static_cast<size_t>(key.primitive_mode);
-	hash *= 13873; // Prime
-	hash ^= static_cast<size_t>(key.culling);
-	hash *= 4289; // Prime
-	hash ^= static_cast<size_t>(key.depth_test);
-	hash *= 19; // Prime
-	hash ^= static_cast<size_t>(key.depth_write);
-	hash *= 7919; // Prime
-	hash ^= static_cast<size_t>(key.stencil_test);
-	hash *= 29; // Prime
-	hash ^= static_cast<size_t>(key.stencil_write);
-	hash *= 999331; // Prime
-	hash ^= static_cast<size_t>(key.blending);
-	return hash;
+	
+	size_t bitset = static_cast<size_t>(key.polygon_mode);
+	bitset |= static_cast<size_t>(key.primitive_mode) << 2;
+	bitset |= static_cast<size_t>(key.culling) << 4;
+	bitset |= static_cast<size_t>(key.depth_test) << 5;
+	bitset |= static_cast<size_t>(key.depth_write) << 6;
+	bitset |= static_cast<size_t>(key.stencil_test) << 7;
+	bitset |= static_cast<size_t>(key.stencil_write) << 8;
+	bitset |= static_cast<size_t>(key.blending) << 9;
+
+	return hash ^ bitset;
 }
 
 size_t hash<volt::gpu::vk12::framebuffer_key>::operator()(const volt::gpu::vk12::framebuffer_key &key) const {
@@ -154,8 +149,16 @@ jit::~jit() {
 }
 
 vk12::pipeline &jit::compute_pipeline(compute_pipeline_key &&key) {
-	auto it = compute_pipelines.find(key);
-	if (it != compute_pipelines.end())
+	// First search in immutable cache
+	auto it = immutable_cache.compute_pipelines.find(key);
+	if (it != immutable_cache.compute_pipelines.end())
+		return it->second;
+
+	// Fall back to mutable cache with locking
+	std::unique_lock lock(mutable_cache_mutex);
+
+	it = mutable_cache.compute_pipelines.find(key);
+	if (it != mutable_cache.compute_pipelines.end())
 		return it->second;
 
 	auto compute_shader = static_cast<vk12::shader *>(key.compute_shader);
@@ -174,12 +177,20 @@ vk12::pipeline &jit::compute_pipeline(compute_pipeline_key &&key) {
 			1, &pipeline_info, nullptr, &pipeline.vk_pipeline), "Failed to create compute pipeline.")
 
 	
-	return compute_pipelines.emplace(std::move(key), std::move(pipeline)).first->second;
+	return mutable_cache.compute_pipelines.emplace(std::move(key), std::move(pipeline)).first->second;
 }
 
 VkRenderPass jit::render_pass(render_pass_key &&key) {
-	auto it = render_passes.find(key);
-	if (it != render_passes.end())
+	// First search in immutable cache
+	auto it = immutable_cache.render_passes.find(key);
+	if (it != immutable_cache.render_passes.end())
+		return it->second;
+
+	// Fall back to mutable cache with locking
+	std::unique_lock lock(mutable_cache_mutex);
+
+	it = mutable_cache.render_passes.find(key);
+	if (it != mutable_cache.render_passes.end())
 		return it->second;
 
 	bool has_depth_stencil_attachment = key.depth_stencil_attachment_format != VK_FORMAT_UNDEFINED;
@@ -236,14 +247,21 @@ VkRenderPass jit::render_pass(render_pass_key &&key) {
 
 	VkRenderPass render_pass;
 	vkCreateRenderPass(device.vk_device, &render_pass_info, nullptr, &render_pass);
-
-	render_passes.insert({ std::move(key), render_pass });
-	return render_pass;
+	
+	return mutable_cache.render_passes.emplace(std::move(key), render_pass).first->second;
 }
 
 pipeline &jit::rasterization_pipeline(rasterization_pipeline_key &&key) {
-	auto it = rasterization_pipelines.find(key);
-	if (it != rasterization_pipelines.end())
+	// First search in immutable cache
+	auto it = immutable_cache.rasterization_pipelines.find(key);
+	if (it != immutable_cache.rasterization_pipelines.end())
+		return it->second;
+
+	// Fall back to mutable cache with locking
+	std::unique_lock lock(mutable_cache_mutex);
+
+	it = mutable_cache.rasterization_pipelines.find(key);
+	if (it != mutable_cache.rasterization_pipelines.end())
 		return it->second;
 
 	// Collect shaders into a list
@@ -385,8 +403,8 @@ pipeline &jit::rasterization_pipeline(rasterization_pipeline_key &&key) {
 	VkPipelineColorBlendAttachmentState attachment_blend_state{};
 	attachment_blend_state.blendEnable = VK_TRUE;
 	if (key.blending == gpu::blending::alpha) {
-		attachment_blend_state.srcColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_DST_ALPHA;
-		attachment_blend_state.dstColorBlendFactor = VK_BLEND_FACTOR_DST_ALPHA;
+		attachment_blend_state.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		attachment_blend_state.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 		attachment_blend_state.colorBlendOp = VK_BLEND_OP_ADD;
 		attachment_blend_state.colorWriteMask = 0b111; // Do not write alpha
 	} else if (key.blending == gpu::blending::add) {
@@ -437,12 +455,20 @@ pipeline &jit::rasterization_pipeline(rasterization_pipeline_key &&key) {
 	VOLT_VK12_CHECK(vkCreateGraphicsPipelines(device.vk_device, device.pipeline_cache,
 			1, &pipeline_info, nullptr, &pipeline.vk_pipeline), "Failed to create graphics pipeline.")
 
-	return rasterization_pipelines.emplace(std::move(key), std::move(pipeline)).first->second;
+	return mutable_cache.rasterization_pipelines.emplace(std::move(key), std::move(pipeline)).first->second;
 }
 
 VkFramebuffer jit::framebuffer(framebuffer_key &&key) {
-	auto it = framebuffers.find(key);
-	if (it != framebuffers.end())
+	// First search in immutable cache
+	auto it = immutable_cache.framebuffers.find(key);
+	if (it != immutable_cache.framebuffers.end())
+		return it->second;
+
+	// Fall back to mutable cache with locking
+	std::unique_lock lock(mutable_cache_mutex);
+
+	it = mutable_cache.framebuffers.find(key);
+	if (it != mutable_cache.framebuffers.end())
 		return it->second;
 
 	std::vector<VkImageView> attachments(key.color_attachments.size() + (key.depth_stencil_attachment != nullptr));
@@ -470,34 +496,62 @@ VkFramebuffer jit::framebuffer(framebuffer_key &&key) {
 	VOLT_VK12_CHECK(vkCreateFramebuffer(device.vk_device, &framebuffer_info,
 			nullptr, &framebuffer), "Failed to create framebuffer.")
 
-	framebuffers.insert({ std::move(key), framebuffer });
-	return framebuffer;
+	return mutable_cache.framebuffers.emplace(std::move(key), framebuffer).first->second;
+}
+
+void jit::optimize() {
+	// Move all items from mutable cache to immutable cache
+
+	for (auto &it : mutable_cache.compute_pipelines)
+		immutable_cache.compute_pipelines.emplace(std::move(it));
+
+	for (auto &it : mutable_cache.render_passes)
+		immutable_cache.render_passes.emplace(std::move(it));
+
+	for (auto &it : mutable_cache.rasterization_pipelines)
+		immutable_cache.rasterization_pipelines.emplace(std::move(it));
+
+	for (auto &it : mutable_cache.framebuffers)
+		immutable_cache.framebuffers.emplace(std::move(it));
+
+	mutable_cache.compute_pipelines.clear();
+	mutable_cache.render_passes.clear();
+	mutable_cache.rasterization_pipelines.clear();
+	mutable_cache.framebuffers.clear();
+}
+
+void jit::clear_framebuffers() {
+	// Flushes mutable cache
+	optimize();
+
+	for (auto &item : immutable_cache.framebuffers)
+		vkDestroyFramebuffer(device.vk_device, item.second, nullptr);
+	immutable_cache.framebuffers.clear();
 }
 
 void jit::clear() {
-	for (auto &item : framebuffers)
-		vkDestroyFramebuffer(device.vk_device, item.second, nullptr);
-	framebuffers.clear();
+	// Flushes mutable cache
+	clear_framebuffers();
 
-	for (auto &item : rasterization_pipelines) {
+	for (auto &item : immutable_cache.rasterization_pipelines) {
 		vkDestroyPipeline(device.vk_device, item.second.vk_pipeline, nullptr);
 		vkDestroyPipelineLayout(device.vk_device, item.second.pipeline_layout, nullptr);
 		for (auto &layout : item.second.set_layouts)
 			vkDestroyDescriptorSetLayout(device.vk_device, layout, nullptr);
 	}
-	rasterization_pipelines.clear();
+	immutable_cache.rasterization_pipelines.clear();
 
-	for (auto &item : render_passes)
+	for (auto &item : immutable_cache.render_passes)
 		vkDestroyRenderPass(device.vk_device, item.second, nullptr);
-	render_passes.clear();
+	immutable_cache.render_passes.clear();
 
-	for (auto &item : compute_pipelines) {
+	for (auto &item : immutable_cache.compute_pipelines) {
 		vkDestroyPipeline(device.vk_device, item.second.vk_pipeline, nullptr);
 		vkDestroyPipelineLayout(device.vk_device, item.second.pipeline_layout, nullptr);
 		for (auto &layout : item.second.set_layouts)
 			vkDestroyDescriptorSetLayout(device.vk_device, layout, nullptr);
 	}
-	compute_pipelines.clear();
+	immutable_cache.compute_pipelines.clear();
 }
 
 

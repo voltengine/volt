@@ -20,6 +20,8 @@ extern std::unordered_map<gpu::topology, VkPrimitiveTopology> primitive_topologi
 
 constexpr uint32_t concurrent_frames = 2;
 
+constexpr uint32_t max_thread_count = 8;
+
 void load_glad();
 
 void unload_glad();

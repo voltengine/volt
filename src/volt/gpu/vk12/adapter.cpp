@@ -87,7 +87,7 @@ adapter::adapter(std::shared_ptr<gpu::instance> &&instance,
 	std::stringstream ss;
 	ss << std::hex;
 	for (size_t i = 0; i < VK_UUID_SIZE; i++)
-		ss << properties.pipelineCacheUUID[i];
+		ss << static_cast<uint32_t>(properties.pipelineCacheUUID[i]);
 	
 	pipeline_cache_uuid = ss.str();
 }
