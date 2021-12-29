@@ -53,31 +53,30 @@ void routine_impl::copy_texture(
 	uint32_t levels = math::min(src->levels(), dst->levels());	
 	std::vector<VkImageCopy> regions(levels);
 
+	uvec3 size = math::min(src->size(), dst->size());
+
 	for (uint32_t i = 0; i < levels; i++) {
 		VkImageCopy &region = regions[i];
 		region.srcSubresource = {
 			.aspectMask = aspect_mask,
 			.mipLevel = i,
-			.baseArrayLayer = 0,
 			.layerCount = 1 // Handled by extent
 		};
 
 		region.dstSubresource = {
 			.aspectMask = aspect_mask,
 			.mipLevel = i,
-			.baseArrayLayer = 0,
 			.layerCount = 1 // Handled by extent
 		};
 
-		uvec3 max_size = min(src->size() / pow(2, i),
-				dst->size() / pow(2, i));
-		region.extent = { max_size.x, max_size.y, max_size.z };
+		region.extent = { size.x, size.y, size.z };
+		size *= 0.5F;
 	}
 
 	vkCmdCopyImage(command_buffer,
 			vk12_src.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
 			vk12_dst.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-			regions.size(), regions.data());
+			static_cast<uint32_t>(regions.size()), regions.data());
 }
 
 void routine_impl::copy_texture_level(
@@ -101,7 +100,6 @@ void routine_impl::copy_texture_level(
 	region.srcSubresource = {
 		.aspectMask = aspect_mask,
 		.mipLevel = src_level,
-		.baseArrayLayer = 0,
 		.layerCount = 1 // Handled by extent
 	};
 	region.srcOffset = {
@@ -113,7 +111,6 @@ void routine_impl::copy_texture_level(
 	region.dstSubresource = {
 		.aspectMask = aspect_mask,
 		.mipLevel = dst_level,
-		.baseArrayLayer = 0,
 		.layerCount = 1 // Handled by extent
 	};
 	region.dstOffset = {
@@ -148,7 +145,7 @@ void routine_impl::dispatch(const dispatch_info &info) {
 }
 
 void routine_impl::pass(const pass_info &info,
-		const std::function<void(gpu::pass_context &)> &callback) {
+		const std::function<void(gpu::pass &)> &callback) {
 	std::vector<VkFormat> color_attachment_formats;
 	std::vector<gpu::attachment_initializer> color_attachment_initializers;
 	std::vector<gpu::texture *> color_attachments;
@@ -229,7 +226,7 @@ void routine_impl::pass(const pass_info &info,
 	vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 	current_render_pass = render_pass;
 
-	vk12::pass_context context(*this);
+	vk12::pass context(*this);
 	callback(context);
 
 	current_render_pass = VK_NULL_HANDLE;
@@ -237,12 +234,12 @@ void routine_impl::pass(const pass_info &info,
 }
 
 void routine_impl::async_pass(const pass_info &info,
-		const std::function<void(gpu::async_pass_context &)> &callback) {
-	pass(info, [](gpu::pass_context &context) {
+		const std::function<void(gpu::async_pass &)> &callback) {
+	pass(info, [](gpu::pass &context) {
 		// TODO: Create contextless execute_pass() function for pass() and async_pass()
 		// Init parallel mode
 
-		// gpu::async_pass_context async_context(*this);
+		// gpu::async_pass async_context(*this);
 		// callback(async_context)
 
 		// Collect parallel work
@@ -446,12 +443,6 @@ void routine_impl::_add_descriptor_pool() {
 	VOLT_VK12_CHECK(vkCreateDescriptorPool(vk12_device.vk_device, &pool_info,
 			nullptr, &pool), "Failed to create descriptor pool.")
 	descriptor_pools.push_back(pool);
-
-	sets_allocated_from_current_pool             = 1;
-	constant_buffers_allocated_from_current_pool = 1;
-	sampled_textures_allocated_from_current_pool = 1;
-	storage_buffers_allocated_from_current_pool  = 1;
-	storage_textures_allocated_from_current_pool = 1;
 }
 
 template<typename RoutineContext>

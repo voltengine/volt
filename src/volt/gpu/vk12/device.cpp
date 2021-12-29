@@ -228,7 +228,7 @@ std::shared_ptr<gpu::texture> device::create_cube_texture(
 }
 
 std::shared_ptr<gpu::sampler> device::create_sampler(
-		texture_filter filter, bool blur, float anisotropy) {
+		sampler_filter filter, bool blur, float anisotropy) {
 	return std::shared_ptr<gpu::sampler>(new vk12::sampler(
 			shared_from_this(), filter, blur, anisotropy));
 }

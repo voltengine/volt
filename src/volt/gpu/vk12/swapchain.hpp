@@ -14,8 +14,7 @@ public:
 	VkSurfaceKHR surface;
 	VkSwapchainKHR vk_swapchain;
 	math::uvec2 frame_size;
-	VkSemaphore acquire_semaphores[vk12::concurrent_frames];
-	std::shared_ptr<gpu::universal_routine> routines[vk12::concurrent_frames];
+	VkSemaphore acquire_semaphores[vk12::graph_count];
 
 	swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::window> &&window);
 

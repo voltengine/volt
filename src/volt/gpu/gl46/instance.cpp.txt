@@ -22,8 +22,8 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 	return {}; // Return single default adapter
 }
 
-uint32_t instance::concurrent_frames() {
-	return gl46::concurrent_frames;
+uint32_t instance::graph_count() {
+	return gl46::graph_count;
 }
 
 }

@@ -6,7 +6,7 @@
 
 namespace volt::gpu::gl46 {
 
-constexpr uint32_t concurrent_frames = 2;
+constexpr uint32_t graph_count = 2;
 
 }
 

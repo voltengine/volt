@@ -10,7 +10,7 @@ class sampler : public gpu::sampler {
 public:
 	VkSampler vk_sampler;
 
-	sampler(std::shared_ptr<gpu::device> &&device, texture_filter filter, bool blur, float anisotropy);
+	sampler(std::shared_ptr<gpu::device> &&device, sampler_filter filter, bool blur, float anisotropy);
 
 protected:
 	void create() override;

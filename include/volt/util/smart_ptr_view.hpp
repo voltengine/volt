@@ -7,11 +7,15 @@
 namespace volt::util {
 
 template<typename T>
-class optional_shared_ptr_ref {
+class smart_ptr_view {
 public:
-	optional_shared_ptr_ref() = default;
+	smart_ptr_view() = default;
 
-	optional_shared_ptr_ref(const std::shared_ptr<T> &ptr);
+	smart_ptr_view(const std::unique_ptr<T> &ptr);
+
+	smart_ptr_view(const std::shared_ptr<T> &ptr);
+
+	smart_ptr_view(const std::weak_ptr<T> &ptr);
 
 	template<typename U>
 	operator U *() const;
@@ -28,4 +32,4 @@ private:
 
 }
 
-#include "optional_shared_ptr_ref.inl"
+#include "smart_ptr_view.inl"

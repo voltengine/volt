@@ -7,15 +7,15 @@ sampler::~sampler() {
 	destroy();
 };
 
-const std::shared_ptr<gpu::device> &sampler::device() {
+const std::shared_ptr<gpu::device> &sampler::device() const {
 	return _device;
 }
 
-texture_filter sampler::filter() {
+sampler_filter sampler::filter() const {
 	return _filter;
 }
 
-void sampler::filter(texture_filter filter) {
+void sampler::filter(sampler_filter filter) {
 	if (filter != _filter) {
 		_filter = filter;
 		destroy();
@@ -23,7 +23,7 @@ void sampler::filter(texture_filter filter) {
 	}
 }
 
-bool sampler::blur() {
+bool sampler::blur() const {
 	return _blur;
 }
 
@@ -35,7 +35,7 @@ void sampler::blur(bool blur) {
 	}
 }
 
-float sampler::anisotropy() {
+float sampler::anisotropy() const{
 	return _anisotropy;
 }
 
@@ -47,7 +47,7 @@ void sampler::anisotropy(float anisotropy) {
 	}
 }
 
-sampler::sampler(std::shared_ptr<gpu::device> &&device, texture_filter filter, bool blur, float anisotropy)
+sampler::sampler(std::shared_ptr<gpu::device> &&device, sampler_filter filter, bool blur, float anisotropy)
 		: _device(std::move(device)), _filter(filter), _blur(blur), _anisotropy(anisotropy) {
 	create();
 }

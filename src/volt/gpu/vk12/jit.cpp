@@ -173,7 +173,7 @@ vk12::pipeline &jit::compute_pipeline(compute_pipeline_key &&key) {
 	pipeline_info.stage = compute_shader->stage_info;
 	pipeline_info.layout = pipeline.pipeline_layout;
 
-	VOLT_VK12_CHECK(vkCreateComputePipelines(device.vk_device, nullptr, // TODO: Pipeline Cache
+	VOLT_VK12_CHECK(vkCreateComputePipelines(device.vk_device, device.pipeline_cache,
 			1, &pipeline_info, nullptr, &pipeline.vk_pipeline), "Failed to create compute pipeline.")
 
 	

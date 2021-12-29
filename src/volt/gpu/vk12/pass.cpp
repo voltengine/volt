@@ -6,9 +6,9 @@
 
 namespace volt::gpu::vk12 {
 
-pass_context::pass_context(vk12::routine_impl &impl) : impl(impl) {}
+pass::pass(vk12::routine_impl &impl) : impl(impl) {}
 
-void pass_context::draw(const draw_info &info) {
+void pass::draw(const draw_info &info) {
 	vk12::rasterization_pipeline_key key{ // TODO: Use bitset
 		.render_pass = impl.current_render_pass,
 		.vertex_shader = info.vertex_shader,
@@ -92,10 +92,10 @@ void pass_context::draw(const draw_info &info) {
 		vkCmdDraw(impl.command_buffer, info.draw_count, info.instance_count, 0, 0);
 }
 
-async_pass_context::async_pass_context(vk12::routine_impl &impl)
-		: gpu::async_pass_context(impl.vk12_device.thread_pool), impl(impl) {}
+async_pass::async_pass(vk12::routine_impl &impl)
+		: gpu::async_pass(impl.vk12_device.thread_pool), impl(impl) {}
 
-void async_pass_context::draw(uint32_t thread_index, const draw_info &info) {
+void async_pass::draw(uint32_t thread_index, const draw_info &info) {
 	// TODO
 }
 

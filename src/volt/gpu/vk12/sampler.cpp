@@ -7,7 +7,7 @@
 
 namespace volt::gpu::vk12 {
 
-sampler::sampler(std::shared_ptr<gpu::device> &&device, texture_filter filter, bool blur, float anisotropy)
+sampler::sampler(std::shared_ptr<gpu::device> &&device, sampler_filter filter, bool blur, float anisotropy)
 		: gpu::sampler(std::move(device), filter, blur, anisotropy) {}
 
 void sampler::create() {
@@ -19,8 +19,8 @@ void sampler::create() {
 	VkSamplerCreateInfo sampler_info{};
 	sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 	sampler_info.magFilter = _blur ? VK_FILTER_LINEAR : VK_FILTER_NEAREST;
-	sampler_info.minFilter = _filter == texture_filter::nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
-	sampler_info.mipmapMode = _filter == texture_filter::trilinear ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST;
+	sampler_info.minFilter = _filter == sampler_filter::nearest ? VK_FILTER_NEAREST : VK_FILTER_LINEAR;
+	sampler_info.mipmapMode = _filter == sampler_filter::trilinear ? VK_SAMPLER_MIPMAP_MODE_LINEAR : VK_SAMPLER_MIPMAP_MODE_NEAREST;
 	sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;

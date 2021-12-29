@@ -2,7 +2,6 @@
 
 #include <volt/pch.hpp>
 
-#include <volt/gpu/routine.hpp>
 #include <volt/gpu/vk12/jit.hpp>
 #include <volt/gpu/vk12/vk12.hpp>
 
@@ -86,10 +85,10 @@ public:
 	void dispatch(const dispatch_info &info) override;
 
 	void pass(const pass_info &info,
-			const std::function<void(gpu::pass_context &)> &callback) override;
+			const std::function<void(gpu::pass &)> &callback) override;
 
 	void async_pass(const pass_info &info,
-			const std::function<void(gpu::async_pass_context &)> &callback) override;
+			const std::function<void(gpu::async_pass &)> &callback) override;
 	
 	template<typename DescriptorInfo> // dispatch_info / draw_info
 	void _update_descriptor_sets(const DescriptorInfo &info, const pipeline &pipeline);

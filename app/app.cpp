@@ -1,5 +1,7 @@
 #include <pch.hpp>
 
+#include <variant>
+
 namespace fs = std::filesystem;
 
 using namespace volt;
@@ -52,51 +54,57 @@ int main() {
 		util::timer timer;
 		timer.start();
 
+		// static resources can be accessed without explicit entry in pass_info
+
+		// GPU Internal
+		// static_texture - read sampled texture, read storage texture - no sync
+		// dynamic_texture - read-write sampled texture (attachment), read-write storage_texture
+
+		// Host interface
+		// upload_texture - sampled texture, read storage texture - streamed from CPU (for videos) - no sync
+		// download_texture - write storage_texture - readback to CPU (for sophisticated compute techniques)
+
+		// GPU Internal
+		// static_buffer - read vertex buffer, read index buffer, read constant buffer, read storage buffer - no sync
+		// dynamic_buffer - read-write storage_buffer
+		
+		// Host interface
+		// upload_buffer - vertex buffer, index buffer, constant buffer, read storage buffer - streamed from CPU (for dynamic data) - no sync
+		// download_buffer - write storage_buffer - readback to CPU (for compute physics)
+
 		while (!window->is_closing()) {
 			glfwPollEvents();
 
-			swapchain->next_frame([&](gpu::frame frame) {
-				math::uvec2 frame_size = window->get_frame_size();
+			device->graph([&](gpu::graph &graph) {
+				swapchain->frame([&](gpu::frame &frame) {
+					math::uvec2 frame_size = window->get_frame_size();
 
-				gpu::pass_info pass_info{
-					.color_attachments = {
-						{ frame.texture, gpu::attachment_initializer::clear, math::fvec4(math::sin(timer.elapsed()) * 0.5F + 0.5F) }
-					}
-				};
-
-				// gpu::dispatch_info dispatch_info{
-				// 	.compute_shader = compute_shader.get(),
-				// 	.group_count = { 1, 1, 1 }
-				// };
-				// frame.routine_context.dispatch(dispatch_info);
-
-				// static resources can be accessed without explicit entry in pass_info
-
-				// static_texture - sampled texture, 
-				// dynamic_texture - writeable storage_texture
-
-				// stream_texture - static texture streamed from CPU (for videos)
-				// readback_texture - 
-
-				// static_buffer - vertex buffer, index buffer, constant buffer, read storage buffer
-				// dynamic_buffer - read-write storage_buffer
-				
-				// stream_buffer - constant buffer, shared storage buffer
-				// readback_buffer - unique storage_buffer
-
-				frame.routine_context.pass(pass_info, [&](gpu::pass_context &pass_context) {
-					gpu::draw_info draw_info{
-						.vertex_shader = vertex_shader,
-						.pixel_shader = pixel_shader,
-						.viewport = {
-							{ 0, static_cast<float>(frame_size.x) },
-							{ 0, static_cast<float>(frame_size.y) }
-						},
-						.culling = false,
-						.draw_count = 3
+					gpu::pass_info pass_info{
+						.color_attachments = {
+							{ frame.texture, gpu::attachment_initializer::clear, math::fvec4(math::sin(timer.elapsed()) * 0.5F + 0.5F) }
+						}
 					};
+
+					graph.pass(pass_info, [&](gpu::pass &pass) {
+						gpu::draw_info draw_info{
+							.vertex_shader = vertex_shader,
+							.pixel_shader = pixel_shader,
+							.viewport = {
+								{ 0, static_cast<float>(frame_size.x) },
+								{ 0, static_cast<float>(frame_size.y) }
+							},
+							.culling = false,
+							.draw_count = 3
+						};
+						
+						pass.draw(draw_info);
+					});
 					
-					pass_context.draw(draw_info);
+					// gpu::dispatch_info dispatch_info{
+					// 	.compute_shader = compute_shader.get(),
+					// 	.group_count = { 1, 1, 1 }
+					// };
+					// graph.dispatch(dispatch_info);
 				});
 			});
 		}

@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "../os/os.hpp"
-#include "routine.hpp"
 #include "texture.hpp"
 
 namespace volt::gpu {
@@ -15,30 +14,34 @@ namespace volt::gpu {
 class device;
 class swapchain;
 
+enum class present_mode {
+	tear,         // Results in tearing; Has no input lag
+	vsync,        // Big input lag + clamps to 30 fps for any framerate below 60
+	triple_buffer // Small input lag + Higher energy consumption (unavailable with OpenGL)
+};
+
 struct frame {
 	const uint32_t index; // The index of the frame in flight
 	std::shared_ptr<gpu::texture> &texture; // Output texture
-	universal_routine_context &routine_context; // Guarded routine_context
 };
 
 class swapchain : public std::enable_shared_from_this<swapchain> {
 public:
 	virtual ~swapchain() = default;
 
-	virtual void next_frame(std::function<void(frame)> &&callback) = 0;
+	virtual void frame(std::function<void(frame)> &&callback) = 0;
 
-	VOLT_API float framerate_limit();
+	VOLT_API float framerate_limit() const;
 
 	VOLT_API void framerate_limit(float fps);
 
-	VOLT_API gpu::present_mode present_mode();
+	VOLT_API gpu::present_mode present_mode() const;
 
-	// OpenGL will not allow triple buffering (no-op)
 	VOLT_API void present_mode(gpu::present_mode mode);
 
-	VOLT_API const std::shared_ptr<gpu::device> &device();
+	VOLT_API const std::shared_ptr<gpu::device> &device() const;
 
-	VOLT_API const std::shared_ptr<os::window> &window();
+	VOLT_API const std::shared_ptr<os::window> &window() const;
 
 protected:
 	std::shared_ptr<gpu::device> _device;

@@ -13,15 +13,12 @@ class shader {
 public:
 	virtual ~shader() = default;
 
-	const std::shared_ptr<gpu::device> &device() {
-		return _device;
-	}
+	VOLT_API const std::shared_ptr<gpu::device> &device() const;
 
 protected:
 	std::shared_ptr<gpu::device> _device;
 
-	shader(std::shared_ptr<gpu::device> &&device)
-			: _device(std::move(device)) {}
+	shader(std::shared_ptr<gpu::device> &&device);
 };
 
 }

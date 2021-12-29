@@ -12,15 +12,13 @@ extern std::unordered_map<uint32_t, std::string> vendor_names;
 
 extern std::vector<const char *> device_extensions;
 
-extern std::unordered_map<gpu::memory_type, VmaMemoryUsage> vma_memory_usages;
-
 extern std::unordered_map<gpu::texture_format, VkFormat> texture_formats;
 
 extern std::unordered_map<gpu::topology, VkPrimitiveTopology> primitive_topologies;
 
-constexpr uint32_t concurrent_frames = 2;
+constexpr uint32_t graph_count = 2;
 
-constexpr uint32_t max_thread_count = 8;
+constexpr uint32_t sets_per_pool = 512;
 
 void load_glad();
 

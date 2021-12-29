@@ -26,15 +26,12 @@ public:
 
 	virtual std::shared_ptr<gpu::device> create_device() = 0;
 
-	const std::shared_ptr<gpu::instance> &instance() {
-		return _instance;
-	}
+	VOLT_API const std::shared_ptr<gpu::instance> &instance() const;
 
 protected:
 	std::shared_ptr<gpu::instance> _instance;
 
-	adapter(std::shared_ptr<gpu::instance> &&instance)
-			: _instance(std::move(instance)) {}
+	adapter(std::shared_ptr<gpu::instance> &&instance);
 };
 
 }

@@ -3,7 +3,7 @@
 
 namespace volt::gpu {
 
-const std::shared_ptr<gpu::adapter> &device::adapter() {
+const std::shared_ptr<gpu::adapter> &device::adapter() const {
 	return _adapter;
 }
 

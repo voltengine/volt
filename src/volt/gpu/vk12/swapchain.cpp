@@ -33,7 +33,7 @@ swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::
 	VkSemaphoreCreateInfo semaphore_info{};
 	semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-	for (uint32_t i = 0; i < vk12::concurrent_frames; i++) {
+	for (uint32_t i = 0; i < vk12::graph_count; i++) {
 		routines[i] = this->_device->create_universal_routine();
 		VOLT_VK12_CHECK(vkCreateSemaphore(vk12_device.vk_device, &semaphore_info, nullptr,
 				&acquire_semaphores[i]), "Failed to create semaphore.")
@@ -46,7 +46,7 @@ swapchain::swapchain(std::shared_ptr<gpu::device> &&device, std::shared_ptr<os::
 swapchain::~swapchain() {
 	destroy();
 
-	for (uint32_t i = 0; i < vk12::concurrent_frames; i++)
+	for (uint32_t i = 0; i < vk12::graph_count; i++)
 		vkDestroySemaphore(vk12_device.vk_device, acquire_semaphores[i], nullptr);
 
 	VkInstance instance = static_cast<vk12::instance *>(_device->adapter()->instance().get())->vk_instance;
@@ -111,7 +111,7 @@ void swapchain::next_frame(std::function<void(frame)> &&callback) {
 	} else
 		VOLT_VK12_DEBUG_CHECK(result, "Failed to present swapchain image.");
 	
-	current_frame = (current_frame + 1) % vk12::concurrent_frames;
+	current_frame = (current_frame + 1) % vk12::graph_count;
 }
 
 void swapchain::create() {

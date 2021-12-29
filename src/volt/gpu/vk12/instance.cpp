@@ -187,8 +187,8 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 	return adapters;
 }
 
-uint32_t instance::concurrent_frames() {
-	return vk12::concurrent_frames;
+uint32_t instance::graph_count() {
+	return vk12::graph_count;
 }
 
 }
