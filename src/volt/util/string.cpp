@@ -12,7 +12,7 @@ void ltrim(std::string &str) {
 void rtrim(std::string &str) {
 	auto begin = std::find_if(str.rbegin(), str.rend(),
 			[](char c) { return !std::isspace(c); }).base();
-    str.erase(begin, str.end());
+	str.erase(begin, str.end());
 }
 
 void trim(std::string &str) {

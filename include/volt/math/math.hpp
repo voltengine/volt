@@ -2,7 +2,9 @@
 
 #include "../macros.hpp"
 
+#include <cstdint>
 #include <numbers>
+#include <type_traits>
 
 namespace volt::math {
 
@@ -59,8 +61,8 @@ template<scalar X>
 inline X abs(X x);
 
 template<scalar A, scalar B,
-		scalar Epsilon = decltype(epsilon)>
-bool is_approx(A a, B b, Epsilon epsilon = epsilon);
+		scalar Epsilon = decltype(math::epsilon)>
+bool is_approx(A a, B b, Epsilon epsilon = math::epsilon);
 
 // Trigonometry
 

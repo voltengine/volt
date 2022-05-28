@@ -11,6 +11,10 @@ const entity entity::null;
 
 entity::entity() : world(nullptr) {}
 
+entity entity::_make(ecs::world *world, size_t id) {
+	return entity(world, id, world->entities[id].version);
+}
+
 std::ostream &operator<<(std::ostream &lhs, entity rhs) {
 	if (!rhs.world)
 		return lhs << "Null Entity";
@@ -55,7 +59,7 @@ void entity::remove(const std::string &name) const {
 	world->remove_component_by_name(id, name);
 }
 
-entity::entity(ecs::world *world, uint32_t id, uint32_t version)
+entity::entity(ecs::world *world, size_t id, size_t version)
 		: world(world), id(id), version(version) {}
 
 }

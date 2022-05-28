@@ -2,6 +2,8 @@
 
 #include "../macros.hpp"
 
+#include <ostream>
+
 #include "math.hpp"
 
 namespace volt::math {

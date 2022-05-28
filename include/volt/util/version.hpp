@@ -39,18 +39,20 @@ public:
 
 	int32_t compare(const version &other) const noexcept;
 
-	bool is_backward_compatible(const version &previous) const noexcept;
+	// Example use:
+	// provided_version.backward_compatible(required_version)
+	bool backward_compatible(const version &previous) const noexcept;
 
-	const std::vector<std::string> &get_pre_release() const noexcept;
+	const std::vector<std::string> &pre_release() const noexcept;
 
-	void set_pre_release(const std::vector<std::string> &pre_release);
+	void pre_release(const std::vector<std::string> &pre_release);
 
-	const std::vector<std::string> &get_build_metadata() const noexcept;
+	const std::vector<std::string> &build_metadata() const noexcept;
 
-	void set_build_metadata(const std::vector<std::string> &build_metadata);
+	void build_metadata(const std::vector<std::string> &build_metadata);
 
 private:
-	std::vector<std::string> pre_release, build_metadata;
+	std::vector<std::string> _pre_release, _build_metadata;
 };
 
 }

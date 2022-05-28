@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <ostream>
 
-#include "world.hpp"
-
 namespace volt::ecs {
+
+class world;
 
 class entity {
 public:
@@ -16,6 +16,8 @@ public:
 	VOLT_API static const entity null;
 
 	VOLT_API entity();
+
+	VOLT_API static entity _make(ecs::world *world, size_t id);
 
 	VOLT_API friend std::ostream &operator<<(std::ostream &lhs, entity rhs);
 
@@ -45,12 +47,9 @@ public:
 
 private:
 	world *world;
-	uint32_t id, version;
+	size_t id, version;
 
-	VOLT_API entity(ecs::world *world, uint32_t id, uint32_t version);
-
-	template<typename T>
-	std::string get_type_name();
+	VOLT_API entity(ecs::world *world, size_t id, size_t version);
 };
 
 }

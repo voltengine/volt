@@ -22,7 +22,7 @@ void _log(const std::string &prefix, std::string message, const fs::path &file, 
 
 	static auto log = []() {
 		auto now = system_clock::now();
-    	std::string iso_day = date::format("%F", now);
+		std::string iso_day = date::format("%F", now);
 
 		fs::path logs_path = paths::data() / "logs";
 		fs::path log_path;
@@ -39,7 +39,7 @@ void _log(const std::string &prefix, std::string message, const fs::path &file, 
 	auto now = floor<seconds>(system_clock::now());
 	std::string timestamp = date::format("%T", now);
 
-    log << '[' << timestamp << "] " << prefix << message << std::endl;
+	log << '[' << timestamp << "] " << prefix << message << std::endl;
 }
 
 void info(const std::string &message, const fs::path &file, size_t line) {

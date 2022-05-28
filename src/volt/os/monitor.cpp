@@ -26,7 +26,7 @@ std::vector<std::shared_ptr<monitor>> monitor::enumerate() {
 		glfw_monitors,
 		glfw_monitors + num_glfw_monitors,
 		monitors.begin(),
-        [](GLFWmonitor *glfw_monitor) {
+		[](GLFWmonitor *glfw_monitor) {
 			return std::shared_ptr<monitor>(new monitor(glfw_monitor));
 		}
 	);

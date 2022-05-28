@@ -14,8 +14,8 @@ version::version(uint32_t major, uint32_t minor, uint32_t patch,
 		const std::vector<std::string> &pre_release,
 		const std::vector<std::string> &build_metadata)
 		: major(major), minor(minor), patch(patch) {
-	set_pre_release(pre_release);
-	set_build_metadata(build_metadata);
+	this->pre_release(pre_release);
+	this->build_metadata(build_metadata);
 }
 
 version::version(const std::string &str) {
@@ -32,24 +32,24 @@ version::version(const std::string &str) {
 	major = std::stoul(match.str(1));
 	minor = std::stoul(match.str(2));
 	patch = std::stoul(match.str(3));
-	pre_release = util::split(match.str(4), ".", true);
-	build_metadata = util::split(match.str(5), ".", true);
+	_pre_release = util::split(match.str(4), ".", true);
+	_build_metadata = util::split(match.str(5), ".", true);
 }
 
 std::ostream &operator<<(std::ostream &lhs, const version &rhs) {
 	lhs << rhs.major << '.' << rhs.minor << '.' << rhs.patch;
 
-	if (rhs.pre_release.size() > 0) {
-		lhs << '-' << std::accumulate(rhs.pre_release.begin() + 1,
-				rhs.pre_release.end(), rhs.pre_release[0],
+	if (rhs._pre_release.size() > 0) {
+		lhs << '-' << std::accumulate(rhs._pre_release.begin() + 1,
+				rhs._pre_release.end(), rhs._pre_release[0],
 				[](std::string &&str, const std::string &identifier) {
 					return std::move(str) + '.' + identifier;
 				});
 	}
 
-	if (rhs.build_metadata.size() > 0) {
-		lhs << '+' << std::accumulate(rhs.build_metadata.begin() + 1,
-				rhs.build_metadata.end(), rhs.build_metadata[0],
+	if (rhs._build_metadata.size() > 0) {
+		lhs << '+' << std::accumulate(rhs._build_metadata.begin() + 1,
+				rhs._build_metadata.end(), rhs._build_metadata[0],
 				[](std::string &&str, const std::string &identifier) {
 					return std::move(str) + '.' + identifier;
 				});
@@ -102,16 +102,16 @@ int32_t version::compare(const version &other) const noexcept {
 	if (patch != other.patch)
 		return patch > other.patch ? 1 : -1;
 
-	size_t a_size = pre_release.size();
-	size_t b_size = other.pre_release.size();
+	size_t a_size = _pre_release.size();
+	size_t b_size = other._pre_release.size();
 
 	size_t min_size = std::min(a_size, b_size);
 	if (min_size == 0)
 		return a_size == 0 ? 1 : -1;
 
 	for (size_t i = 0; i < min_size; i++) {
-		auto &a = pre_release[i];
-		auto &b = other.pre_release[i];
+		auto &a = _pre_release[i];
+		auto &b = other._pre_release[i];
 
 		// These won't throw
 		bool a_numeric = std::all_of(a.begin(), a.end(), [](auto &c) noexcept { return std::isdigit(c); });
@@ -143,20 +143,17 @@ int32_t version::compare(const version &other) const noexcept {
 	return 0;
 }
 
-bool version::is_backward_compatible(const version &previous) const noexcept {
-	// Example use:
-	// provided_version.is_backward_compatible(required_version)
-
+bool version::backward_compatible(const version &previous) const noexcept {
 	if (major != previous.major)
 		return false;
 	return previous < *this;
 }
 
-const std::vector<std::string> &version::get_pre_release() const noexcept {
-	return pre_release;
+const std::vector<std::string> &version::pre_release() const noexcept {
+	return _pre_release;
 }
 
-void version::set_pre_release(const std::vector<std::string> &pre_release) {
+void version::pre_release(const std::vector<std::string> &pre_release) {
 	static const std::regex validator("[0-9A-Za-z-]+");
 
 	for (const std::string &identifier : pre_release) {
@@ -173,17 +170,17 @@ void version::set_pre_release(const std::vector<std::string> &pre_release) {
 		}
 	}
 
-	this->pre_release = pre_release;
+	this->_pre_release = pre_release;
 }
 
-const std::vector<std::string> &version::get_build_metadata() const noexcept {
-	return build_metadata;
+const std::vector<std::string> &version::build_metadata() const noexcept {
+	return _build_metadata;
 }
 
-void version::set_build_metadata(const std::vector<std::string> &build) {
+void version::build_metadata(const std::vector<std::string> &build_metadata) {
 	static const std::regex validator("[0-9A-Za-z-]+");
 
-	for (std::string &identifier : build_metadata) {
+	for (const std::string &identifier : build_metadata) {
 		if (identifier.empty() || !std::regex_match(identifier, validator)) {
 			throw std::invalid_argument("Identifiers must comprise"
 					" only ASCII alphanumerics and hyphens."
@@ -191,7 +188,7 @@ void version::set_build_metadata(const std::vector<std::string> &build) {
 		}
 	}
 
-	this->build_metadata = build_metadata;
+	this->_build_metadata = build_metadata;
 }
 
 }

@@ -1,3 +1,5 @@
+#include <cmath>
+
 namespace volt::math {
 
 // Basic

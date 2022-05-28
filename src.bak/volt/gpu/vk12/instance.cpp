@@ -187,7 +187,7 @@ std::vector<std::shared_ptr<gpu::adapter>> instance::enumerate_adapters() {
 	return adapters;
 }
 
-uint32_t instance::graph_count() {
+uint32_t instance::graph_count() const {
 	return vk12::graph_count;
 }
 

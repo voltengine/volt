@@ -43,7 +43,7 @@ unset(VOLT_PACKAGE_VERSION)
 # adds C++ sources from ./src/ and ./include/ and
 # defines C++ 20 as the required standard
 # Additionally generates module_main from annotations
-# Can be called only just once for each package
+# Can be called only once for each package
 set(VOLT_LIST_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE INTERNAL "")
 function(volt_add_module target)
 	# Detect information about the package
@@ -57,12 +57,6 @@ function(volt_add_module target)
 		"${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 		"${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp"
 	)
-
-	# Transform list of headers into a string
-	# of space-separated command line arguments
-	list(TRANSFORM TARGET_HEADERS PREPEND "\"" OUTPUT_VARIABLE QUOTED_TARGET_HEADERS)
-	list(TRANSFORM QUOTED_TARGET_HEADERS APPEND "\"")
-	list(JOIN QUOTED_TARGET_HEADERS " " SPACE_SEPARATED_HEADERS)
 
 	string(REPLACE "-" "_" GENERATED_SOURCE_NAME ${VOLT_PACKAGE_NAME})
 	set(GENERATED_SOURCE "${CMAKE_BINARY_DIR}/generated/${GENERATED_SOURCE_NAME}.cpp")
@@ -104,9 +98,15 @@ function(volt_add_module target)
 	endif()
 
 	# Add module_main source file generation step
+	if (${VOLT_DEVELOPMENT})
+		set(DEVELOPMENT_ENABLED true)
+	else()
+		set(DEVELOPMENT_ENABLED false)
+	endif()
+
 	add_custom_command(
 		OUTPUT ${GENERATED_SOURCE}
-		COMMAND "python" "$CACHE{VOLT_LIST_DIR}/generate_module_main.py" ${VOLT_DEVELOPMENT} "${CMAKE_CURRENT_SOURCE_DIR}" "${GENERATED_SOURCE}" ${SPACE_SEPARATED_HEADERS}
+		COMMAND "python" "$CACHE{VOLT_LIST_DIR}/generate_module_main.py" ${DEVELOPMENT_ENABLED} "${CMAKE_CURRENT_SOURCE_DIR}" "${GENERATED_SOURCE}" ${TARGET_HEADERS}
 		DEPENDS ${TARGET_HEADERS}
 	)
 endfunction()
@@ -126,7 +126,7 @@ target_link_libraries(${PROJECT_NAME}
 	Termcolor::Termcolor
 )
 
-# Include Vulkan on non-Apple operating systems
+# Link Vulkan on non-Apple operating systems
 if(NOT APPLE)
 	target_link_libraries(${PROJECT_NAME}
 		Glad::Glad
@@ -135,7 +135,7 @@ if(NOT APPLE)
 	)
 endif()
 
-# Include Direct3D 12 on Windows
+# Link Direct3D 12 on Windows
 if(WIN32)
 	target_link_libraries(${PROJECT_NAME}
 		D3D12MemoryAllocator::D3D12MemoryAllocator

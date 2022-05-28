@@ -7,5 +7,7 @@
 	"cmake.configureArgs": [
 		"-DVOLT_DEVELOPMENT=ON",
 		"-DVOLT_GPU_DEBUG=ON"
-	]
+	],
+	"cmake.configureOnOpen": false,
+    "cmake.autoSelectActiveFolder": false
 }

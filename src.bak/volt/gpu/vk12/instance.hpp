@@ -19,7 +19,7 @@ public:
 
 	std::vector<std::shared_ptr<gpu::adapter>> enumerate_adapters() override;
 
-	uint32_t graph_count() override;
+	uint32_t graph_count() const override;
 };
 
 }

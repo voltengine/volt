@@ -1,5 +1,7 @@
 import os, pathlib, re, sys
 
+print(sys.argv)
+
 development = (sys.argv[1] == 'true')
 
 annotations = {
@@ -99,8 +101,8 @@ lines = []
 
 lines.append('#include <volt/macros.hpp>')
 lines.append('')
-lines.append('#include <volt/assets/assets.hpp>')
-lines.append('#include <volt/ecs/ecs.hpp>')
+# lines.append('#include <volt/assets/assets.hpp>')
+# lines.append('#include <volt/ecs/ecs.hpp>')
 lines.append('#include <volt/modules.hpp>')
 lines.append('')
 

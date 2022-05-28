@@ -38,10 +38,6 @@ static void iterate_development_paths(const std::function<bool(fs::path &)> &cal
 
 #endif
 
-static asset *load_asset() {
-
-}
-
 const std::unordered_map<std::string, std::set<std::string>> &get_types() {
 	return module_name_to_types;
 }
@@ -204,7 +200,8 @@ void module_unload_callback(const std::string &module_name) {
 		));
 
 		for (auto &item : path_to_cached_owner) {
-			if (type_index_to_type[typeid(*item.second->ptr.get())] != type)
+			asset *ptr = item.second->ptr.get();
+			if (type_index_to_type[typeid(*ptr)] != type)
 				continue;
 
 			// remember state
