@@ -5,11 +5,11 @@ print(sys.argv)
 development = (sys.argv[1] == 'true')
 
 annotations = {
-	'VOLT_MODULE_LOAD_CALLBACK': 'volt::modules::register_load_callback({id});',
-	'VOLT_MODULE_UNLOAD_CALLBACK': 'volt::modules::register_unload_callback({id});',
-	'VOLT_COMPONENT': 'volt::ecs::register_component<{id}>("{id}");',
-	'VOLT_SYSTEM': 'volt::ecs::register_system<{id}>("{id}");',
-	'VOLT_ASSET': 'volt::assets::register_type<{id}>("{id}");'
+	'VOLT_DEVELOPMENT_MODULE_LOAD_CALLBACK': 'volt::modules::_internal::register_development_module_load_callback({id});',
+	'VOLT_DEVELOPMENT_MODULE_UNLOAD_CALLBACK': 'volt::modules::_internal::register_development_module_unload_callback({id});',
+	'VOLT_COMPONENT': 'volt::ecs::_internal::register_component<{id}>("{id}");',
+	'VOLT_SYSTEM': 'volt::ecs::_internal::register_system<{id}>("{id}");',
+	'VOLT_ASSET': 'volt::assets::_internal::register_type<{id}>("{id}");'
 }
 
 headers_to_include = []
@@ -99,11 +99,7 @@ for i in range(4, len(sys.argv)):
 
 lines = []
 
-lines.append('#include <volt/macros.hpp>')
-lines.append('')
-# lines.append('#include <volt/assets/assets.hpp>')
-# lines.append('#include <volt/ecs/ecs.hpp>')
-lines.append('#include <volt/modules.hpp>')
+lines.append('#include <volt/volt.hpp>')
 lines.append('')
 
 for header in headers_to_include:

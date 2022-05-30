@@ -7,25 +7,12 @@
 #include <string>
 #include <unordered_map>
 
-#define VOLT_MODULE_LOAD_CALLBACK
-#define VOLT_MODULE_UNLOAD_CALLBACK
+#define VOLT_DEVELOPMENT_MODULE_LOAD_CALLBACK
+#define VOLT_DEVELOPMENT_MODULE_UNLOAD_CALLBACK
 
 namespace volt::modules {
 
-using load_callback = std::function<void(const std::string &)>;
-using unload_callback = load_callback;
-
-#ifdef VOLT_PLATFORM_LINUX
-constexpr char module_extension[] = ".so";
-#elif defined(VOLT_PLATFORM_WINDOWS)
-constexpr char module_extension[] = ".dll";
-#endif
-
 inline std::string this_module_name();
-
-VOLT_API void load();
-
-VOLT_API void unload();
 
 #ifdef VOLT_DEVELOPMENT
 
@@ -33,22 +20,32 @@ VOLT_API void reload_development_module();
 
 #endif
 
-VOLT_API const std::set<std::string> &get_names();
-
-inline void register_load_callback(const load_callback &callback);
-
-inline void register_unload_callback(const unload_callback &callback);
+VOLT_API const std::set<std::string> &names();
 
 }
 
 namespace volt::modules::_internal {
 
 VOLT_API extern std::unordered_map<std::string, std::vector<
-		unload_callback>> module_name_to_unload_callbacks;
+		std::function<void()>>> module_name_to_development_module_unload_callbacks;
 VOLT_API extern std::unordered_map<std::string, std::vector<
-		load_callback>> module_name_to_load_callbacks;
+		std::function<void()>>> module_name_to_development_module_load_callbacks;
 
-inline std::string path_to_name(const std::string &path);
+VOLT_API std::string path_to_name(const std::string &path);
+
+VOLT_API void load();
+
+VOLT_API void unload();
+
+#ifdef VOLT_DEVELOPMENT
+
+// Load callbacks are executed after the module is loaded and after volt_module_main() was called
+inline void register_development_module_load_callback(const std::function<void()> &callback);
+
+// Load callbacks are executed before any unloading happens
+inline void register_development_module_unload_callback(const std::function<void()> &callback);
+
+#endif
 
 }
 

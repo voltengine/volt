@@ -7,12 +7,6 @@ dynamic_bitset::dynamic_bitset(size_t size) {
 	resize(size);
 }
 
-dynamic_bitset::dynamic_bitset(const dynamic_bitset &other)
-		: chunks(other.chunks) {}
-
-dynamic_bitset::dynamic_bitset(dynamic_bitset &&other)
-		: chunks(std::move(other.chunks)) {}
-
 std::ostream &operator<<(std::ostream &lhs, const dynamic_bitset &rhs) {
 	for (auto it = rhs.chunks.rbegin(); it != rhs.chunks.rend(); it++)
 		lhs << std::bitset<dynamic_bitset::chunk_size>(*it);

@@ -14,11 +14,15 @@ public:
 
     VOLT_API dynamic_bitset(size_t size);
 
-    VOLT_API dynamic_bitset(const dynamic_bitset &other);
+    dynamic_bitset(const dynamic_bitset &other) = default;
 
-    VOLT_API dynamic_bitset(dynamic_bitset &&other);
+    dynamic_bitset(dynamic_bitset &&other) = default;
 
 	VOLT_API friend std::ostream &operator<<(std::ostream &lhs, const dynamic_bitset &rhs);
+
+    dynamic_bitset &operator=(const dynamic_bitset &other) = default;
+    
+    dynamic_bitset &operator=(dynamic_bitset &&other) = default;
 
     VOLT_API bool operator==(const dynamic_bitset &rhs) const;
 

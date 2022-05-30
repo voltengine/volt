@@ -1,6 +1,6 @@
 #include "../modules.hpp"
 
-namespace volt::assets {
+namespace volt::assets::_internal {
 
 template<std::derived_from<asset> T>
 void register_type(const std::string &name) {

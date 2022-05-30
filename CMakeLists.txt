@@ -13,7 +13,6 @@ endfunction()
 
 # Set build options
 set(VOLT_DEVELOPMENT true CACHE BOOL "Build app with development features (i.e. the editor and additional error checks).")
-set(VOLT_MAX_COMPONENTS "128" CACHE STRING "Maximum number of registered components.")
 set(VOLT_GPU_DEBUG false CACHE BOOL "Build app with graphics API debugging enabled.")
 
 # Read root package name into $CACHE{VOLT_DEVELOPMENT_MODULE}
@@ -86,7 +85,6 @@ function(volt_add_module target)
 	)
 
 	# Add precompiler definitions and set build type
-	target_compile_definitions(${target} PUBLIC VOLT_MAX_COMPONENTS=${VOLT_MAX_COMPONENTS})
 	target_compile_definitions(${target} PUBLIC VOLT_VERSION="$CACHE{VOLT_VERSION}")
 	if(VOLT_DEVELOPMENT)
 		target_compile_definitions(${target} PUBLIC VOLT_DEVELOPMENT)

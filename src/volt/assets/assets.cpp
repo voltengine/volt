@@ -168,27 +168,24 @@ std::unordered_map<std::string, asset_owner *> path_to_cached_owner;
 
 #ifdef VOLT_DEVELOPMENT
 
-void module_load_callback(const std::string &module_name) {
-	// There's no point in handling other modules,
-	// because they won't ever be reloaded and
-	// their state will never have to be recovered
-	if (module_name != VOLT_DEVELOPMENT_MODULE)
-		return;
-
-	for (auto &type : module_name_to_types[VOLT_DEVELOPMENT_MODULE]) {
-		for (auto &item : development_reload_snapshot[type]) {
-			path_to_cached_owner[item.first]->ptr.reset(type_to_constructor[type]());
-			path_to_cached_owner[item.first]->ptr->deserialize(item.second);
+void development_module_load_callback() {
+	if (module_name_to_types.contains(VOLT_DEVELOPMENT_MODULE)) {
+		for (auto &type : module_name_to_types[VOLT_DEVELOPMENT_MODULE]) {
+			for (auto &item : development_reload_snapshot[type]) {
+				path_to_cached_owner[item.first]->ptr.reset(type_to_constructor[type]());
+				path_to_cached_owner[item.first]->ptr->deserialize(item.second);
+			}
 		}
 	}
 
 	development_reload_snapshot.clear();
 }
 
-#endif
+void development_module_unload_callback() {
+	if (!module_name_to_types.contains(VOLT_DEVELOPMENT_MODULE))
+		return;
 
-void module_unload_callback(const std::string &module_name) {
-	for (auto &type : module_name_to_types[module_name]) {
+	for (auto &type : module_name_to_types[VOLT_DEVELOPMENT_MODULE]) {
 		type_to_constructor.erase(type);
 
 		type_index_to_type.erase(std::find_if(
@@ -204,19 +201,17 @@ void module_unload_callback(const std::string &module_name) {
 			if (type_index_to_type[typeid(*ptr)] != type)
 				continue;
 
-			// remember state
-#ifdef VOLT_DEVELOPMENT
-			if (module_name == VOLT_DEVELOPMENT_MODULE) {
-				nl::json data = item.second->ptr->serialize();
-				development_reload_snapshot[type][item.first] = data;
-			}
-#endif
+			// Remember state
+			nl::json data = item.second->ptr->serialize();
+			development_reload_snapshot[type][item.first] = data;
 
 			item.second->ptr.reset();
 		}
 	}
 
-	module_name_to_types.erase(module_name);
+	module_name_to_types.erase(VOLT_DEVELOPMENT_MODULE);
 }
+
+#endif
 
 }

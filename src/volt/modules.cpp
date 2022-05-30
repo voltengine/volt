@@ -11,36 +11,44 @@ namespace nl = nlohmann;
 
 #ifdef VOLT_PLATFORM_LINUX
 using module_handle = void *;
+constexpr char module_prefix[] = "lib";
+constexpr char module_suffix[] = ".so";
 #elif defined(VOLT_PLATFORM_WINDOWS)
 using module_handle = HINSTANCE;
+constexpr char module_prefix[] = "";
+constexpr char module_suffix[] = ".dll";
 #endif
 
 static std::set<std::string> module_names;
 static std::unordered_map<std::string, module_handle> module_name_to_handle;
 
 static fs::path name_to_path(const std::string &name) {
-	return fs::current_path() / (name + volt::modules::module_extension);
+	return fs::current_path() / (module_prefix + name + module_suffix);
 }
 
 namespace volt::modules {
 
-static void run_load_callbacks(const std::string &name) {
-	for (auto &item : _internal::module_name_to_load_callbacks) {
+#ifdef VOLT_DEVELOPMENT
+
+static void run_development_module_load_callbacks() {
+	for (auto &item : _internal::module_name_to_development_module_load_callbacks) {
 		for (auto &callback : item.second)
-			callback(name);
+			callback();
 	}
 }
 
-static void run_unload_callbacks(const std::string &name) {
-	for (auto &item : _internal::module_name_to_unload_callbacks) {
+static void run_development_module_unload_callbacks() {
+	for (auto &item : _internal::module_name_to_development_module_unload_callbacks) {
 		for (auto &callback : item.second)
-			callback(name);
+			callback();
 	}
 }
+
+#endif
 
 // Use only after run_unload_callbacks
 static void unload_without_erasing_name(const std::string &name) {
-	_internal::module_name_to_unload_callbacks.erase(name);
+	_internal::module_name_to_development_module_unload_callbacks.erase(name);
 
 	#ifdef VOLT_PLATFORM_LINUX
 		dlclose(module_name_to_handle[name]);
@@ -66,7 +74,7 @@ static void load(const std::string &name, bool throw_errors) {
 		return;
 	}
 
-	// This is needed for emergency unload
+	// This is needed here before possible emergency unload
 	module_name_to_handle[name] = std::move(handle);
 
 	// We must copy any potential exception from module_main
@@ -75,7 +83,7 @@ static void load(const std::string &name, bool throw_errors) {
 	try {
 		using volt_module_main = void (*)();
 #ifdef VOLT_PLATFORM_LINUX
-		auto module_main = reinterpret_cast<volt_module_main>(dlsym(handle, "volt_module_load"));
+		auto module_main = reinterpret_cast<volt_module_main>(dlsym(handle, "volt_module_main"));
 #elif defined(VOLT_PLATFORM_WINDOWS)
 		auto module_main = reinterpret_cast<volt_module_main>(GetProcAddress(handle, "volt_module_main"));
 #endif
@@ -93,7 +101,10 @@ static void load(const std::string &name, bool throw_errors) {
 	
 	if (local_error.has_value()) {
 		// We can unload only outside of the try-catch
-		run_unload_callbacks(name);
+#ifdef VOLT_DEVELOPMENT
+		if (name == VOLT_DEVELOPMENT_MODULE)
+			run_development_module_unload_callbacks();
+#endif
 		unload_without_erasing_name(name);
 		throw local_error.value();
 	}
@@ -101,60 +112,16 @@ static void load(const std::string &name, bool throw_errors) {
 	module_names.emplace(name);
 }
 
-void load() {
-	for (auto &item : fs::directory_iterator(fs::current_path())) {
-		auto &path = item.path();
-		if (path.extension() != module_extension)
-			continue;
-		
-		std::string name = _internal::path_to_name(path.string());
-
-#ifdef VOLT_DEVELOPMENT
-		if (name == VOLT_DEVELOPMENT_MODULE)
-			continue;
-#endif
-
-		try {
-			load(name, false);
-		} catch (volt::error &e) {
-			volt::log::error(e.what(), e.where(), e.at());
-		}
-	}
-
-#ifdef VOLT_DEVELOPMENT
-	try {
-		load(VOLT_DEVELOPMENT_MODULE, false);
-	} catch (volt::error &e) {
-		volt::log::error(e.what(), e.where(), e.at());
-		VOLT_LOG_WARNING("Failed to load development module. "
-				"Please correct the errors and attempt to reload.")
-	}
-#endif
-
-	for (auto &name : module_names)
-		run_load_callbacks(name);
-}
-
-void unload() {
-	for (auto &name : module_names)
-		run_unload_callbacks(name);
-
-	for (auto &name : module_names)
-		unload_without_erasing_name(name);
-
-	module_names.clear();
-}
-
 #ifdef VOLT_DEVELOPMENT
 
 void reload_development_module() {
 	auto cache_path = fs::path(VOLT_DEVELOPMENT_PATH) / "cache";
-	auto src = cache_path / "cmake" / "bin" / (std::string(VOLT_DEVELOPMENT_MODULE) + module_extension);
-	auto dst = cache_path / "bin" / (std::string(VOLT_DEVELOPMENT_MODULE) + module_extension);
-	auto backup_path = cache_path / (std::string("reload-backup") + module_extension);
+	auto src = cache_path / "cmake" / "bin" / (module_prefix + std::string(VOLT_DEVELOPMENT_MODULE) + module_suffix);
+	auto dst = cache_path / "bin" / (module_prefix + std::string(VOLT_DEVELOPMENT_MODULE) + module_suffix);
+	auto backup_path = cache_path / (module_prefix + std::string("reload-backup") + module_suffix);
 
 	if (module_name_to_handle.contains(VOLT_DEVELOPMENT_MODULE)) {
-		run_unload_callbacks(VOLT_DEVELOPMENT_MODULE);
+		run_development_module_unload_callbacks();
 		unload_without_erasing_name(VOLT_DEVELOPMENT_MODULE);
 		module_names.erase(VOLT_DEVELOPMENT_MODULE);
 		
@@ -184,12 +151,12 @@ void reload_development_module() {
 			VOLT_LOG_ERROR("No backup available. Development module will remain unloaded.");
 	}
 
-	run_load_callbacks(VOLT_DEVELOPMENT_MODULE);
+	run_development_module_load_callbacks();
 }
 
 #endif
 
-const std::set<std::string> &get_names() {
+const std::set<std::string> &names() {
 	return module_names;
 }
 
@@ -197,9 +164,59 @@ const std::set<std::string> &get_names() {
 
 namespace volt::modules::_internal {
 
-std::unordered_map<std::string, std::vector<
-		load_callback>> module_name_to_load_callbacks;
-std::unordered_map<std::string, std::vector<
-		unload_callback>> module_name_to_unload_callbacks;
+std::unordered_map<std::string, std::vector<std::function<void()>>>
+		module_name_to_development_module_load_callbacks;
+std::unordered_map<std::string, std::vector<std::function<void()>>>
+		module_name_to_development_module_unload_callbacks;
+
+std::string path_to_name(const std::string &path) {
+#ifdef VOLT_PLATFORM_LINUX
+	size_t filename_index = path.rfind('/') + 1;
+#elif defined(VOLT_PLATFORM_WINDOWS)
+	size_t filename_index = path.rfind('\\') + 1;
+#endif
+
+	size_t start  = filename_index + (sizeof(module_prefix) - 1);
+	size_t length = path.size() - start - (sizeof(module_suffix) - 1);
+	return path.substr(start, length);
+}
+
+void load() {
+	for (auto &item : fs::directory_iterator(fs::current_path())) {
+		auto &path = item.path();
+		if (path.extension() != module_suffix || !path.filename().string().starts_with(module_prefix))
+			continue;
+		
+		std::string name = _internal::path_to_name(path.string());
+
+#ifdef VOLT_DEVELOPMENT
+		if (name == VOLT_DEVELOPMENT_MODULE)
+			continue;
+#endif
+
+		// If this throws then the program is killed
+		volt::modules::load(name, false);
+	}
+
+	// Loading development module after all other modules will make reloading much easier
+#ifdef VOLT_DEVELOPMENT
+	try {
+		volt::modules::load(VOLT_DEVELOPMENT_MODULE, false);
+		run_development_module_load_callbacks();
+	} catch (volt::error &e) {
+		// We allow development module to fail to load without emergency exit
+		volt::log::error(e.what(), e.where(), e.at());
+		VOLT_LOG_WARNING("Failed to load development module. "
+				"Please correct the errors and attempt to reload.")
+	}
+#endif
+}
+
+void unload() {
+	for (auto &name : module_names)
+		unload_without_erasing_name(name);
+
+	module_names.clear();
+}
 
 }

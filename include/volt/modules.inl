@@ -41,29 +41,22 @@ std::string this_module_name() {
 #endif
 }
 
-void register_load_callback(const load_callback &callback) {
-	_internal::module_name_to_load_callbacks[
-			this_module_name()].push_back(callback);
-}
-
-void register_unload_callback(const unload_callback &callback) {
-	_internal::module_name_to_unload_callbacks[
-			this_module_name()].push_back(callback);
-}
-
 }
 
 namespace volt::modules::_internal {
 
-inline std::string path_to_name(const std::string &path) {
-#ifdef VOLT_PLATFORM_LINUX
-	size_t filename_index = path.rfind('/') + 1;
-#elif defined(VOLT_PLATFORM_WINDOWS)
-	size_t filename_index = path.rfind('\\') + 1;
-#endif
+#ifdef VOLT_DEVELOPMENT
 
-	size_t dot_index = path.rfind('.');
-	return path.substr(filename_index, dot_index - filename_index);
+void register_development_module_load_callback(const std::function<void()> &callback) {
+	_internal::module_name_to_development_module_load_callbacks[
+			this_module_name()].push_back(callback);
 }
+
+void register_development_module_unload_callback(const std::function<void()> &callback) {
+	_internal::module_name_to_development_module_unload_callbacks[
+			this_module_name()].push_back(callback);
+}
+
+#endif
 
 }

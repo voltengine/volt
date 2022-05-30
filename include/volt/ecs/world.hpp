@@ -38,6 +38,8 @@ public:
 	VOLT_API archetype(const util::dynamic_bitset &mask);
 
 	archetype(archetype &&other) = default;
+
+	archetype &operator=(archetype &&other) = default;
 };
 
 };
@@ -70,8 +72,17 @@ public:
 	template<typename T1, typename T2, typename... Tn>
 	void each(const std::type_identity_t<std::function<void(entity, T1 &, T2 &, Tn &...)>> &func);
 
-	// template<typename T1,typename... Tn>
+	// template<typename T1, typename... Tn>
 	// void each(const std::function<void(T1 &, Tn &...)> &func, util::thread_pool &pool, size_t least_entities_per_job = 50);
+
+#ifdef VOLT_DEVELOPMENT
+	// 
+	VOLT_API static void _register_development_components();
+
+	VOLT_API static void _unregister_development_components();
+
+	VOLT_API static void _clear_development_reload_snapshots();
+#endif
 
 private:
 	class entity_data {
@@ -80,11 +91,22 @@ private:
 		size_t archetype; // Index of the archetype in the world's archetypes vector
 	};
 
+	// std::list does not invaldiate iterators when it's modified
+	// so world instances can always remove themselves from the list
+	VOLT_API static std::list<world *> instances;
+
+	std::list<world *>::iterator instance_it;
+
 	std::vector<_internal::archetype> archetypes;
 	std::vector<std::vector<size_t>> component_index_to_archetype_indices;
 
 	std::vector<entity_data> entities;
 	std::vector<size_t> free_eids;
+
+#ifdef VOLT_DEVELOPMENT
+	// Component name -> (eid -> component data serialized as JSON)
+	std::unordered_map<std::string, std::unordered_map<uint32_t, nlohmann::json>> development_reload_snapshot;
+#endif
 
 	VOLT_API bool expired(size_t eid, size_t version) const;
 

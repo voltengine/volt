@@ -22,9 +22,6 @@ class asset_ref;
 
 using asset_path = std::string;
 
-template<std::derived_from<asset> T>
-void register_type(const std::string &type);
-
 VOLT_API const std::unordered_map<std::string, std::set<std::string>> &get_types();
 
 #ifdef VOLT_DEVELOPMENT
@@ -70,11 +67,14 @@ VOLT_API extern std::unordered_map<std::string, asset_owner *> path_to_cached_ow
 
 #ifdef VOLT_DEVELOPMENT
 
-VOLT_MODULE_LOAD_CALLBACK VOLT_API void module_load_callback(const std::string &module_name);
+VOLT_DEVELOPMENT_MODULE_LOAD_CALLBACK VOLT_API void development_module_load_callback();
+
+VOLT_DEVELOPMENT_MODULE_UNLOAD_CALLBACK VOLT_API void development_module_unload_callback();
 
 #endif
 
-VOLT_MODULE_UNLOAD_CALLBACK VOLT_API void module_unload_callback(const std::string &module_name);
+template<std::derived_from<asset> T>
+void register_type(const std::string &type);
 
 }
 
