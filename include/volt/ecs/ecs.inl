@@ -1,53 +1,46 @@
 #include "component_storage.hpp"
 
-namespace volt::ecs {
-
-template<typename T>
-const std::string &component_name() {
-	using namespace _internal;
-
-	VOLT_DEVELOPMENT_ASSERT(component_type_index_to_index.contains(typeid(T)),
-			std::string("No such component type registered: ") + typeid(T).name())
-
-	// It's not performance critical so we choose to not declare a reverse lookup map
-	size_t index = component_type_index_to_index[typeid(T)];
-	return std::find_if(
-		component_name_to_index.begin(),
-		component_name_to_index.end(),
-		[&](auto &item) {
-			return item.second == index;
-		}
-	)->first;
-}
-
-}
-
 namespace volt::ecs::_internal {
 
 template<typename T>
-void register_component(const std::string &name) {
+void register_component(const std::string &module_name, const std::string &name) {
 	VOLT_ASSERT(!component_name_to_index.contains(name),
 			"Component name \"" + name + "\" is already registered.")
 	VOLT_ASSERT(!component_type_index_to_index.contains(typeid(T)),
 			"Cannot register type as component \"" + name +
-			"\". It's already registered as \"" +
-			std::find_if(
-				component_name_to_index.begin(),
-				component_name_to_index.end(),
-				[](auto &item) {
-					return item.second == component_type_index_to_index[typeid(T)];
-				}
-			)->first + "\".")
+			"\". It's already registered as \"" + component_name(
+			component_type_index_to_index[typeid(T)]) + "\".")
 
 	size_t component_index = component_type_index_to_index.size();
 
-	module_name_to_component_names[modules::this_module_name()].push_back(name);
+	module_name_to_component_names[module_name].push_back(name);
 
 	component_type_index_to_index.emplace(typeid(T), component_index);
 	component_name_to_index.emplace(name, component_index);
 
 	component_index_to_storage_constructor.emplace_back([]() {
 		return new component_storage<T>;
+	});
+}
+
+template<typename T>
+void register_system(const std::string &module_name, const std::string &name) {
+	VOLT_ASSERT(!system_name_to_index.contains(name),
+			"system name \"" + name + "\" is already registered.")
+	VOLT_ASSERT(!system_type_index_to_index.contains(typeid(T)),
+			"Cannot register type as system \"" + name +
+			"\". It's already registered as \"" + system_name(
+			system_type_index_to_index[typeid(T)]) + "\".")
+
+	size_t system_index = system_type_index_to_index.size();
+
+	module_name_to_system_names[module_name].push_back(name);
+
+	system_type_index_to_index.emplace(typeid(T), system_index);
+	system_name_to_index.emplace(name, system_index);
+
+	system_index_to_constructor.emplace_back([]() {
+		return new T;
 	});
 }
 

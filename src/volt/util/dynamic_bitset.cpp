@@ -18,43 +18,52 @@ bool dynamic_bitset::operator==(const dynamic_bitset &rhs) const {
 	return chunks == rhs.chunks;
 }
 
+dynamic_bitset &dynamic_bitset::operator&=(const dynamic_bitset &rhs) {
+	size_t min_chunk_count = std::min(chunks.size(), rhs.chunks.size());
+
+	for (size_t i = 0; i < min_chunk_count; i++)
+		chunks[i] &= rhs.chunks[i];
+
+	return *this;
+}
+
+dynamic_bitset &dynamic_bitset::operator|=(const dynamic_bitset &rhs) {
+	size_t min_chunk_count = std::min(chunks.size(), rhs.chunks.size());
+
+	for (size_t i = 0; i < min_chunk_count; i++)
+		chunks[i] |= rhs.chunks[i];
+
+	return *this;
+}
+
+dynamic_bitset &dynamic_bitset::operator^=(const dynamic_bitset &rhs) {
+	size_t min_chunk_count = std::min(chunks.size(), rhs.chunks.size());
+
+	for (size_t i = 0; i < min_chunk_count; i++)
+		chunks[i] ^= rhs.chunks[i];
+
+	return *this;
+}
+
 dynamic_bitset dynamic_bitset::operator~() const {
 	return dynamic_bitset(*this).flip();
 }
 
 dynamic_bitset dynamic_bitset::operator&(const dynamic_bitset &rhs) const {
-	size_t chunk_count = std::max(chunks.size(), rhs.chunks.size());
-	size_t size = chunk_count * chunk_size;
-
-	dynamic_bitset bitset(size);
-
-	for (size_t i = 0; i < chunk_count; i++)
-		bitset.chunks[i] = chunks[i] & rhs.chunks[i];
-
+	dynamic_bitset bitset(*this);
+	bitset &= rhs;
 	return bitset;
 }
 
 dynamic_bitset dynamic_bitset::operator|(const dynamic_bitset &rhs) const {
-	size_t chunk_count = std::max(chunks.size(), rhs.chunks.size());
-	size_t size = chunk_count * chunk_size;
-
-	dynamic_bitset bitset(size);
-
-	for (size_t i = 0; i < chunk_count; i++)
-		bitset.chunks[i] = chunks[i] | rhs.chunks[i];
-
+	dynamic_bitset bitset(*this);
+	bitset |= rhs;
 	return bitset;
 }
 
 dynamic_bitset dynamic_bitset::operator^(const dynamic_bitset &rhs) const {
-	size_t chunk_count = std::max(chunks.size(), rhs.chunks.size());
-	size_t size = chunk_count * chunk_size;
-
-	dynamic_bitset bitset(size);
-
-	for (size_t i = 0; i < chunk_count; i++)
-		bitset.chunks[i] = chunks[i] ^ rhs.chunks[i];
-
+	dynamic_bitset bitset(*this);
+	bitset ^= rhs;
 	return bitset;
 }
 
@@ -65,7 +74,7 @@ size_t dynamic_bitset::size() const {
 size_t dynamic_bitset::count(bool value) const {
 	size_t count = 0;
 
-	for (const chunk_type &chunk : chunks) {
+	for (chunk_type chunk : chunks) {
 		for (size_t i = 0; i < chunk_size; i++) {
 			if (static_cast<bool>(chunk & (static_cast<chunk_type>(1UL) << i)) == value)
 				count++;
@@ -79,8 +88,19 @@ bool dynamic_bitset::test(size_t pos) const {
 	size_t chunk_index = pos / chunk_size;
 	size_t index       = pos % chunk_size;
 
-	const chunk_type &chunk = chunks[chunk_index];
+	chunk_type chunk = chunks[chunk_index];
 	return chunk & (static_cast<chunk_type>(1UL) << index);
+}
+
+bool dynamic_bitset::all(bool value) const {
+	chunk_type expected_chunk = value ? static_cast<chunk_type>(-1) : static_cast<chunk_type>(0);
+
+	for (chunk_type chunk : chunks) {
+		if (chunk != expected_chunk)
+			return false;
+	}
+
+	return true;
 }
 
 dynamic_bitset &dynamic_bitset::set(bool value) {

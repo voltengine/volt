@@ -24,8 +24,10 @@ namespace volt::ecs {
 
 using namespace _internal;
 
+std::list<world *> world::_instances;
+
 world::world() {
-	instance_it = instances.emplace(instances.end(), this);
+	instance_it = _instances.emplace(_instances.end(), this);
 
 	// Create empty archetype
 	archetypes.emplace_back();
@@ -36,7 +38,7 @@ world::world() {
 }
 
 world::~world() {
-	instances.erase(instance_it);
+	_instances.erase(instance_it);
 }
 
 entity world::create() {
@@ -68,7 +70,7 @@ entity world::root() {
 
 void world::_register_development_components() {
 	// For each world
-	for (auto *instance : instances) {
+	for (auto *instance : _instances) {
 		// Extend archetypes if necessary
 		for (_internal::archetype &archetype : instance->archetypes) {
 			if (archetype.mask.size() < component_count()) {
@@ -94,7 +96,7 @@ void world::_register_development_components() {
 
 void world::_unregister_development_components() {
 	// For each world
-	for (auto instance : instances) {
+	for (auto instance : _instances) {
 		// For each development component
 		for (auto &name : module_name_to_component_names[VOLT_DEVELOPMENT_MODULE]) {
 			size_t index = component_name_to_index[name];
@@ -170,13 +172,11 @@ void world::_unregister_development_components() {
 }
 
 void world::_clear_development_reload_snapshots() {
-	for (auto instance : instances)
+	for (auto instance : _instances)
 		instance->development_reload_snapshot.clear();
 }
 
 #endif
-
-std::list<world *> world::instances;
 
 bool world::expired(size_t eid, size_t version) const {
 	return entities[eid].version != version;

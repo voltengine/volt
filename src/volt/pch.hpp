@@ -15,6 +15,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <queue>
 #include <set>
 #include <stack>
 #include <thread>
@@ -24,7 +25,9 @@
 #include <unordered_set>
 #include <vector>
 
-#ifdef VOLT_PLATFORM_WINDOWS
+#ifdef VOLT_PLATFORM_LINUX
+	#include <dlfcn.h>
+#elif defined(VOLT_PLATFORM_WINDOWS)
 	#include <Windows.h>
 	#include <d3d12.h>
 	#include <D3D12MemAlloc.h>

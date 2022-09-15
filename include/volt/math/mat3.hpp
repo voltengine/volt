@@ -14,7 +14,10 @@ public:
 	static const mat3<T> identity;
 
 	union {
-		struct { vec3<T> x, y, z; };
+		class {
+		public:
+			vec3<T> x, y, z;
+		};
 		vec3<T> data[3];
 	};
 

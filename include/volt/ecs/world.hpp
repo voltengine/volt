@@ -52,6 +52,10 @@ class world {
 public:
 	friend entity;
 
+	// std::list does not invaldiate iterators when it's modified
+	// so world instances can always remove themselves from the list
+	VOLT_API static std::list<world *> _instances;
+
 	VOLT_API world();
 
 	VOLT_API ~world();
@@ -90,10 +94,6 @@ private:
 		size_t version = 0; // Entity version to odetermine whether it was removed or not
 		size_t archetype; // Index of the archetype in the world's archetypes vector
 	};
-
-	// std::list does not invaldiate iterators when it's modified
-	// so world instances can always remove themselves from the list
-	VOLT_API static std::list<world *> instances;
 
 	std::list<world *>::iterator instance_it;
 

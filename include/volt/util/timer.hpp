@@ -22,7 +22,7 @@ public:
 
 private:
 	bool _running;
-	std::chrono::high_resolution_clock::time_point start_time, end_time;
+	std::chrono::steady_clock::time_point start_time, end_time;
 };
 
 }

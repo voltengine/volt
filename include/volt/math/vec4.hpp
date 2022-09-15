@@ -201,7 +201,8 @@ vec4<Ret> mod(const vec4<X> &x, const vec4<Y> &y);
 namespace std {
 
 template<volt::math::scalar T>
-struct hash<volt::math::vec4<T>> {
+class hash<volt::math::vec4<T>> {
+public:
 	std::size_t operator()(volt::math::vec4<T> vec) const;
 };
 

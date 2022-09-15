@@ -1,5 +1,7 @@
 #include <type_traits>
 
+#include "../error.hpp"
+
 namespace volt::ecs::_internal {
 
 template<typename T>

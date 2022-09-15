@@ -1,9 +1,10 @@
+#include "../error.hpp"
 #include "../modules.hpp"
 
 namespace volt::assets::_internal {
 
 template<std::derived_from<asset> T>
-void register_type(const std::string &name) {
+void register_type(const std::string &module_name, const std::string &name) {
 	using namespace _internal;
 
 	VOLT_ASSERT(!type_to_constructor.contains(name),
@@ -13,7 +14,7 @@ void register_type(const std::string &name) {
 		return new T;
 	};
 
-	module_name_to_types[modules::this_module_name()].emplace(name);
+	module_name_to_types[module_name].emplace(name);
 	type_index_to_type[typeid(T)] = name;
 }
 

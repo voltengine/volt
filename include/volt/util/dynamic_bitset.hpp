@@ -25,6 +25,12 @@ public:
     dynamic_bitset &operator=(dynamic_bitset &&other) = default;
 
     VOLT_API bool operator==(const dynamic_bitset &rhs) const;
+    
+    VOLT_API dynamic_bitset &operator&=(const dynamic_bitset &rhs);
+
+    VOLT_API dynamic_bitset &operator|=(const dynamic_bitset &rhs);
+
+    VOLT_API dynamic_bitset &operator^=(const dynamic_bitset &rhs);
 
     VOLT_API dynamic_bitset operator~() const;
 
@@ -39,6 +45,8 @@ public:
     VOLT_API size_t count(bool value = true) const;
 
     VOLT_API bool test(size_t pos) const;
+
+    VOLT_API bool all(bool value = true) const;
 
     VOLT_API dynamic_bitset &set(bool value = true);
 

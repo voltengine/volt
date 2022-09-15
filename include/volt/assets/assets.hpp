@@ -74,7 +74,7 @@ VOLT_DEVELOPMENT_MODULE_UNLOAD_CALLBACK VOLT_API void development_module_unload_
 #endif
 
 template<std::derived_from<asset> T>
-void register_type(const std::string &type);
+void register_type(const std::string &module_name, const std::string &type);
 
 }
 

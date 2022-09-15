@@ -21,6 +21,10 @@ constexpr char module_suffix[] = ".dll";
 
 static std::set<std::string> module_names;
 static std::unordered_map<std::string, module_handle> module_name_to_handle;
+static std::unordered_map<std::string, std::vector<std::function<void()>>>
+		module_name_to_development_module_load_callbacks,
+		module_name_to_development_module_unload_callbacks,
+		module_name_to_unload_all_modules_callbacks;
 
 static fs::path name_to_path(const std::string &name) {
 	return fs::current_path() / (module_prefix + name + module_suffix);
@@ -31,14 +35,14 @@ namespace volt::modules {
 #ifdef VOLT_DEVELOPMENT
 
 static void run_development_module_load_callbacks() {
-	for (auto &item : _internal::module_name_to_development_module_load_callbacks) {
+	for (auto &item : module_name_to_development_module_load_callbacks) {
 		for (auto &callback : item.second)
 			callback();
 	}
 }
 
 static void run_development_module_unload_callbacks() {
-	for (auto &item : _internal::module_name_to_development_module_unload_callbacks) {
+	for (auto &item : module_name_to_development_module_unload_callbacks) {
 		for (auto &callback : item.second)
 			callback();
 	}
@@ -46,9 +50,18 @@ static void run_development_module_unload_callbacks() {
 
 #endif
 
+static void run_unload_all_modules_callbacks() {
+	for (auto &item : module_name_to_unload_all_modules_callbacks) {
+		for (auto &callback : item.second)
+			callback();
+	}
+}
+
 // Use only after run_unload_callbacks
 static void unload_without_erasing_name(const std::string &name) {
-	_internal::module_name_to_development_module_unload_callbacks.erase(name);
+	module_name_to_development_module_load_callbacks.erase(name);
+	module_name_to_development_module_unload_callbacks.erase(name);
+	module_name_to_unload_all_modules_callbacks.erase(name);
 
 	#ifdef VOLT_PLATFORM_LINUX
 		dlclose(module_name_to_handle[name]);
@@ -164,11 +177,6 @@ const std::set<std::string> &names() {
 
 namespace volt::modules::_internal {
 
-std::unordered_map<std::string, std::vector<std::function<void()>>>
-		module_name_to_development_module_load_callbacks;
-std::unordered_map<std::string, std::vector<std::function<void()>>>
-		module_name_to_development_module_unload_callbacks;
-
 std::string path_to_name(const std::string &path) {
 #ifdef VOLT_PLATFORM_LINUX
 	size_t filename_index = path.rfind('/') + 1;
@@ -213,10 +221,28 @@ void load() {
 }
 
 void unload() {
+	run_unload_all_modules_callbacks();
+
 	for (auto &name : module_names)
 		unload_without_erasing_name(name);
 
 	module_names.clear();
+}
+
+#ifdef VOLT_DEVELOPMENT
+
+void register_development_module_load_callback(const std::string &module_name, std::function<void()> callback) {
+	module_name_to_development_module_load_callbacks[module_name].emplace_back(std::move(callback));
+}
+
+void register_development_module_unload_callback(const std::string &module_name, std::function<void()> callback) {
+	module_name_to_development_module_unload_callbacks[module_name].emplace_back(std::move(callback));
+}
+
+#endif
+
+void register_unload_all_modules_callback(const std::string &module_name, std::function<void()> callback) {
+	module_name_to_unload_all_modules_callbacks[module_name].emplace_back(std::move(callback));
 }
 
 }

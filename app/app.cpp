@@ -25,6 +25,7 @@ int main() {
 #else
 		std::cout << "Hello from Volt App! (Development Disabled)" << '\n';
 #endif
+
 		volt::modules::_internal::load();
 
 		std::cout << "\nLoaded modules:\n";
@@ -45,13 +46,15 @@ int main() {
 			switch (c) {
 			case 'p':
 			{
-				auto &component_names = volt::ecs::component_names();
-				auto &system_names = volt::ecs::system_names();
+#ifdef VOLT_DEVELOPMENT
+				auto &component_names = volt::ecs::_internal::module_name_to_component_names;
+				auto &system_names = volt::ecs::_internal::module_name_to_system_names;
+#endif
 				auto &asset_types = volt::assets::get_types();
 
 				for (auto &module_name : volt::modules::names()) {
 					std::cout << '\n' << module_name;
-
+#ifdef VOLT_DEVELOPMENT
 					if (component_names.contains(module_name)) {
 						std::cout << "\n(components) ";
 						for (auto &component_name : component_names.at(module_name)) {
@@ -69,6 +72,7 @@ int main() {
 								std::cout << ", ";
 						}
 					}
+#endif
 					if (asset_types.contains(module_name)) {
 						std::cout << "\n(assets) ";
 
@@ -84,8 +88,7 @@ int main() {
 			}
 			case 'u':
 				try {
-					// volt::ecs::update_systems(0);
-					std::cout << "Systems are not implemented.\n";
+					volt::ecs::system::_update_all(0.0F);
 				} catch (volt::error &e) {
 					volt::log::error(e.what(), e.where(), e.at());
 				}

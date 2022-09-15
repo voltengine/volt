@@ -3,13 +3,15 @@ import os, pathlib, re, sys
 print(sys.argv)
 
 development = (sys.argv[1] == 'true')
+module_name = os.path.split(sys.argv[3])[1][:-4].replace('_', '-')
 
 annotations = {
-	'VOLT_DEVELOPMENT_MODULE_LOAD_CALLBACK': 'volt::modules::_internal::register_development_module_load_callback({id});',
-	'VOLT_DEVELOPMENT_MODULE_UNLOAD_CALLBACK': 'volt::modules::_internal::register_development_module_unload_callback({id});',
-	'VOLT_COMPONENT': 'volt::ecs::_internal::register_component<{id}>("{id}");',
-	'VOLT_SYSTEM': 'volt::ecs::_internal::register_system<{id}>("{id}");',
-	'VOLT_ASSET': 'volt::assets::_internal::register_type<{id}>("{id}");'
+	'VOLT_DEVELOPMENT_MODULE_LOAD_CALLBACK': 'volt::modules::_internal::register_development_module_load_callback("{module}", {id});',
+	'VOLT_DEVELOPMENT_MODULE_UNLOAD_CALLBACK': 'volt::modules::_internal::register_development_module_unload_callback("{module}", {id});',
+	'VOLT_UNLOAD_ALL_MODULES_CALLBACK': 'volt::modules::_internal::register_unload_all_modules_callback("{module}", {id});',
+	'VOLT_COMPONENT': 'volt::ecs::_internal::register_component<{id}>("{module}", "{id}");',
+	'VOLT_SYSTEM': 'volt::ecs::_internal::register_system<{id}>("{module}", "{id}");',
+	'VOLT_ASSET': 'volt::assets::_internal::register_type<{id}>("{module}", "{id}");'
 }
 
 headers_to_include = []
@@ -90,7 +92,7 @@ for i in range(4, len(sys.argv)):
 				identifier = token
 
 			identifier = '::'.join(namespace_stack.values()) + ('::' if len(namespace_stack) > 0 else '') + identifier
-			statements_to_insert.append(annotations[annotation].format(id=identifier))
+			statements_to_insert.append(annotations[annotation].format(module=module_name, id=identifier))
 	
 	diff = len(statements_to_insert) - statement_count
 	if diff != 0:
